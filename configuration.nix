@@ -15,9 +15,7 @@
     <home-manager/nixos>
   ];
 
-  users.users.nixos = {
-    shell = pkgs.fish;
-  };
+  users.users.nixos = { shell = pkgs.fish; };
 
   wsl.enable = true;
   wsl.defaultUser = "nixos";
@@ -29,7 +27,7 @@
   # home-manager stuff
   home-manager.users.nixos = { pkgs, ... }: {
     home.packages = with pkgs; [
-      helix
+      evince
       grc
       pastel
       fd
@@ -46,6 +44,8 @@
       tealdeer
       zip
       unzip
+      duf
+      upower
       # zellij
       # font-awesome
       # (nerdfonts.override { fonts = ["JetBrainsMono" "Iosevka"]; })
@@ -56,45 +56,86 @@
     ];
 
     programs = {
+      helix = {
+        enable = true;
+        settings = {
+          theme = "catppuccin_macchiato";
+          editor.cursor-shape = {
+            normal = "block";
+            insert = "bar";
+            select = "underline";
+          };
+        };
+        languages.language = [{
+          name = "nix";
+          auto-format = true;
+          formatter.command = "${pkgs.nixfmt}/bin/nixfmt";
+        }];
+      };
       fish = {
         enable = true;
         interactiveShellInit = ''
           set fish_greeting # Disable greeting
+
+          set -x COUNTDOWN_COLORS (pastel gradient '#8aadf4' '#c6a0f6' '#ed8796'  -s HSL -n 100 | pastel format hex)
+          countdown -s (date --date '2024-01-29' +%s) -e (date --date '2024-6-04 12:00' +%s) -t "Master Thesis Hand-in Deadline"
+
+          if not set -q ZELLIJ
+              zellij
+          end
         '';
         shellInit = ''
           set -gx EDITOR hx
 
           abbr -a rf 'exec fish'
           abbr -a rfc 'clear && exec fish'
+          abbr -a PS 'PowerShell.exe'
 
           alias space 'duf --hide-fs squashfs'
           alias power 'upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -E "state:|time to full:|percentage:|energy-rate:|energy:|energy-full:|charge-cycles:|time to empty:"'
           alias cpower 'upower -i /org/freedesktop/UPower/devices/battery_ps_controller_battery_58o10o31o1eo60od3 | grep -E "state:|time to full:|percentage:|energy-rate:|energy:|energy-full:|charge-cycles:|time to empty:"'
 
-          command --query starship; and starship init fish | source
-
-          set -x COUNTDOWN_COLORS (pastel gradient '#8aadf4' '#c6a0f6' '#ed8796'  -s HSL -n 100 | pastel format hex)
-          countdown -s (date --date '2024-01-29' +%s) -e (date --date '2024-6-04 12:00' +%s) -t "Master Thesis Hand-in Deadline"
+          # command --query starship; and starship init fish | source
 
           set -x CARGO_HOME ~/.cargo
           set -x COLORTERM truecolor
           set -x fish_term24bit 1
-          
-          if not set -q ZELLIJ
-              zellij
-          end
         '';
         plugins = [
           # Enable a plugin (here grc for colorized command output) from nixpkgs
-          { name = "grc"; src = pkgs.fishPlugins.grc.src; }
-          { name = "z"; src = pkgs.fishPlugins.z.src; }
-          { name = "sponge"; src = pkgs.fishPlugins.sponge.src; }
-          { name = "puffer"; src = pkgs.fishPlugins.puffer.src; }
+          {
+            name = "grc";
+            src = pkgs.fishPlugins.grc.src;
+          }
+          {
+            name = "z";
+            src = pkgs.fishPlugins.z.src;
+          }
+          {
+            name = "sponge";
+            src = pkgs.fishPlugins.sponge.src;
+          }
+          {
+            name = "puffer";
+            src = pkgs.fishPlugins.puffer.src;
+          }
           # { name = "hydro"; src = pkgs.fishPlugins.hydro.src; }
-          { name = "pure"; src = pkgs.fishPlugins.pure.src; }
-          { name = "fzf-fish"; src = pkgs.fishPlugins.fzf-fish.src; }
-          { name = "colored-man-pages"; src = pkgs.fishPlugins.colored-man-pages.src; }
-          { name = "colored-man-pages"; src = pkgs.fishPlugins.colored-man-pages.src; }
+          {
+            name = "pure";
+            src = pkgs.fishPlugins.pure.src;
+          }
+          {
+            name = "fzf-fish";
+            src = pkgs.fishPlugins.fzf-fish.src;
+          }
+          {
+            name = "colored-man-pages";
+            src = pkgs.fishPlugins.colored-man-pages.src;
+          }
+          {
+            name = "colored-man-pages";
+            src = pkgs.fishPlugins.colored-man-pages.src;
+          }
           # kpbaks
           {
             name = "git";
@@ -182,15 +223,18 @@
 
       zellij = {
         enable = true;
+        settings = {
+          ui.pane_frames.rounded_corners = true;
+          theme = "catppuccin-macchiato";
+          default_layout = "compact";
+        };
       };
 
       git = {
         enable = true;
         userName = "Jens";
         userEmail = "jens.jens@live.dk";
-        extraConfig = {
-          credential.helper = "store";
-        };
+        extraConfig = { credential.helper = "store"; };
       };
 
       direnv.enable = true;
@@ -200,12 +244,11 @@
 
     fonts.fontconfig.enable = true;
 
-    home.stateVersion = "23.11"; # KEEP THIS, read comment for system.stateVersion
+    home.stateVersion =
+      "23.11"; # KEEP THIS, read comment for system.stateVersion
   };
-  
-  environment.systemPackages = with pkgs ; [
-    helix
-  ];
+
+  environment.systemPackages = with pkgs; [ helix ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
