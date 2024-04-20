@@ -22,11 +22,28 @@
 
   programs.fish.enable = true;
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix = {
+    settings = {
+      experimental-features = [ "nix-command" "flakes" ];
+      substituters =
+        [ "https://cache.nixos.org" "https://nix-community.cachix.org" ];
+      trusted-public-keys = [
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      ];
+      trusted-substituters = [ "https://cache.nixos.org" ];
+    };
+  };
+
+  # nix = {
+  #   settings = {
+  #     experimental-features = [ "nix-command" "flakes" ];
+  #   };
+  # };
 
   # home-manager stuff
   home-manager.users.nixos = { pkgs, ... }: {
     home.packages = with pkgs; [
+      # devenv
       evince
       grc
       pastel
@@ -86,6 +103,7 @@
         '';
         shellInit = ''
           set -gx EDITOR hx
+          set --universal git_fish_git_status_command gstatus
 
           abbr -a rf 'exec fish'
           abbr -a rfc 'clear && exec fish'
@@ -94,8 +112,6 @@
           alias space 'duf --hide-fs squashfs'
           alias power 'upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -E "state:|time to full:|percentage:|energy-rate:|energy:|energy-full:|charge-cycles:|time to empty:"'
           alias cpower 'upower -i /org/freedesktop/UPower/devices/battery_ps_controller_battery_58o10o31o1eo60od3 | grep -E "state:|time to full:|percentage:|energy-rate:|energy:|energy-full:|charge-cycles:|time to empty:"'
-
-          # command --query starship; and starship init fish | source
 
           set -x CARGO_HOME ~/.cargo
           set -x COLORTERM truecolor
