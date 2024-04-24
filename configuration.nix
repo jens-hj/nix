@@ -154,6 +154,15 @@
           }
           # kpbaks
           {
+            name = "typst";
+            src = pkgs.fetchFromGitHub {
+              owner = "kpbaks";
+              repo = "typst.fish";
+              rev = "25b8ddfe27654d641382f5251807879459bd2d42";
+              sha256 = "sha256-vE13aH/Bp3R+43RbiXaoVfrKdrmtFCpQ7IN2i1M6B9M=";
+            };
+          }
+          {
             name = "git";
             src = pkgs.fetchFromGitHub {
               owner = "kpbaks";
