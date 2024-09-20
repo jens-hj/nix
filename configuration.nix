@@ -98,6 +98,21 @@
           if not set -q ZELLIJ
               zellij
           end
+
+          function super-tab
+              commandline --paging-mode && down-or-search && return
+
+              set -l buf (commandline)
+              if string match -q -r '^\s*$' -- $buf
+                  repos cd
+              else
+                  commandline -f complete
+                  commandline -f pager-toggle-search
+              end
+              commandline -f repaint
+          end
+
+          bind \t super-tab
         '';
         shellInit = ''
           set -gx EDITOR hx
