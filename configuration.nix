@@ -127,6 +127,9 @@
           alias power 'upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -E "state:|time to full:|percentage:|energy-rate:|energy:|energy-full:|charge-cycles:|time to empty:"'
           alias cpower 'upower -i /org/freedesktop/UPower/devices/battery_ps_controller_battery_58o10o31o1eo60od3 | grep -E "state:|time to full:|percentage:|energy-rate:|energy:|energy-full:|charge-cycles:|time to empty:"'
 
+          alias ls 'eza --icons --group-directories-first --classify --grid'
+          alias ll 'eza --icons --group-directories-first --classify --long --header --git'
+
           set -x CARGO_HOME ~/.cargo
           set -x COLORTERM truecolor
           set -x fish_term24bit 1
