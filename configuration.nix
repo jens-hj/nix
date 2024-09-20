@@ -34,11 +34,9 @@
     };
   };
 
-  # nix = {
-  #   settings = {
-  #     experimental-features = [ "nix-command" "flakes" ];
-  #   };
-  # };
+  # Create symlink from /mnt/c/Users/<myuser>/repos to ~/repos
+  systemd.tmpfiles.rules =
+    [ "L /home/nixos/repos - - - - /mnt/c/Users/jensj/source/repos" ];
 
   # home-manager stuff
   home-manager.users.nixos = { pkgs, ... }: {
@@ -86,7 +84,7 @@
         languages.language = [{
           name = "nix";
           auto-format = true;
-          formatter.command = "${pkgs.nixfmt}/bin/nixfmt";
+          formatter.command = "${pkgs.nixfmt-classic}/bin/nixfmt";
         }];
       };
       fish = {
@@ -107,6 +105,7 @@
 
           abbr -a rf 'exec fish'
           abbr -a rfc 'clear && exec fish'
+          abbr --position anywhere --set-cursor -a wind '/mnt/c/Users/jensj/%'
           abbr -a PS 'PowerShell.exe'
 
           alias space 'duf --hide-fs squashfs'
