@@ -92,8 +92,8 @@
         interactiveShellInit = ''
           set fish_greeting # Disable greeting
 
-          set -x COUNTDOWN_COLORS (pastel gradient '#8aadf4' '#c6a0f6' '#ed8796'  -s HSL -n 100 | pastel format hex)
-          countdown -s (date --date '2024-01-29' +%s) -e (date --date '2024-6-04 12:00' +%s) -t "Master Thesis Hand-in Deadline"
+          # set -x COUNTDOWN_COLORS (pastel gradient '#8aadf4' '#c6a0f6' '#ed8796'  -s HSL -n 100 | pastel format hex)
+          # countdown -s (date --date '2024-01-29' +%s) -e (date --date '2024-6-04 12:00' +%s) -t "Master Thesis Hand-in Deadline"
 
           if not set -q ZELLIJ
               zellij
@@ -154,92 +154,62 @@
           # kpbaks
           {
             name = "typst";
-            src = pkgs.fetchFromGitHub {
-              owner = "kpbaks";
-              repo = "typst.fish";
-              rev = "25b8ddfe27654d641382f5251807879459bd2d42";
-              sha256 = "sha256-vE13aH/Bp3R+43RbiXaoVfrKdrmtFCpQ7IN2i1M6B9M=";
+            src = builtins.fetchGit {
+              url = "https://github.com/kpbaks/typst.fish.git";
             };
           }
           {
             name = "git";
-            src = pkgs.fetchFromGitHub {
-              owner = "kpbaks";
-              repo = "git.fish";
-              rev = "b09c4d467dd22d8cbebb6de68746e295ca3f64a2";
-              sha256 = "sha256-iXPGUf6y2/ABGLoGE1ZaxF0oml06TQ68uiiLrIZY+Yk=";
+            src = builtins.fetchGit {
+              url = "https://github.com/kpbaks/git.fish.git";
             };
           }
           {
             name = "countdown";
-            src = pkgs.fetchFromGitHub {
-              owner = "kpbaks";
-              repo = "countdown.fish";
-              rev = "af93bb541d6b9134aef41e65a311ec41da1a5e5a";
-              sha256 = "sha256-EW88pygEshmwoJUo2/TXNsGw4Ynf0xUDjluONq1mmoM=";
+            src = builtins.fetchGit {
+              url = "https://github.com/kpbaks/countdown.fish.git";
             };
           }
           {
             name = "autols";
-            src = pkgs.fetchFromGitHub {
-              owner = "kpbaks";
-              repo = "autols.fish";
-              rev = "fe2693e80558550e0d995856332b280eb86fde19";
-              sha256 = "sha256-EPgvY8gozMzai0qeDH2dvB4tVvzVqfEtPewgXH6SPGs=";
+            src = builtins.fetchGit {
+              url = "https://github.com/kpbaks/autols.fish.git";
             };
           }
           {
             name = "ctrl-z";
-            src = pkgs.fetchFromGitHub {
-              owner = "kpbaks";
-              repo = "ctrl-z.fish";
-              rev = "bf597fc4d0187ff9011e3abe4f7932339244c438";
-              sha256 = "sha256-vn5tJehcUQIOxgQxX+RFe1XYz6zci3L9xNqA0UBfMYE=";
+            src = builtins.fetchGit {
+              url = "https://github.com/kpbaks/ctrl-z.fish.git";
             };
           }
           {
             name = "rust";
-            src = pkgs.fetchFromGitHub {
-              owner = "kpbaks";
-              repo = "rust.fish";
-              rev = "f1caf3b68c2d2aa49132bf1206526612bab538a3";
-              sha256 = "sha256-7T3hJuFWP5AJLD2+mdUrYcx7BV5g8YVV60h/9QM5pr4=";
+            src = builtins.fetchGit {
+              url = "https://github.com/kpbaks/rust.fish.git";
             };
           }
           {
             name = "border";
-            src = pkgs.fetchFromGitHub {
-              owner = "kpbaks";
-              repo = "border.fish";
-              rev = "a16e8e611420b24a2c06d71ffe80c0f8f03514ef";
-              sha256 = "sha256-X4Viw9JcLDDTFepaTE2jq09hQCJlo0Nlqa5ga/ygwdA=";
+            src = builtins.fetchGit {
+              url = "https://github.com/kpbaks/border.fish.git";
             };
           }
           {
             name = "what-changed";
-            src = pkgs.fetchFromGitHub {
-              owner = "kpbaks";
-              repo = "what-changed.fish";
-              rev = "5c61537d5718a4b7a4c9ef903f7f458205b6fe9c";
-              sha256 = "sha256-zriK/H/EymSp5dhcn4nX1sZ9qce+v1Q6e8O/B7n21CM=";
+            src = builtins.fetchGit {
+              url = "https://github.com/kpbaks/what-changed.fish.git";
             };
           }
           {
             name = "peopletime";
-            src = pkgs.fetchFromGitHub {
-              owner = "kpbaks";
-              repo = "peopletime.fish";
-              rev = "d1239e3945163051e34683b48b93b63edc71bd88";
-              sha256 = "sha256-J1L4v4/PV3kppfs/prCV1dVN2UW8l2I5Vw+RsijoyEk=";
+            src = builtins.fetchGit {
+              url = "https://github.com/kpbaks/peopletime.fish.git";
             };
           }
           {
             name = "zellij";
-            src = pkgs.fetchFromGitHub {
-              owner = "kpbaks";
-              repo = "zellij.fish";
-              rev = "0b2393b48b55a7f3b200b5a12ac0cf26444b7172";
-              sha256 = "sha256-Nxo6usCI5tqLJ/CZ1YXtCFJ+piy1DGlzFIi9/HSgDIk=";
+            src = builtins.fetchGit {
+              url = "https://github.com/kpbaks/zellij.fish.git";
             };
           }
         ];
@@ -249,7 +219,7 @@
         enable = true;
         settings = {
           ui.pane_frames.rounded_corners = true;
-          theme = "catppuccin-macchiato";
+          theme = "catppuccin-frappe";
           default_layout = "compact";
         };
       };
