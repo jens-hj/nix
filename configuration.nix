@@ -227,11 +227,6 @@
 
       zellij = {
         enable = true;
-        settings = {
-          ui.pane_frames.rounded_corners = true;
-          theme = "catppuccin-frappe";
-          default_layout = "custom-layout";
-        };
         enableFishIntegration = true;
       };
 
@@ -290,6 +285,98 @@
           "https://github.com/dj95/zjstatus/releases/latest/download/zjstatus.wasm";
         sha256 = "sha256-IgTfSl24Eap+0zhfiwTvmdVy/dryPxfEF7LhVNVXe+U=";
       };
+      ".config/zellij/plugins/room.wasm".source = pkgs.fetchurl {
+        url =
+          "https://github.com/rvcas/room/releases/latest/download/room.wasm";
+        sha256 = "sha256-wCGnvFaoaoyH6QFkIqaDj0j0lGe1DOAX4ZmUQOyT/eY=";
+      };
+      ".config/zellij/plugins/zellij_forgot.wasm".source = pkgs.fetchurl {
+        url =
+          "https://github.com/karimould/zellij-forgot/releases/latest/download/zellij_forgot.wasm";
+        sha256 = "sha256-WdPKHrCtmg0dv446f8KkHNnAk/GKXtufJfCZyLXf7cM=";
+      };
+      ".config/zellij/config.kdl".text = ''
+          pane_frames false
+          session_serialization false
+          copy_on_select true
+
+          default_layout "custom-layout"
+
+          ui {
+              pane_frames {
+                  rounded_corners true
+              }
+          }
+
+          theme "catppuccin-macchiato"
+          
+          keybinds {
+            normal {
+                bind "Alt q" { GoToTab 1; }
+                bind "Alt w" { GoToTab 2; }
+                bind "Alt e" { GoToTab 3; }
+                bind "Alt r" { GoToTab 4; }
+                bind "Alt t" { GoToTab 5; }
+                bind "Alt t" { NewTab; }
+            }
+            shared_except "locked" {
+                bind "Ctrl y" {
+                    LaunchOrFocusPlugin "file:~/.config/zellij/plugins/room.wasm" {
+                        floating true
+                        ignore_case true
+                    }
+                }
+            }
+            shared_except "locked" {
+                bind "Ctrl e" {
+                    LaunchOrFocusPlugin "file:~/.config/zellij/plugins/zellij_forgot.wasm" {
+                        "lock"                  "ctrl + g"
+                        "unlock"                "ctrl + g"
+                        "new pane"              "ctrl + p + n"
+                        "change focus of pane"  "ctrl + p + arrow key"
+                        "close pane"            "ctrl + p + x"
+                        "rename pane"           "ctrl + p + c"
+                        "toggle fullscreen"     "ctrl + p + f"
+                        "toggle floating pane"  "ctrl + p + w"
+                        "toggle embed pane"     "ctrl + p + e"
+                        "choose right pane"     "ctrl + p + l"
+                        "choose left pane"      "ctrl + p + r"
+                        "choose upper pane"     "ctrl + p + k"
+                        "choose lower pane"     "ctrl + p + j"
+                        "new tab"               "ctrl + t + n"
+                        "close tab"             "ctrl + t + x"
+                        "change focus of tab"   "ctrl + t + arrow key"
+                        "rename tab"            "ctrl + t + r"
+                        "sync tab"              "ctrl + t + s"
+                        "brake pane to new tab" "ctrl + t + b"
+                        "brake pane left"       "ctrl + t + ["
+                        "brake pane right"      "ctrl + t + ]"
+                        "toggle tab"            "ctrl + t + tab"
+                        "increase pane size"    "ctrl + n + +"
+                        "decrease pane size"    "ctrl + n + -"
+                        "increase pane top"     "ctrl + n + k"
+                        "increase pane right"   "ctrl + n + l"
+                        "increase pane bottom"  "ctrl + n + j"
+                        "increase pane left"    "ctrl + n + h"
+                        "decrease pane top"     "ctrl + n + K"
+                        "decrease pane right"   "ctrl + n + L"
+                        "decrease pane bottom"  "ctrl + n + J"
+                        "decrease pane left"    "ctrl + n + H"
+                        "move pane to top"      "ctrl + h + k"
+                        "move pane to right"    "ctrl + h + l"
+                        "move pane to bottom"   "ctrl + h + j"
+                        "move pane to left"     "ctrl + h + h"
+                        "search"                "ctrl + s + s"
+                        "go into edit mode"     "ctrl + s + e"
+                        "detach session"        "ctrl + o + w"
+                        "open session manager"  "ctrl + o + w"
+                        "quit zellij"           "ctrl + q"
+                        floating true
+                    }
+                }
+            }
+        }
+      '';
     };
 
     fonts.fontconfig.enable = true;
