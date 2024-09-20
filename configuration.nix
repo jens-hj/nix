@@ -230,7 +230,7 @@
         settings = {
           ui.pane_frames.rounded_corners = true;
           theme = "catppuccin-frappe";
-          default_layout = "compact";
+          default_layout = "custom-layout";
         };
         enableFishIntegration = true;
       };
@@ -245,6 +245,51 @@
       direnv.enable = true;
       fzf.enable = true;
       ssh.enable = true;
+    };
+
+    # Define the custom layout and plugin file
+    home.file = {
+      ".config/zellij/layouts/custom-layout.kdl".text = ''
+        layout {
+          default_tab_template {
+            children
+            pane size=1 borderless=true {
+              plugin location="file:~/.config/zellij/plugins/zjstatus.wasm" {
+                format_left  "{mode} #[fg=cyan,bold]{session} {tabs}"
+                format_right "{command_git_branch} {datetime}"
+                format_space ""
+
+                border_enabled  "false"
+                border_char     "─"
+                border_format   "#[fg=white]{char}"
+                border_position "top"
+
+                hide_frame_for_single_pane "true"
+
+                mode_normal  "#[bg=cyan] "
+                mode_tmux    "#[bg=red] "
+
+                tab_normal   "#[fg=white] {name} "
+                tab_active   "#[fg=yellow,bold,italic] {name} "
+
+                command_git_branch_command   "git rev-parse --abbrev-ref HEAD"
+                command_git_branch_format    "#[fg=magenta] {stdout} "
+                command_git_branch_interval  "10"
+
+                datetime          "#[fg=white,bold] {format} "
+                datetime_format   "%A, %d %b %Y %H:%M"
+                datetime_timezone "Europe/Berlin"
+              }
+            }
+          }
+          tab name="default" focus=true
+        }
+      '';
+      ".config/zellij/plugins/zjstatus.wasm".source = pkgs.fetchurl {
+        url =
+          "https://github.com/dj95/zjstatus/releases/latest/download/zjstatus.wasm";
+        sha256 = "sha256-IgTfSl24Eap+0zhfiwTvmdVy/dryPxfEF7LhVNVXe+U=";
+      };
     };
 
     fonts.fontconfig.enable = true;
