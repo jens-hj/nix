@@ -74,7 +74,7 @@
       helix = {
         enable = true;
         settings = {
-          theme = "catppuccin_macchiato";
+          theme = "catppuccin_frappe";
           editor.cursor-shape = {
             normal = "block";
             insert = "bar";
@@ -86,18 +86,12 @@
           auto-format = true;
           formatter.command = "${pkgs.nixfmt-classic}/bin/nixfmt";
         }];
+        defaultEditor = true;
       };
       fish = {
         enable = true;
         interactiveShellInit = ''
           set fish_greeting # Disable greeting
-
-          # set -x COUNTDOWN_COLORS (pastel gradient '#8aadf4' '#c6a0f6' '#ed8796'  -s HSL -n 100 | pastel format hex)
-          # countdown -s (date --date '2024-01-29' +%s) -e (date --date '2024-6-04 12:00' +%s) -t "Master Thesis Hand-in Deadline"
-
-          if not set -q ZELLIJ
-              zellij
-          end
 
           function super-tab
               commandline --paging-mode && down-or-search && return
@@ -115,7 +109,6 @@
           bind \t super-tab
         '';
         shellInit = ''
-          set -gx EDITOR hx
           set --universal git_fish_git_status_command gstatus
 
           abbr -a rf 'exec fish'
@@ -152,7 +145,6 @@
             name = "puffer";
             src = pkgs.fishPlugins.puffer.src;
           }
-          # { name = "hydro"; src = pkgs.fishPlugins.hydro.src; }
           {
             name = "pure";
             src = pkgs.fishPlugins.pure.src;
@@ -240,6 +232,7 @@
           theme = "catppuccin-frappe";
           default_layout = "compact";
         };
+        enableFishIntegration = true;
       };
 
       git = {
