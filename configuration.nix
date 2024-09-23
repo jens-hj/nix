@@ -50,6 +50,14 @@ in
     repo = "nix-node";
   };
 
+  # security.pki.certificateFiles = [
+  #   ./sse_issuing_256.cer
+  #   ./sse_root_256.cer
+  # ];
+
+  # environment.etc."ssl/certs/SSERoot.pem".source = "./sse_root_256.cer";
+  # environment.etc."ssl/certs/SSEIssuer.pem".source = "./sse_issuing_256.cer";
+
   # home-manager stuff
   home-manager.users.nixos = { pkgs, ... }: {
     home.packages = with pkgs; [
@@ -122,7 +130,7 @@ in
 
           abbr -a rf 'exec fish'
           abbr -a rfc 'clear && exec fish'
-          abbr --position anywhere --set-cursor -a wind '/mnt/c/Users/jensj/%'
+          abbr --position anywhere --set-cursor -a wind '/mnt/c/Users/jjs/%'
           abbr -a PS 'PowerShell.exe'
 
           alias space 'duf --hide-fs squashfs'
