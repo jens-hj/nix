@@ -5,6 +5,9 @@
 # NixOS-WSL specific options are documented on the NixOS-WSL repository:
 # https://github.com/nix-community/NixOS-WSL
 
+# sudo nix-channel --add https://nixos.org/channels/nixos-unstable nixos
+# DONT sudo nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
+
 { config, lib, pkgs, ... }:
 let
   home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/master.tar.gz";
