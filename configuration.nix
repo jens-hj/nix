@@ -44,6 +44,12 @@ in
   systemd.tmpfiles.rules =
     [ "L /home/nixos/clones - - - - /mnt/c/Users/jjs/clones" ];
 
+  nix.registry."node".to = {
+    type = "github";
+    owner = "andyrichardson";
+    repo = "nix-node";
+  };
+
   # home-manager stuff
   home-manager.users.nixos = { pkgs, ... }: {
     home.packages = with pkgs; [
@@ -70,6 +76,7 @@ in
       curl
       nix-prefetch-github
       alejandra
+      zulu11
     ];
 
     programs = {
@@ -216,6 +223,12 @@ in
         enable = true;
         userName = "Jens Høigaard Jensen";
         userEmail = "jjs@systematic.com";
+        extraConfig = {
+          core.longpaths = true;
+          core.autocrlf = false;
+          merge.renamelimit = 50000;
+          http.sslbackend = "schannel";
+        };
       };
 
       direnv.enable = true;
