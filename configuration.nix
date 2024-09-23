@@ -56,7 +56,7 @@ in
 
   # Create symlink from /mnt/c/Users/<myuser>/repos to ~/repos
   systemd.tmpfiles.rules =
-    [ "L /home/nixos/clones - - - - /mnt/c/Users/jjs/clones" ];
+    [ "L /home/nixos/clones - - - - /mnt/c/Users/jensj/source/repos" ];
 
   # home-manager stuff
   home-manager.users.nixos = { pkgs, ... }: {
@@ -262,8 +262,8 @@ in
 
       git = {
         enable = true;
-        userName = "Jens Høigaard Jensen";
-        userEmail = "jjs@systematic.com";
+        userName = "Jens";
+        userEmail = "jens.jens@live.dk";
       };
 
       direnv.enable = true;
