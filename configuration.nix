@@ -7,16 +7,13 @@
 
 { config, lib, pkgs, ... }:
 let
-  # unstableTarball = builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz";
   home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/master.tar.gz";
 in
 {
   imports = [
-    # (import "${unstableTarball}/nixos")
     # include NixOS-WSL modules
     <nixos-wsl/modules>
     # include home-manager modules
-    # <home-manager/nixos>
     (import "${home-manager}/nixos")
   ];
 
@@ -38,20 +35,6 @@ in
       ];
       trusted-substituters = [ "https://cache.nixos.org" ];
     };
-    # extraOptions = ''
-    #   keep-outputs = true
-    #   keep-derivations = true
-    # '';
-    # buildMachines = [{
-    #   systems = [ "x86_64-linux" "aarch64-linux" ];
-    #   supportedFeatures = [ "kvm" "big-parallel" "nixos-test" ];
-    #   mandatoryFeatures = [ ];
-    # }];
-    # sandboxPaths = [
-    #   "/bin/sh=${pkgs.bash}/bin/sh"
-    #   "/usr/bin/env=${pkgs.coreutils}/bin/env"
-    #   "/bin/basename=${pkgs.coreutils}/bin/basename"
-    # ];
   };
 
   # Create symlink from /mnt/c/Users/<myuser>/repos to ~/repos
@@ -61,12 +44,11 @@ in
   # home-manager stuff
   home-manager.users.nixos = { pkgs, ... }: {
     home.packages = with pkgs; [
-      # devenv
       evince
       grc
       pastel
       fd
-      # dust
+      dust
       pre-commit
       comma
       rustup
@@ -81,9 +63,6 @@ in
       unzip
       duf
       upower
-      # zellij
-      # font-awesome
-      # (nerdfonts.override { fonts = ["JetBrainsMono" "Iosevka"]; })
       wget
       curl
       nix-prefetch-github
@@ -185,72 +164,42 @@ in
           {
             name = "typst";
             src = builtins.fetchTarball "https://github.com/kpbaks/typst.fish/archive/master.tar.gz";
-            # {
-            #   url = "https://github.com/kpbaks/typst.fish.git";
-            # };
           }
           {
             name = "git";
             src = builtins.fetchTarball "https://github.com/kpbaks/git.fish/archive/master.tar.gz";
-            # {
-            #   url = "https://github.com/kpbaks/git.fish.git";
-            # };
           }
           {
             name = "countdown";
             src = builtins.fetchTarball "https://github.com/kpbaks/countdown.fish/archive/master.tar.gz";
-            # {
-            #   url = "https://github.com/kpbaks/countdown.fish.git";
-            # };
           }
           {
             name = "autols";
             src = builtins.fetchTarball "https://github.com/kpbaks/autols.fish/archive/master.tar.gz";
-            # {
-            #   url = "https://github.com/kpbaks/autols.fish.git";
-            # };
           }
           {
             name = "ctrl-z";
             src = builtins.fetchTarball "https://github.com/kpbaks/ctrl-z.fish/archive/master.tar.gz";
-            # {
-            #   url = "https://github.com/kpbaks/ctrl-z.fish.git";
-            # };
           }
           {
             name = "rust";
             src = builtins.fetchTarball "https://github.com/kpbaks/rust.fish/archive/master.tar.gz";
-            # {
-            #   url = "https://github.com/kpbaks/rust.fish.git";
-            # };
           }
           {
             name = "border";
             src = builtins.fetchTarball "https://github.com/kpbaks/border.fish/archive/master.tar.gz";
-            # {
-            #   url = "https://github.com/kpbaks/border.fish.git";
-            # };
           }
           {
             name = "what-changed";
             src = builtins.fetchTarball "https://github.com/kpbaks/what-changed.fish/archive/master.tar.gz";
-            # {
-            #   url = "https://github.com/kpbaks/what-changed.fish.git";
-            # };
           }
           {
             name = "peopletime";
             src = builtins.fetchTarball "https://github.com/kpbaks/peopletime.fish/archive/master.tar.gz";
-            # {
-            #   url = "https://github.com/kpbaks/peopletime.fish.git";
-            # };
           }
           {
             name = "zellij";
             src = builtins.fetchTarball "https://github.com/kpbaks/zellij.fish/archive/master.tar.gz";
-            # {
-            #   url = "https://github.com/kpbaks/zellij.fish.git";
-            # };
           }
         ];
       };
