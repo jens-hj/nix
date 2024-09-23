@@ -6,13 +6,18 @@
 # https://github.com/nix-community/NixOS-WSL
 
 { config, lib, pkgs, ... }:
-
+let
+  # unstableTarball = builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz";
+  home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/master.tar.gz";
+in
 {
   imports = [
+    # (import "${unstableTarball}/nixos")
     # include NixOS-WSL modules
     <nixos-wsl/modules>
     # include home-manager modules
-    <home-manager/nixos>
+    # <home-manager/nixos>
+    (import "${home-manager}/nixos")
   ];
 
   users.users.nixos = { shell = pkgs.fish; };
@@ -23,6 +28,7 @@
   programs.fish.enable = true;
 
   nix = {
+    # package = pkgs.nixFlakes;
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
       substituters =
@@ -32,11 +38,25 @@
       ];
       trusted-substituters = [ "https://cache.nixos.org" ];
     };
+    # extraOptions = ''
+    #   keep-outputs = true
+    #   keep-derivations = true
+    # '';
+    # buildMachines = [{
+    #   systems = [ "x86_64-linux" "aarch64-linux" ];
+    #   supportedFeatures = [ "kvm" "big-parallel" "nixos-test" ];
+    #   mandatoryFeatures = [ ];
+    # }];
+    # sandboxPaths = [
+    #   "/bin/sh=${pkgs.bash}/bin/sh"
+    #   "/usr/bin/env=${pkgs.coreutils}/bin/env"
+    #   "/bin/basename=${pkgs.coreutils}/bin/basename"
+    # ];
   };
 
   # Create symlink from /mnt/c/Users/<myuser>/repos to ~/repos
   systemd.tmpfiles.rules =
-    [ "L /home/nixos/repos - - - - /mnt/c/Users/jensj/source/repos" ];
+    [ "L /home/nixos/clones - - - - /mnt/c/Users/jjs/clones" ];
 
   # home-manager stuff
   home-manager.users.nixos = { pkgs, ... }: {
@@ -164,63 +184,73 @@
           # kpbaks
           {
             name = "typst";
-            src = builtins.fetchGit {
-              url = "https://github.com/kpbaks/typst.fish.git";
-            };
+            src = builtins.fetchTarball "https://github.com/kpbaks/typst.fish/archive/master.tar.gz";
+            # {
+            #   url = "https://github.com/kpbaks/typst.fish.git";
+            # };
           }
           {
             name = "git";
-            src = builtins.fetchGit {
-              url = "https://github.com/kpbaks/git.fish.git";
-            };
+            src = builtins.fetchTarball "https://github.com/kpbaks/git.fish/archive/master.tar.gz";
+            # {
+            #   url = "https://github.com/kpbaks/git.fish.git";
+            # };
           }
           {
             name = "countdown";
-            src = builtins.fetchGit {
-              url = "https://github.com/kpbaks/countdown.fish.git";
-            };
+            src = builtins.fetchTarball "https://github.com/kpbaks/countdown.fish/archive/master.tar.gz";
+            # {
+            #   url = "https://github.com/kpbaks/countdown.fish.git";
+            # };
           }
           {
             name = "autols";
-            src = builtins.fetchGit {
-              url = "https://github.com/kpbaks/autols.fish.git";
-            };
+            src = builtins.fetchTarball "https://github.com/kpbaks/autols.fish/archive/master.tar.gz";
+            # {
+            #   url = "https://github.com/kpbaks/autols.fish.git";
+            # };
           }
           {
             name = "ctrl-z";
-            src = builtins.fetchGit {
-              url = "https://github.com/kpbaks/ctrl-z.fish.git";
-            };
+            src = builtins.fetchTarball "https://github.com/kpbaks/ctrl-z.fish/archive/master.tar.gz";
+            # {
+            #   url = "https://github.com/kpbaks/ctrl-z.fish.git";
+            # };
           }
           {
             name = "rust";
-            src = builtins.fetchGit {
-              url = "https://github.com/kpbaks/rust.fish.git";
-            };
+            src = builtins.fetchTarball "https://github.com/kpbaks/rust.fish/archive/master.tar.gz";
+            # {
+            #   url = "https://github.com/kpbaks/rust.fish.git";
+            # };
           }
           {
             name = "border";
-            src = builtins.fetchGit {
-              url = "https://github.com/kpbaks/border.fish.git";
-            };
+            src = builtins.fetchTarball "https://github.com/kpbaks/border.fish/archive/master.tar.gz";
+            # {
+            #   url = "https://github.com/kpbaks/border.fish.git";
+            # };
           }
           {
             name = "what-changed";
-            src = builtins.fetchGit {
-              url = "https://github.com/kpbaks/what-changed.fish.git";
-            };
+            src = builtins.fetchTarball "https://github.com/kpbaks/what-changed.fish/archive/master.tar.gz";
+            # {
+            #   url = "https://github.com/kpbaks/what-changed.fish.git";
+            # };
           }
           {
             name = "peopletime";
-            src = builtins.fetchGit {
-              url = "https://github.com/kpbaks/peopletime.fish.git";
-            };
+            src = builtins.fetchTarball "https://github.com/kpbaks/peopletime.fish/archive/master.tar.gz";
+            # {
+            #   url = "https://github.com/kpbaks/peopletime.fish.git";
+            # };
           }
           {
             name = "zellij";
-            src = builtins.fetchGit {
-              url = "https://github.com/kpbaks/zellij.fish.git";
-            };
+            src = builtins.fetchTarball "https://github.com/kpbaks/zellij.fish/archive/master.tar.gz";
+            # {
+            #   url = "https://github.com/kpbaks/zellij.fish.git";
+            # };
           }
         ];
       };
@@ -232,15 +262,14 @@
 
       git = {
         enable = true;
-        userName = "Jens";
-        userEmail = "jens.jens@live.dk";
-        extraConfig = { credential.helper = "store"; };
+        userName = "Jens Høigaard Jensen";
+        userEmail = "jjs@systematic.com";
       };
 
       direnv.enable = true;
-      fzf.enable = true;
-      ssh.enable = true;
-    };
+        fzf.enable = true;
+        ssh.enable = true;
+      };
 
     # Define the custom layout and plugin file
     home.file = {
@@ -385,7 +414,7 @@
       "23.11"; # KEEP THIS, read comment for system.stateVersion
   };
 
-  environment.systemPackages = with pkgs; [ helix ];
+  environment.systemPackages = with pkgs; [ helix git ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
