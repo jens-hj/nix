@@ -229,9 +229,9 @@ in
       };
 
       direnv.enable = true;
-        fzf.enable = true;
-        ssh.enable = true;
-      };
+      fzf.enable = true;
+      ssh.enable = true;
+    };
 
     # Define the custom layout and plugin file
     home.file = {
