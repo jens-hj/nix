@@ -25,7 +25,10 @@ in
   wsl.enable = true;
   wsl.defaultUser = "nixos";
 
-  programs.fish.enable = true;
+  programs = {
+    fish.enable = true;
+    nix-ld.enable = true;
+  };
 
   nix = {
     # package = pkgs.nixFlakes;
