@@ -8,7 +8,8 @@
 { config, lib, pkgs, ... }:
 let
   # unstableTarball = builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz";
-  home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/master.tar.gz";
+  home-manager = builtins.fetchTarball
+    "https://github.com/nix-community/home-manager/archive/master.tar.gz";
 in
 {
   imports = [
@@ -29,15 +30,19 @@ in
     fish.enable = true;
     nix-ld = {
       enable = true;
-      libraries = with pkgs; [
-        # Add any missing dynamic libraries for unpackaged programs
-        # here, NOT in environment.systemPackages
-      ];
+      libraries = with pkgs;
+        [
+          # Add any missing dynamic libraries for unpackaged programs
+          # here, NOT in environment.systemPackages
+        ];
     };
   };
 
   nix = {
     # package = pkgs.nixFlakes;
+    extraOptions = ''
+      trusted-users = root nixos
+    '';
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
       substituters =
@@ -53,10 +58,26 @@ in
   systemd.tmpfiles.rules =
     [ "L /home/nixos/clones - - - - /mnt/c/Users/jensj/source/repos" ];
 
+  # Enable Podman
+  virtualisation = {
+    podman = {
+      enable = true;
+      # Optional: enable Docker compatibility mode
+      dockerCompat = true;
+      # Optional: create a `docker` alias for podman
+      dockerSocket.enable = true;
+      # Optional: enable Podman's new REST API socket
+      enableNvidia = false; # set to true if you need NVIDIA GPU support
+    };
+  };
+
+  # Optional: Add your user to the podman group
+  users.users.nixos.extraGroups = [ "podman" ];
+
   # home-manager stuff
   home-manager.users.nixos = { pkgs, ... }: {
     home.packages = with pkgs; [
-      # devenv
+      devenv
       evince
       grc
       pastel
@@ -78,8 +99,10 @@ in
       upower
       wget
       curl
-      nix-prefetch-github
       alejandra
+      podman-compose
+      nix-prefetch-github
+      nixpkgs-fmt
     ];
 
     programs = {
@@ -119,9 +142,12 @@ in
           end
 
           bind \t super-tab
+
+          direnv hook fish | source
         '';
         shellInit = ''
           set --universal git_fish_git_status_command gstatus
+          set -x PODMAN_IGNORE_CGROUPSV1_WARNING 1
 
           abbr -a rf 'exec fish'
           abbr -a rfc 'clear && exec fish'
@@ -176,43 +202,53 @@ in
           # kpbaks
           {
             name = "typst";
-            src = builtins.fetchTarball "https://github.com/kpbaks/typst.fish/archive/master.tar.gz";
+            src = builtins.fetchTarball
+              "https://github.com/kpbaks/typst.fish/archive/master.tar.gz";
           }
           {
             name = "git";
-            src = builtins.fetchTarball "https://github.com/kpbaks/git.fish/archive/master.tar.gz";
+            src = builtins.fetchTarball
+              "https://github.com/kpbaks/git.fish/archive/master.tar.gz";
           }
           {
             name = "countdown";
-            src = builtins.fetchTarball "https://github.com/kpbaks/countdown.fish/archive/master.tar.gz";
+            src = builtins.fetchTarball
+              "https://github.com/kpbaks/countdown.fish/archive/master.tar.gz";
           }
           {
             name = "autols";
-            src = builtins.fetchTarball "https://github.com/kpbaks/autols.fish/archive/master.tar.gz";
+            src = builtins.fetchTarball
+              "https://github.com/kpbaks/autols.fish/archive/master.tar.gz";
           }
           {
             name = "ctrl-z";
-            src = builtins.fetchTarball "https://github.com/kpbaks/ctrl-z.fish/archive/master.tar.gz";
+            src = builtins.fetchTarball
+              "https://github.com/kpbaks/ctrl-z.fish/archive/master.tar.gz";
           }
           {
             name = "rust";
-            src = builtins.fetchTarball "https://github.com/kpbaks/rust.fish/archive/master.tar.gz";
+            src = builtins.fetchTarball
+              "https://github.com/kpbaks/rust.fish/archive/master.tar.gz";
           }
           {
             name = "border";
-            src = builtins.fetchTarball "https://github.com/kpbaks/border.fish/archive/master.tar.gz";
+            src = builtins.fetchTarball
+              "https://github.com/kpbaks/border.fish/archive/master.tar.gz";
           }
           {
             name = "what-changed";
-            src = builtins.fetchTarball "https://github.com/kpbaks/what-changed.fish/archive/master.tar.gz";
+            src = builtins.fetchTarball
+              "https://github.com/kpbaks/what-changed.fish/archive/master.tar.gz";
           }
           {
             name = "peopletime";
-            src = builtins.fetchTarball "https://github.com/kpbaks/peopletime.fish/archive/master.tar.gz";
+            src = builtins.fetchTarball
+              "https://github.com/kpbaks/peopletime.fish/archive/master.tar.gz";
           }
           {
             name = "zellij";
-            src = builtins.fetchTarball "https://github.com/kpbaks/zellij.fish/archive/master.tar.gz";
+            src = builtins.fetchTarball
+              "https://github.com/kpbaks/zellij.fish/archive/master.tar.gz";
           }
         ];
       };
@@ -224,8 +260,9 @@ in
 
       git = {
         enable = true;
-        userName = "Jens";
+        userName = "jens-hj";
         userEmail = "jens.jens@live.dk";
+        extraConfig = { init.defaultBranch = "main"; };
       };
 
       direnv.enable = true;
@@ -376,7 +413,7 @@ in
       "23.11"; # KEEP THIS, read comment for system.stateVersion
   };
 
-  environment.systemPackages = with pkgs; [ helix git ];
+  environment = { systemPackages = with pkgs; [ helix git wget ]; };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
