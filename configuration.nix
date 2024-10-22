@@ -10,9 +10,9 @@
 
 { config, lib, pkgs, ... }:
 let
-  home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/master.tar.gz";
-in
-{
+  home-manager = builtins.fetchTarball
+    "https://github.com/nix-community/home-manager/archive/master.tar.gz";
+in {
   imports = [
     # include NixOS-WSL modules
     <nixos-wsl/modules>
@@ -65,12 +65,14 @@ in
   home-manager.users.nixos = { pkgs, ... }: {
     home.packages = with pkgs; [
       evince
+      jq
       grc
       pastel
       fd
       dust
       pre-commit
       comma
+      tokei
       rustup
       ripgrep
       ripgrep-all
@@ -88,9 +90,13 @@ in
       nix-prefetch-github
       alejandra
       zulu11
+      difftastic
+      openssl
     ];
 
     programs = {
+      # openssl.enable = true;
+      gradle.enable = true;
       helix = {
         enable = true;
         settings = {
@@ -101,15 +107,45 @@ in
             select = "underline";
           };
         };
-        languages.language = [{
-          name = "nix";
-          auto-format = true;
-          formatter.command = "${pkgs.nixfmt-classic}/bin/nixfmt";
-        }];
+        languages.language = [
+          {
+            name = "nix";
+            auto-format = true;
+            formatter.command = "${pkgs.nixfmt-classic}/bin/nixfmt";
+          }
+          { name = "kdl"; }
+        ];
         defaultEditor = true;
       };
       fish = {
         enable = true;
+        shellAbbrs = {
+          wgradle = "pwsh.exe -c ./gradlew";
+          wgradleb = "pwsh.exe -c ./gradlew build";
+          wgradlebd = "pwsh.exe -c ./gradlew build deploy";
+          wgradled = "pwsh.exe -c ./gradlew deploy";
+          nixb = ''
+            sudo nixos-rebuild switch -I nixos-config=/mnt/c/Users/jjs/clones/util/nix/configuration.ni
+            x'';
+          rf = "exec fish";
+          rfc = "clear && exec fish";
+          PS = "pwsh.exe";
+          wind = {
+            position = "anywhere";
+            setCursor = true;
+            expansion = "/mnt/c/Users/jjs/%";
+          };
+        };
+        shellAliases = {
+          space = "duf --hide-fs squashfs";
+          power =
+            "upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -E 'state:|time to full:|percentage:|energy-rate:|energy:|energy-full:|charge-cycles:|time to empty:'";
+          cpower =
+            "upower -i /org/freedesktop/UPower/devices/battery_ps_controller_battery_58o10o31o1eo60od3 | grep -E 'state:|time to full:|percentage:|energy-rate:|energy:|energy-full:|charge-cycles:|time to empty:'";
+          ls = "eza --icons --group-directories-first --classify --grid";
+          ll =
+            "eza --icons --group-directories-first --classify --long --header --git";
+        };
         interactiveShellInit = ''
           set fish_greeting # Disable greeting
 
@@ -130,18 +166,6 @@ in
         '';
         shellInit = ''
           set --universal git_fish_git_status_command gstatus
-
-          abbr -a rf 'exec fish'
-          abbr -a rfc 'clear && exec fish'
-          abbr --position anywhere --set-cursor -a wind '/mnt/c/Users/jjs/%'
-          abbr -a PS 'PowerShell.exe'
-
-          alias space 'duf --hide-fs squashfs'
-          alias power 'upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -E "state:|time to full:|percentage:|energy-rate:|energy:|energy-full:|charge-cycles:|time to empty:"'
-          alias cpower 'upower -i /org/freedesktop/UPower/devices/battery_ps_controller_battery_58o10o31o1eo60od3 | grep -E "state:|time to full:|percentage:|energy-rate:|energy:|energy-full:|charge-cycles:|time to empty:"'
-
-          alias ls 'eza --icons --group-directories-first --classify --grid'
-          alias ll 'eza --icons --group-directories-first --classify --long --header --git'
 
           set -x CARGO_HOME ~/.cargo
           set -x COLORTERM truecolor
@@ -184,44 +208,54 @@ in
           # kpbaks
           {
             name = "typst";
-            src = builtins.fetchTarball "https://github.com/kpbaks/typst.fish/archive/master.tar.gz";
+            src = builtins.fetchTarball
+              "https://github.com/kpbaks/typst.fish/archive/master.tar.gz";
           }
           {
             name = "git";
-            src = builtins.fetchTarball "https://github.com/kpbaks/git.fish/archive/master.tar.gz";
+            src = builtins.fetchTarball
+              "https://github.com/kpbaks/git.fish/archive/master.tar.gz";
           }
           {
             name = "countdown";
-            src = builtins.fetchTarball "https://github.com/kpbaks/countdown.fish/archive/master.tar.gz";
+            src = builtins.fetchTarball
+              "https://github.com/kpbaks/countdown.fish/archive/master.tar.gz";
           }
           {
             name = "autols";
-            src = builtins.fetchTarball "https://github.com/kpbaks/autols.fish/archive/master.tar.gz";
+            src = builtins.fetchTarball
+              "https://github.com/kpbaks/autols.fish/archive/master.tar.gz";
           }
           {
             name = "ctrl-z";
-            src = builtins.fetchTarball "https://github.com/kpbaks/ctrl-z.fish/archive/master.tar.gz";
+            src = builtins.fetchTarball
+              "https://github.com/kpbaks/ctrl-z.fish/archive/master.tar.gz";
           }
           {
             name = "rust";
-            src = builtins.fetchTarball "https://github.com/kpbaks/rust.fish/archive/master.tar.gz";
+            src = builtins.fetchTarball
+              "https://github.com/kpbaks/rust.fish/archive/master.tar.gz";
           }
           {
             name = "border";
-            src = builtins.fetchTarball "https://github.com/kpbaks/border.fish/archive/master.tar.gz";
+            src = builtins.fetchTarball
+              "https://github.com/kpbaks/border.fish/archive/master.tar.gz";
           }
           {
             name = "what-changed";
-            src = builtins.fetchTarball "https://github.com/kpbaks/what-changed.fish/archive/master.tar.gz";
+            src = builtins.fetchTarball
+              "https://github.com/kpbaks/what-changed.fish/archive/master.tar.gz";
           }
           {
             name = "peopletime";
-            src = builtins.fetchTarball "https://github.com/kpbaks/peopletime.fish/archive/master.tar.gz";
+            src = builtins.fetchTarball
+              "https://github.com/kpbaks/peopletime.fish/archive/master.tar.gz";
           }
-          {
-            name = "zellij";
-            src = builtins.fetchTarball "https://github.com/kpbaks/zellij.fish/archive/master.tar.gz";
-          }
+          # {
+          #   name = "zellij";
+          #   src = builtins.fetchTarball
+          #     "https://github.com/kpbaks/zellij.fish/archive/master.tar.gz";
+          # }
         ];
       };
 
@@ -239,13 +273,14 @@ in
           core.autocrlf = false;
           merge.renamelimit = 50000;
           http.sslbackend = "schannel";
+          diff.external = "difft";
         };
       };
 
       direnv.enable = true;
-        fzf.enable = true;
-        ssh.enable = true;
-      };
+      fzf.enable = true;
+      ssh.enable = true;
+    };
 
     # Define the custom layout and plugin file
     home.file = {
@@ -282,7 +317,18 @@ in
               }
             }
           }
-          tab name="default" focus=true
+          tab name="nix" cwd="/mnt/c/Users/jjs/clones/util/nix" split_direction="vertical" {
+            pane {
+              command "hx"
+              args "~/clones/util/nix"
+            }
+            pane {
+              command "sudo"
+              args "nixos-rebuild" "switch" "-I" "nixos-config=/mnt/c/Users/jjs/clones/util/nix/configuration.nix"
+              start_suspended true
+            }
+          }
+          tab name="dev" focus=true split_direction="vertical"
         }
       '';
       ".config/zellij/plugins/zjstatus.wasm".source = pkgs.fetchurl {
