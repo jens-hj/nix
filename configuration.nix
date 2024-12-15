@@ -10,8 +10,7 @@ let
   # unstableTarball = builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz";
   home-manager = builtins.fetchTarball
     "https://github.com/nix-community/home-manager/archive/master.tar.gz";
-in
-{
+in {
   imports = [
     # (import "${unstableTarball}/nixos")
     # include NixOS-WSL modules
@@ -27,6 +26,7 @@ in
   wsl.defaultUser = "nixos";
 
   programs = {
+    nh.enable = true;
     fish.enable = true;
     nix-ld = {
       enable = true;
@@ -56,7 +56,7 @@ in
 
   # Create symlink from /mnt/c/Users/<myuser>/repos to ~/repos
   systemd.tmpfiles.rules =
-    [ "L /home/nixos/clones - - - - /mnt/c/Users/jensj/source/repos" ];
+    [ "L /home/nixos/repos - - - - /mnt/c/Users/jensj/source/repos" ];
 
   # Enable Podman
   virtualisation = {
@@ -77,6 +77,12 @@ in
   # home-manager stuff
   home-manager.users.nixos = { pkgs, ... }: {
     home.packages = with pkgs; [
+      python3
+      bottom
+      poetry
+      gleam
+      erlang
+      tokei
       devenv
       evince
       grc
@@ -153,6 +159,7 @@ in
           abbr -a rfc 'clear && exec fish'
           abbr --position anywhere --set-cursor -a wind '/mnt/c/Users/jensj/%'
           abbr -a PS 'PowerShell.exe'
+          abbr -a obs "cd /mnt/c/Users/jensj/source/repos/notes && git status && git add . && git status && git commit --message 'commit from abbr' && git push && cd"
 
           alias space 'duf --hide-fs squashfs'
           alias power 'upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -E "state:|time to full:|percentage:|energy-rate:|energy:|energy-full:|charge-cycles:|time to empty:"'
