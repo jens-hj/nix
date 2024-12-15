@@ -56,7 +56,7 @@ in {
 
   # Create symlink from /mnt/c/Users/<myuser>/repos to ~/repos
   systemd.tmpfiles.rules =
-    [ "L /home/nixos/repos - - - - /mnt/c/Users/jensj/source/repos" ];
+    [ "L /home/nixos/win-repos - - - - /mnt/c/Users/jensj/repos" ];
 
   # Enable Podman
   virtualisation = {
@@ -115,7 +115,7 @@ in {
       helix = {
         enable = true;
         settings = {
-          theme = "catppuccin_frappe";
+          theme = "catppuccin_mocha";
           editor.cursor-shape = {
             normal = "block";
             insert = "bar";
@@ -318,17 +318,17 @@ in {
       ".config/zellij/plugins/zjstatus.wasm".source = pkgs.fetchurl {
         url =
           "https://github.com/dj95/zjstatus/releases/latest/download/zjstatus.wasm";
-        sha256 = "sha256-IgTfSl24Eap+0zhfiwTvmdVy/dryPxfEF7LhVNVXe+U=";
+        sha256 = "sha256-6Hv9mGqoTIsMOcaHu/VjSBDX3ygy1T0ydptbeWGnXsw=";
       };
       ".config/zellij/plugins/room.wasm".source = pkgs.fetchurl {
         url =
           "https://github.com/rvcas/room/releases/latest/download/room.wasm";
-        sha256 = "sha256-wCGnvFaoaoyH6QFkIqaDj0j0lGe1DOAX4ZmUQOyT/eY=";
+        sha256 = "sha256-t6GPP7OOztf6XtBgzhLF+edUU294twnu0y5uufXwrkw=";
       };
       ".config/zellij/plugins/zellij_forgot.wasm".source = pkgs.fetchurl {
         url =
           "https://github.com/karimould/zellij-forgot/releases/latest/download/zellij_forgot.wasm";
-        sha256 = "sha256-WdPKHrCtmg0dv446f8KkHNnAk/GKXtufJfCZyLXf7cM=";
+        sha256 = "sha256-kBGZG+I9PMKhXtyAy6XRW4Sqht0/RCDcv86p0WjxvN8=";
       };
       ".config/zellij/config.kdl".text = ''
           pane_frames false
