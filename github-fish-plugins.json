@@ -1,0 +1,34 @@
+[
+	{
+		"owner": "kpbaks",
+		"repo": "autols.fish"
+	},
+	{
+		"owner": "kpbaks",
+		"repo": "ctrl-z.fish"
+	},
+	{
+		"owner": "kpbaks",
+		"repo": "typst.fish"
+	},
+	{
+		"owner": "kpbaks",
+		"repo": "git.fish"
+	},
+	{
+		"owner": "kpbaks",
+		"repo": "rust.fish"
+	},
+	{
+		"owner": "kpbaks",
+		"repo": "border.fish"
+	},
+	{
+		"owner": "kpbaks",
+		"repo": "what-changed.fish"
+	},
+	{
+		"owner": "kpbaks",
+		"repo": "peopletime.fish"
+	}
+]
