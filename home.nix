@@ -50,6 +50,8 @@
     alejandra
     difftastic
     nix-prefetch-github
+    nixfmt-classic
+    k9s
   ];
 
   programs = {
@@ -79,13 +81,15 @@
         nixb = "sudo nixos-rebuild switch --flake /home/jens/nixos#default";
         rf = "exec fish";
         rfc = "clear && exec fish";
+        dr = "darwin-rebuild switch --flake ~/repos/nix/#macbook";
+        obs =
+          "pushd ~/repos/notes; git status; git add .; gstatus; git commit --message 'commit from abbr'; gstatus; git push; popd;";
       };
       shellAliases = {
         space = "duf --hide-fs squashfs";
         ls = "eza --icons --group-directories-first --classify --grid";
         ll =
           "eza --icons --group-directories-first --classify --long --header --git";
-        obs = "pushd ~/repos/notes; git status; git add .; gstatus; git commit --message 'commit from abbr'; gstatus; git push; popd;";
       };
       interactiveShellInit = ''
         set fish_greeting # Disable greeting
@@ -106,6 +110,10 @@
         eval "$(/opt/homebrew/bin/brew shellenv)"
 
         bind \t super-tab
+
+        if not set -q ZELLIJ
+            zellij
+        end
       '';
       shellInit = ''
         set --universal git_fish_git_status_command gstatus
@@ -293,8 +301,7 @@
       sha256 = "sha256-OSg7Q1AWKW32Y9sHWJbWOXWF1YI5mt0N4Vsa2fcvuNg=";
     };
     ".config/zellij/plugins/room.wasm".source = pkgs.fetchurl {
-      url =
-        "https://github.com/rvcas/room/releases/latest/download/room.wasm";
+      url = "https://github.com/rvcas/room/releases/latest/download/room.wasm";
       sha256 = "sha256-t6GPP7OOztf6XtBgzhLF+edUU294twnu0y5uufXwrkw=";
     };
     ".config/zellij/plugins/zellij_forgot.wasm".source = pkgs.fetchurl {
@@ -306,6 +313,7 @@
         pane_frames false
         session_serialization false
         copy_on_select true
+        on_force_close "quit"
 
         default_layout "custom-layout"
 
@@ -386,7 +394,6 @@
     '';
   };
 
-
   # Home Manager can also manage your environment variables through
   # 'home.sessionVariables'. These will be explicitly sourced when using a
   # shell provided by Home Manager. If you don't want to manage your shell
@@ -404,7 +411,7 @@
   #  /etc/profiles/per-user/jens/etc/profile.d/hm-session-vars.sh
   #
   home.sessionVariables = {
-    CARGO_HOME = "~/.cargo";
+    CARGO_HOME = "/Users/jens/.cargo";
     COLORTERM = "truecolor";
     fish_term24bit = "1";
     LANG = "en_US.UTF-8";
