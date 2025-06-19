@@ -14,11 +14,7 @@
   # want to update the value, then make sure to first check the Home Manager
   # release notes.
   home = {
-    stateVersion = "24.05";
-    # version = {
-    #   release = "24.05";
-    #   format = "24.05";
-    # };
+    stateVersion = "24.11";
   };
 
   catppuccin.flavor = "mocha";
@@ -29,36 +25,48 @@
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
-    dconf
-    dust
-    grc
-    pre-commit
-    comma
-    tokei
-    ripgrep
-    ripgrep-all
-    tree
-    sqlite
-    bat
-    eza
-    tealdeer
-    zip
-    unzip
-    duf
-    wget
-    curl
-    alejandra
-    difftastic
-    nix-prefetch-github
-    nixfmt-classic
-    k9s
+      evince
+      jq
+      grc
+      pastel
+      fd
+      dust
+      pre-commit
+      comma
+      tokei
+      rustup
+      ripgrep
+      ripgrep-all
+      tree
+      sqlite
+      bat
+      eza
+      tealdeer
+      zip
+      unzip
+      duf
+      upower
+      wget
+      curl
+      nix-prefetch-github
+      alejandra
+      # zulu11
+      # jdk11
+      difftastic
+      openssl
   ];
 
   programs = {
+    # openssl.enable = true;
+    java = {
+      enable = true;
+      package = pkgs.jdk11;
+    };
+    gradle.enable = true;
     helix = {
       enable = true;
       settings = {
-        # theme = "catppuccin_frappe";
+        theme = "catppuccin_frappe";
         editor.cursor-shape = {
           normal = "block";
           insert = "bar";
@@ -78,15 +86,28 @@
     fish = {
       enable = true;
       shellAbbrs = {
-        nixb = "sudo nixos-rebuild switch --flake /home/jens/nixos#default";
+        wgradle = "pwsh.exe -c ./gradlew";
+        wgradleb = "pwsh.exe -c ./gradlew build";
+        wgradlebd = "pwsh.exe -c ./gradlew build deploy";
+        wgradled = "pwsh.exe -c ./gradlew deploy";
+        nixb = ''
+          sudo nixos-rebuild switch -I nixos-config=/mnt/c/Users/jjs/clones/util/nix/configuration.ni
+          x'';
         rf = "exec fish";
         rfc = "clear && exec fish";
-        dr = "darwin-rebuild switch --flake ~/repos/nix/#macbook";
-        obs =
-          "pushd ~/repos/notes; git status; git add .; gstatus; git commit --message 'commit from abbr'; gstatus; git push; popd;";
+        PS = "pwsh.exe";
+        wind = {
+          position = "anywhere";
+          setCursor = true;
+          expansion = "/mnt/c/Users/jjs/%";
+        };
       };
       shellAliases = {
         space = "duf --hide-fs squashfs";
+        power =
+          "upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -E 'state:|time to full:|percentage:|energy-rate:|energy:|energy-full:|charge-cycles:|time to empty:'";
+        cpower =
+          "upower -i /org/freedesktop/UPower/devices/battery_ps_controller_battery_58o10o31o1eo60od3 | grep -E 'state:|time to full:|percentage:|energy-rate:|energy:|energy-full:|charge-cycles:|time to empty:'";
         ls = "eza --icons --group-directories-first --classify --grid";
         ll =
           "eza --icons --group-directories-first --classify --long --header --git";
@@ -107,16 +128,14 @@
             commandline -f repaint
         end
 
-        eval "$(/opt/homebrew/bin/brew shellenv)"
-
         bind \t super-tab
-
-        if not set -q ZELLIJ
-            zellij
-        end
       '';
       shellInit = ''
         set --universal git_fish_git_status_command gstatus
+
+        set -x CARGO_HOME ~/.cargo
+        set -x COLORTERM truecolor
+        set -x fish_term24bit 1
       '';
       plugins = [
         # Enable a plugin (here grc for colorized command output) from nixpkgs
@@ -227,28 +246,24 @@
         }
       ];
     };
-    kitty = {
-      enable = true;
-      settings = {
-        font_size = 14;
-        confirm_os_window_close = 0;
-        tab_bar_style = "hidden";
-        hide_window_decorations = "yes";
-        window_padding_width = 0;
-        window_margin_width = 0;
-      };
-    };
 
-    # zellij = {
-    #   enable = true;
-    #   enableFishIntegration = true;
-    # };
+
+    zellij = {
+      enable = true;
+      enableFishIntegration = true;
+    };
 
     git = {
       enable = true;
-      userName = "Jens";
-      userEmail = "jens.jens@live.dk";
-      extraConfig = { diff.external = "difft"; };
+      userName = "Jens Høigaard Jensen";
+      userEmail = "jjs@systematic.com";
+      extraConfig = {
+        core.longpaths = true;
+        core.autocrlf = false;
+        merge.renamelimit = 50000;
+        http.sslbackend = "schannel";
+        diff.external = "difft";
+      };
     };
 
     direnv.enable = true;
@@ -410,13 +425,13 @@
   #
   #  /etc/profiles/per-user/jens/etc/profile.d/hm-session-vars.sh
   #
-  home.sessionVariables = {
-    CARGO_HOME = "/Users/jens/.cargo";
-    COLORTERM = "truecolor";
-    fish_term24bit = "1";
-    LANG = "en_US.UTF-8";
-    LC_ALL = "en_US.UTF-8";
-  };
+  # home.sessionVariables = {
+  #   CARGO_HOME = "/Users/jens/.cargo";
+  #   COLORTERM = "truecolor";
+  #   fish_term24bit = "1";
+  #   LANG = "en_US.UTF-8";
+  #   LC_ALL = "en_US.UTF-8";
+  # };
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;

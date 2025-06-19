@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -19,23 +20,28 @@
     };
   };
 
-  outputs = { self, nix-darwin, nixpkgs, home-manager, ... }@inputs: {
+  outputs = { self, nix-darwin, nixos-wsl, nixpkgs, home-manager, ... }@inputs: {
     nixosConfigurations.default = nixpkgs.lib.nixosSystem {
       specialArgs = { inherit inputs; };
       modules = [
+        # ./hardware/wsl-nixos.nix
         ./configuration.nix
         home-manager.nixosModules.default
         # inputs.stylix.homeManagerModules.stylix
         # inputs.stylix.nixosModules.stylix
         inputs.catppuccin.nixosModules.catppuccin
+        nixos-wsl.nixosModules.default
         {
-          home-manager.users.jens = {
+          system.stateVersion = "24.11";
+          wsl.enable = true;
+        }
+        {
+          home-manager.users.nixos = {
             # extraSpecialArgs = { inherit inputs; };
             imports = [
               ./home.nix
               inputs.catppuccin.homeManagerModules.catppuccin
               inputs.stylix.homeManagerModules.stylix
-              inputs.niri.homeModules.niri
             ];
           };
         }

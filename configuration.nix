@@ -2,183 +2,91 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, inputs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 let tuigreet = "${pkgs.greetd.tuigreet}/bin/tuigreet";
 in {
   imports = [ # Include the results of the hardware scan.
-    ./hardware-configuration.nix
-    inputs.home-manager.nixosModules.default
-    ./apple-silicon-support
+    # include NixOS-WSL modules
+    # <nixos-wsl/modules>
   ];
 
-  security.rtkit.enable = true;
 
-  # stylix.enable = true;
+  users.users.nixos = { shell = pkgs.fish; };
 
-  services = {
-    # sound
-    pipewire = {
-      enable = true;
-      alsa = {
-        enable = true;
-        support32Bit = true;
-      };
-      pulse.enable = true;
-    };
-    # Configure keymap in X11
-    xserver = {
-      enable = true;
-      xkb = {
-        layout = "us";
-        variant = "";
-      };
-      displayManager.startx.enable = true;
-    };
-    # login manager
-    greetd = {
-      enable = true;
-      settings = {
-        default_session = {
-          command = "${tuigreet} --time --remember --cmd niri-session";
-          user = "greeter";
-        };
-      };
+  wsl.enable = true;
+  wsl.defaultUser = "nixos";
+
+  programs = {
+    fish.enable = true;
+    nix-ld.enable = true;
+    # java.enable = true;
+  };
+
+  nix = {
+    # package = pkgs.nixFlakes;
+    settings = {
+      experimental-features = [ "nix-command" "flakes" ];
+      substituters =
+        [ "https://cache.nixos.org" "https://nix-community.cachix.org" ];
+      trusted-public-keys = [
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      ];
+      trusted-substituters = [ "https://cache.nixos.org" ];
     };
   };
 
-  systemd.services.greetd.serviceConfig = {
-    Type = "idle";
-    StandardInput = "tty";
-    StandardOutput = "tty";
-    # Without this errors will spam on screen
-    StandardError = "journal";
-    # Without these boot logs will spam on screen
-    TTYReset = true;
-    TTYVHangup = true;
-    TTYVTDisallocate = true;
+  # Create symlink from /mnt/c/Users/<myuser>/repos to ~/repos
+  systemd.tmpfiles.rules =
+    [ "L /home/nixos/clones - - - - /mnt/c/Users/jjs/clones" ];
+
+  nix.registry."node".to = {
+    type = "github";
+    owner = "andyrichardson";
+    repo = "nix-node";
   };
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users = {
-    defaultUserShell = pkgs.fish;
-    users.jens = {
-      isNormalUser = true;
-      description = "Jens";
-      extraGroups = [ "networkmanager" "wheel" "audio" "openrazer" ];
-      packages = with pkgs; [ ];
+  security.pki = {
+    installCACerts = true;
+    certificateFiles = [ ./sse_issuing_256.pem ./sse_root_256.pem ];
+  };
+
+  # environment.etc."ssl/certs/SSERoot.pem".source = "./sse_root_256.cer";
+  # environment.etc."ssl/certs/SSEIssuer.pem".source = "./sse_issuing_256.cer";
+  environment.variables = {
+    # JAVA_HOME = ""
+    JAVAX_NET_SSL_TRUSTSTORE = let
+      caBundle = config.environment.etc."ssl/certs/ca-certificates.crt".source;
+      p11kit = pkgs.p11-kit.overrideAttrs (oldAttrs: {
+        mesonFlags = [
+          "--sysconfdir=/etc"
+          (lib.mesonEnable "systemd" false)
+          (lib.mesonOption "bashcompdir"
+            "${placeholder "bin"}/share/bash-completion/completions")
+          (lib.mesonOption "trust_paths"
+            (lib.concatStringsSep ":" [ "${caBundle}" ]))
+        ];
+      });
+    in derivation {
+      name = "java-cacerts";
+      builder = pkgs.writeShellScript "java-cacerts-builder" ''
+        ${p11kit.bin}/bin/trust \
+          extract \
+          --format=java-cacerts \
+          --purpose=server-auth \
+          $out
+      '';
+      system = builtins.currentSystem;
     };
   };
 
   # home manager
   home-manager = {
     extraSpecialArgs = { inherit inputs; };
-    users = { "jens" = import ./home.nix; };
+    users = { "nixos" = import ./home.nix; };
   };
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
 
-  programs = {
-    fish.enable = true;
-    # hyprland.enable = true;
-    firefox.enable = true;
-    # niri.enable = true;
-  };
-
-  # List packages installed in system profile.
-  environment.systemPackages = with pkgs; [
-    pulsemixer
-    pulseaudio
-    wireplumber
-    helix
-    wget
-    bottom
-    kitty
-    pciutils
-    # niri
-    wlroots
-  ];
-
-  xdg.portal = {
-    enable = true;
-    wlr = {
-      enable = true;
-      settings = { screencast = { screencopy_version = 1; }; };
-    };
-    extraPortals = with pkgs; [
-      xdg-desktop-portal-gtk
-      xdg-desktop-portal-gnome
-    ];
-    config.common.default = "*";
-  };
-
-  environment.sessionVariables = {
-    BEMENU_SCALE = "1.5";
-    NIXOS_OZONE_WL = "1";
-  };
-
-  nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
-    substituters = [ "https://niri.cachix.org" ];
-    trusted-public-keys =
-      [ "niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964=" ];
-    trusted-substituters = [ "https://niri.cachix.org" ];
-  };
-
-  # sound.enable = true;
-  hardware = {
-    openrazer.enable = true;
-    graphics.enable = true;
-    nvidia = {
-      modesetting.enable = true;
-      # enable this if crashes happen caused by nvidia gpu
-      powerManagement.enable = true;
-      # turns gpu off when not in use (experimental)
-      powerManagement.finegrained = false;
-      open = false;
-      nvidiaSettings = true;
-      package = config.boot.kernelPackages.nvidiaPackages.stable;
-    };
-    bluetooth.enable = true;
-  };
-
-  # Bootloader.
-  boot = {
-    # blacklistedKernelModules = [ "nouveau" ];
-    loader = {
-      # systemd-boot.enable = true;
-      efi.canTouchEfiVariables = true;
-      grub = {
-        enable = true;
-        devices = [ "nodev" ];
-        efiSupport = true;
-        useOSProber = true;
-      };
-    };
-  };
-
-  networking.hostName = "nixos"; # Define your hostname.
-
-  # Enable networking
-  networking.networkmanager.enable = true;
-
-  # Set your time zone.
-  time.timeZone = "Europe/Copenhagen";
-
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_DK.UTF-8";
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "da_DK.UTF-8";
-    LC_IDENTIFICATION = "da_DK.UTF-8";
-    LC_MEASUREMENT = "da_DK.UTF-8";
-    LC_MONETARY = "da_DK.UTF-8";
-    LC_NAME = "da_DK.UTF-8";
-    LC_NUMERIC = "da_DK.UTF-8";
-    LC_PAPER = "da_DK.UTF-8";
-    LC_TELEPHONE = "da_DK.UTF-8";
-    LC_TIME = "da_DK.UTF-8";
-  };
+  environment.systemPackages = with pkgs; [ helix git zulu11 ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
@@ -186,6 +94,6 @@ in {
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "24.05"; # Did you read the comment?
+  system.stateVersion = "24.11"; # Did you read the comment?
 
 }
