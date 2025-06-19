@@ -28,6 +28,7 @@ in {
   programs = {
     fish.enable = true;
     nix-ld.enable = true;
+    # java.enable = true;
   };
 
   nix = {
@@ -53,13 +54,39 @@ in {
     repo = "nix-node";
   };
 
-  # security.pki.certificateFiles = [
-  #   ./sse_issuing_256.cer
-  #   ./sse_root_256.cer
-  # ];
+  security.pki = {
+    installCACerts = true;
+    certificateFiles = [ ./sse_issuing_256.pem ./sse_root_256.pem ];
+  };
 
   # environment.etc."ssl/certs/SSERoot.pem".source = "./sse_root_256.cer";
   # environment.etc."ssl/certs/SSEIssuer.pem".source = "./sse_issuing_256.cer";
+  environment.variables = {
+    # JAVA_HOME = ""
+    JAVAX_NET_SSL_TRUSTSTORE = let
+      caBundle = config.environment.etc."ssl/certs/ca-certificates.crt".source;
+      p11kit = pkgs.p11-kit.overrideAttrs (oldAttrs: {
+        mesonFlags = [
+          "--sysconfdir=/etc"
+          (lib.mesonEnable "systemd" false)
+          (lib.mesonOption "bashcompdir"
+            "${placeholder "bin"}/share/bash-completion/completions")
+          (lib.mesonOption "trust_paths"
+            (lib.concatStringsSep ":" [ "${caBundle}" ]))
+        ];
+      });
+    in derivation {
+      name = "java-cacerts";
+      builder = pkgs.writeShellScript "java-cacerts-builder" ''
+        ${p11kit.bin}/bin/trust \
+          extract \
+          --format=java-cacerts \
+          --purpose=server-auth \
+          $out
+      '';
+      system = builtins.currentSystem;
+    };
+  };
 
   # home-manager stuff
   home-manager.users.nixos = { pkgs, ... }: {
@@ -89,13 +116,18 @@ in {
       curl
       nix-prefetch-github
       alejandra
-      zulu11
+      # zulu11
+      # jdk11
       difftastic
       openssl
     ];
 
     programs = {
       # openssl.enable = true;
+      java = {
+        enable = true;
+        package = pkgs.jdk11;
+      };
       gradle.enable = true;
       helix = {
         enable = true;
@@ -436,7 +468,7 @@ in {
       "23.11"; # KEEP THIS, read comment for system.stateVersion
   };
 
-  environment.systemPackages = with pkgs; [ helix git ];
+  environment.systemPackages = with pkgs; [ helix git zulu11 ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
