@@ -18,9 +18,6 @@
   catppuccin = {
     enable = true;
     flavor = "mocha";
-    # Enable GNOME Terminal styling
-    gnome.enable = true;
-    gnomeTerminal.enable = true;
   };
 
   nixpkgs.config.allowUnfree = true;
@@ -35,7 +32,7 @@
     alejandra
     nix-prefetch-github
     nixfmt-classic
-    (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+    nerd-fonts.jetbrains-mono
   ];
 
   # Enable the custom base configuration from ./../../modules/default.nix
