@@ -3,11 +3,7 @@
 {
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
-  environment.systemPackages = with pkgs; [
-    helix
-    wget
-    bottom
-  ];
+  environment.systemPackages = with pkgs; [ helix wget bottom ];
 
   home-manager = {
     backupFileExtension = "before-nix-darwin";
@@ -18,7 +14,7 @@
       imports = [
         ./home.nix
         inputs.self.outputs.homeManagerModules.default
-        inputs.catppuccin.homeManagerModules.catppuccin
+        inputs.catppuccin.homeModules.catppuccin
       ];
     };
   };
@@ -30,7 +26,8 @@
   programs.fish.enable = true;
 
   # Set Git commit hash for darwin-version.
-  system.configurationRevision = inputs.self.rev or inputs.self.dirtyRev or null;
+  system.configurationRevision =
+    inputs.self.rev or inputs.self.dirtyRev or null;
 
   # Used for backwards compatibility, please read the changelog before changing.
   # $ darwin-rebuild changelog

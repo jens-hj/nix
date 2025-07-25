@@ -1,17 +1,15 @@
-{ config, pkgs, inputs, ... }:
-{
-  imports =
-    [
-      ./hardware.nix
-    ];
+{ config, pkgs, inputs, ... }: {
+  imports = [ ./hardware.nix ];
 
   home-manager = {
     extraSpecialArgs = { inherit inputs; };
+    useGlobalPkgs = true;
+    useUserPackages = true;
     users.nix = {
       imports = [
         ./home.nix
         inputs.self.outputs.homeManagerModules.default
-        inputs.catppuccin.homeManagerModules.catppuccin
+        inputs.catppuccin.homeModules.catppuccin
       ];
     };
   };
@@ -42,11 +40,11 @@
   };
 
   services.xserver.enable = true;
-  services.xserver.displayManager.gdm = {
+  services.displayManager.gdm = {
     enable = true;
-    autoSuspend = false;
+    autoSu:spend = false;
   };
-  services.xserver.desktopManager.gnome = {
+  services.desktopManager.gnome = {
     enable = true;
     extraGSettingsOverrides = ''
       [org.gnome.settings-daemon.plugins.power]
@@ -100,13 +98,7 @@
 
   nixpkgs.config.allowUnfree = true;
 
-  environment = {
-    systemPackages = with pkgs; [
-        helix
-        wget
-        git
-    ];
-  };
+  environment = { systemPackages = with pkgs; [ helix wget git ]; };
 
   system.stateVersion = "25.05";
 }

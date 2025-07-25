@@ -46,7 +46,10 @@
     direnv.enable = true;
     fzf.enable = true;
     ssh.enable = true;
-    firefox.enable = true;
+    firefox = {
+      enable = true;
+      profiles.default.extensions.force = true;
+    };
   };
 
   home.sessionVariables = {

@@ -15,7 +15,7 @@ in {
     imports = [
       ./home.nix
       inputs.self.outputs.homeManagerModules.default
-      inputs.catppuccin.homeManagerModules.catppuccin
+      inputs.catppuccin.homeModules.catppuccin
       inputs.stylix.homeManagerModules.stylix
       inputs.niri.homeModules.niri
     ];
