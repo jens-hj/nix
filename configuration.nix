@@ -115,6 +115,7 @@ in {
   environment.sessionVariables = {
     BEMENU_SCALE = "1.5";
     NIXOS_OZONE_WL = "1";
+    RELEASE_CONTAINER_ENGINE = "docker";
   };
 
   nix.settings = {

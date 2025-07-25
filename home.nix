@@ -29,6 +29,14 @@
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
+    croc
+    aichat
+    mcrcon
+    typst
+    typstfmt
+    just
+    pixi
+    pgweb
     dconf
     dust
     grc
@@ -84,8 +92,12 @@
         dr = "darwin-rebuild switch --flake ~/repos/nix/#macbook";
         obs =
           "pushd ~/repos/notes; git status; git add .; gstatus; git commit --message 'commit from abbr'; gstatus; git push; popd;";
+        code = "code-insiders";
+        xc-sim =
+          "xcodebuild -scheme Nanolet -destination 'platform=iOS Simulator,name=iPhone 16' BUILD_DIR=./build; xcrun simctl install booted ./build/Debug-iphonesimulator/Nanolet.app/; xcrun simctl launch booted Unincorporated.Dev.Nanolet";
       };
       shellAliases = {
+        # code = "code-insiders";
         space = "duf --hide-fs squashfs";
         ls = "eza --icons --group-directories-first --classify --grid";
         ll =
@@ -108,6 +120,9 @@
         end
 
         eval "$(/opt/homebrew/bin/brew shellenv)"
+        set -x RELEASE_CONTAINER_ENGINE "docker"
+        set -x DIRENV_LOG_FORMAT
+        set -x TERM xterm-256color
 
         bind \t super-tab
 
@@ -151,6 +166,10 @@
         {
           name = "colored-man-pages";
           src = pkgs.fishPlugins.colored-man-pages.src;
+        }
+        {
+          name = "bass";
+          src = pkgs.fishPlugins.bass.src;
         }
         # kpbaks
         {
@@ -266,25 +285,14 @@
           pane size=1 borderless=true {
             plugin location="file:~/.config/zellij/plugins/zjstatus.wasm" {
               format_left  "{mode} #[fg=cyan,bold]{session} {tabs}"
-              format_right "{command_git_branch} {datetime}"
+              format_right "{datetime}"
               format_space ""
-
-              border_enabled  "false"
-              border_char     "─"
-              border_format   "#[fg=white]{char}"
-              border_position "top"
-
-              hide_frame_for_single_pane "true"
 
               mode_normal  "#[bg=cyan] "
               mode_tmux    "#[bg=red] "
 
               tab_normal   "#[fg=white] {name} "
               tab_active   "#[fg=yellow,bold,italic] {name} "
-
-              command_git_branch_command   "git rev-parse --abbrev-ref HEAD"
-              command_git_branch_format    "#[fg=magenta] {stdout} "
-              command_git_branch_interval  "10"
 
               datetime          "#[fg=white,bold] {format} "
               datetime_format   "%A, %d %b %Y %H:%M"
@@ -298,7 +306,7 @@
     ".config/zellij/plugins/zjstatus.wasm".source = pkgs.fetchurl {
       url =
         "https://github.com/dj95/zjstatus/releases/latest/download/zjstatus.wasm";
-      sha256 = "sha256-OSg7Q1AWKW32Y9sHWJbWOXWF1YI5mt0N4Vsa2fcvuNg=";
+      sha256 = "sha256-p6JTnAyim0T3TkJzGhEitzc3JpPovL5k7jb8gv+oLD4=";
     };
     ".config/zellij/plugins/room.wasm".source = pkgs.fetchurl {
       url = "https://github.com/rvcas/room/releases/latest/download/room.wasm";
@@ -307,24 +315,25 @@
     ".config/zellij/plugins/zellij_forgot.wasm".source = pkgs.fetchurl {
       url =
         "https://github.com/karimould/zellij-forgot/releases/latest/download/zellij_forgot.wasm";
-      sha256 = "sha256-kBGZG+I9PMKhXtyAy6XRW4Sqht0/RCDcv86p0WjxvN8=";
+      sha256 = "sha256-MRlBRVGdvcEoaFtFb5cDdDePoZ/J2nQvvkoyG6zkSds=";
     };
     ".config/zellij/config.kdl".text = ''
-        pane_frames false
         session_serialization false
         copy_on_select true
         on_force_close "quit"
 
-        default_layout "custom-layout"
-
         ui {
-            pane_frames {
-                rounded_corners true
-            }
+          pane_frames {
+            rounded_corners true
+          }
         }
 
+        pane_frames false
+
+        default_layout "custom-layout"
+
         theme "catppuccin-macchiato"
-        
+
         keybinds {
           normal {
               bind "Alt q" { GoToTab 1; }
@@ -411,11 +420,16 @@
   #  /etc/profiles/per-user/jens/etc/profile.d/hm-session-vars.sh
   #
   home.sessionVariables = {
+    MCRCON_HOST = "192.168.0.188";
+    MCRCON_PASS = "7568";
     CARGO_HOME = "/Users/jens/.cargo";
     COLORTERM = "truecolor";
     fish_term24bit = "1";
     LANG = "en_US.UTF-8";
     LC_ALL = "en_US.UTF-8";
+    RELEASE_CONTAINER_ENGINE = "docker";
+    DIRENV_LOG_FORMAT = "";
+    TERM = "xterm-256color";
   };
 
   # Let Home Manager install and manage itself.
