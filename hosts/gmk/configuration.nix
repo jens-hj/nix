@@ -60,13 +60,17 @@
     variant = "";
   };
 
-  services.pulseaudio.enable = false;
+  # Modern audio setup with PipeWire
+  # PulseAudio is replaced by PipeWire's pulse compatibility
+  sound.enable = true;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
+    # Use PipeWire as a PulseAudio replacement
+    wireplumber.enable = true;
   };
 
   services.openssh = {
