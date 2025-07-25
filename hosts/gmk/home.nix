@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   # Home Manager needs a bit of information about you and the paths it should
@@ -37,24 +37,11 @@
 
   # Enable the custom base configuration from ./../../modules/default.nix
   base.enable = true;
+  ghostty.enable = lib.mkForce true;
 
   programs = {
     # Enable home-manager itself
     home-manager.enable = true;
-    # Terminal
-    gnome-terminal = {
-      enable = true;
-      showMenubar = false;
-      profile = {
-        "b1dcc9dd-5262-4d8d-a863-c897e6d979b9" = {
-          default = true;
-          visibleName = "Catppuccin";
-          font = "JetBrainsMono Nerd Font 12";
-          scrollOnOutput = true;
-          showScrollbar = false;
-        };
-      };
-    };
     # Other
     direnv.enable = true;
     fzf.enable = true;
