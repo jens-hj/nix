@@ -19,7 +19,6 @@
     pixi
     pgweb
     dconf
-    grc
     pre-commit
     comma
     tokei

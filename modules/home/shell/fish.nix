@@ -5,6 +5,7 @@
 
   config = lib.mkIf config.fish.enable {
     home.packages = with pkgs; [
+      grc
       eza
       tree
       croc
@@ -142,15 +143,15 @@
               sha256 = "sha256-uX8s0D4/a0hiuB84E1RDVvah2nnuZL44ykB6wMiIEO4=";
             };
           }
-          {
-            name = "rust";
-            src = pkgs.fetchFromGitHub {
-              owner = "kpbaks";
-              repo = "rust.fish";
-              rev = "16261ed8c2c987c32d6a7d2135554862f2279843";
-              sha256 = "sha256-0vOTfAc2uiPQwEwp4hsVhxETZn+wrEmtojzamuLoCX4=";
-            };
-          }
+          # {
+          #   name = "rust";
+          #   src = pkgs.fetchFromGitHub {
+          #     owner = "kpbaks";
+          #     repo = "rust.fish";
+          #     rev = "16261ed8c2c987c32d6a7d2135554862f2279843";
+          #     sha256 = "sha256-0vOTfAc2uiPQwEwp4hsVhxETZn+wrEmtojzamuLoCX4=";
+          #   };
+          # }
           {
             name = "border";
             src = pkgs.fetchFromGitHub {
