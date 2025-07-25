@@ -15,8 +15,13 @@
   # release notes.
   home.stateVersion = "25.05";
 
-  catppuccin.flavor = "mocha";
-  catppuccin.enable = true;
+  catppuccin = {
+    enable = true;
+    flavor = "mocha";
+    # Enable GNOME Terminal styling
+    gnome.enable = true;
+    gnomeTerminal.enable = true;
+  };
 
   nixpkgs.config.allowUnfree = true;
 
@@ -30,6 +35,7 @@
     alejandra
     nix-prefetch-github
     nixfmt-classic
+    (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
   # Enable the custom base configuration from ./../../modules/default.nix
@@ -38,6 +44,20 @@
   programs = {
     # Enable home-manager itself
     home-manager.enable = true;
+    # Terminal
+    gnome-terminal = {
+      enable = true;
+      showMenubar = false;
+      profile = {
+        "b1dcc9dd-5262-4d8d-a863-c897e6d979b9" = {
+          default = true;
+          visibleName = "Catppuccin";
+          font = "JetBrainsMono Nerd Font 12";
+          scrollOnOutput = true;
+          showScrollbar = false;
+        };
+      };
+    };
     # Other
     direnv.enable = true;
     fzf.enable = true;
