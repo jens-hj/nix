@@ -78,16 +78,18 @@
     settings.PasswordAuthentication = false;
   };
 
-  users.users.nix = {
-    isNormalUser = true;
-    description = "nix";
-    extraGroups = [ "networkmanager" "wheel" ];
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPdsaBGuK12xRMbGNPL2utoTc0lziypsWdAKsUCh6lru jens@j-ubuntu"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILh7s/A2WOBY+O+Q10iwZ5L0dqfbVc+5IaaT9VUHvcl5 jens@Jenss-MacBook-Pro.local"
-    ];
+  users = {
     defaultUserShell = pkgs.fish;
-    packages = with pkgs; [ ];
+    users.nix = {
+      isNormalUser = true;
+      description = "nix";
+      extraGroups = [ "networkmanager" "wheel" ];
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPdsaBGuK12xRMbGNPL2utoTc0lziypsWdAKsUCh6lru jens@j-ubuntu"
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILh7s/A2WOBY+O+Q10iwZ5L0dqfbVc+5IaaT9VUHvcl5 jens@Jenss-MacBook-Pro.local"
+      ];
+      packages = with pkgs; [ ];
+    };
   };
 
   services.displayManager.autoLogin.enable = true;
