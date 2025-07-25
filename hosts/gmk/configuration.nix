@@ -61,15 +61,14 @@
   };
 
   # Modern audio setup with PipeWire
-  # PulseAudio is replaced by PipeWire's pulse compatibility
-  sound.enable = true;
+  # PipeWire provides complete audio stack with ALSA and PulseAudio compatibility
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    # Use PipeWire as a PulseAudio replacement
+    # Use the WirePlumber session manager
     wireplumber.enable = true;
   };
 
@@ -78,6 +77,7 @@
     settings.PasswordAuthentication = false;
   };
 
+  programs.fish.enable = true;
   users = {
     defaultUserShell = pkgs.fish;
     users.nix = {
@@ -97,10 +97,6 @@
 
   systemd.services."getty@tty1".enable = false;
   systemd.services."autovt@tty1".enable = false;
-
-  # programs = {
-  #   fish.enable = true;
-  # };
 
   nixpkgs.config.allowUnfree = true;
 
