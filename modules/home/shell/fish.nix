@@ -16,6 +16,7 @@
       duf
       wget
       curl
+      sqlite
     ];
 
     programs = {
@@ -33,7 +34,6 @@
             "xcodebuild -scheme Nanolet -destination 'platform=iOS Simulator,name=iPhone 16' BUILD_DIR=./build; xcrun simctl install booted ./build/Debug-iphonesimulator/Nanolet.app/; xcrun simctl launch booted Unincorporated.Dev.Nanolet";
         };
         shellAliases = {
-            # code = "code-insiders";
             space = "duf --hide-fs squashfs";
             ls = "eza --icons --group-directories-first --classify --grid";
             ll =
@@ -55,8 +55,6 @@
                 commandline -f repaint
             end
 
-            eval "$(/opt/homebrew/bin/brew shellenv)"
-            set -x RELEASE_CONTAINER_ENGINE "docker"
             set -x DIRENV_LOG_FORMAT
             set -x TERM xterm-256color
 
