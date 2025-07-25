@@ -1,11 +1,23 @@
-{ pkgs, config, lib, ... }
-
+{ pkgs, config, lib, ... }:
 {
   options = {
     fish.enable = lib.mkEnableOption "enable custom configured fish";
   };
 
   config = lib.mkIf config.fish.enable {
+    home.packages = with pkgs; [
+      eza
+      tree
+      croc
+      dust
+      bat
+      zip
+      unzip
+      duf
+      wget
+      curl
+    ];
+
     programs = {
         fish = {
         enable = true;

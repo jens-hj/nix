@@ -1,4 +1,5 @@
-{ pkgs, config, lib, ... }: {
+{ pkgs, config, lib, ... }:
+{
   imports = [
     ./shell/fish.nix
     ./shell/zellij.nix

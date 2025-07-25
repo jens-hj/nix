@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ... }
+{ pkgs, config, lib, ... }:
 {
   options = {
     helix.enable = lib.mkEnableOption "enables custom configured helix";

@@ -6,7 +6,7 @@
 let tuigreet = "${pkgs.greetd.tuigreet}/bin/tuigreet";
 in {
   imports = [ # Include the results of the hardware scan.
-    ./hardware/default.nix
+    ./hardware.nix
     inputs.home-manager.nixosModules.default
   ];
 
@@ -14,6 +14,7 @@ in {
     # extraSpecialArgs = { inherit inputs; };
     imports = [
       ./home.nix
+      inputs.self.outputs.homeManagerModules.default
       inputs.catppuccin.homeManagerModules.catppuccin
       inputs.stylix.homeManagerModules.stylix
       inputs.niri.homeModules.niri

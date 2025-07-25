@@ -1,12 +1,14 @@
-{ pkgs, config, lib, ... }
-
+{ pkgs, config, lib, ... }:
 {
   options = {
     zellij.enable = lib.mkEnableOption "enable custom configured zellij";
   };
 
   config = lib.mkIf config.zellij.enable {
-    programs.zellij.enable = true;
+    home.packages = with pkgs; [
+      zellij
+    ];
+
     # Configuration
     home.file = {
         ".config/zellij/layouts/custom-layout.kdl".text = ''

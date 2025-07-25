@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   home.stateVersion = "24.05";
@@ -11,7 +11,6 @@
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
-    croc
     aichat
     mcrcon
     typst
@@ -20,23 +19,14 @@
     pixi
     pgweb
     dconf
-    dust
     grc
     pre-commit
     comma
     tokei
     ripgrep
     ripgrep-all
-    tree
     sqlite
-    bat
-    eza
     tealdeer
-    zip
-    unzip
-    duf
-    wget
-    curl
     alejandra
     difftastic
     nix-prefetch-github
@@ -44,23 +34,13 @@
     k9s
   ];
 
+  # Enable the custom base configuration from ./../../modules/default.nix
   base.enable = true;
 
   programs = {
+    # Enable home-manager itself
     home-manager.enable = true;
-    nil.enable = true;
-    kitty = {
-      enable = true;
-      settings = {
-        font_size = 14;
-        confirm_os_window_close = 0;
-        tab_bar_style = "hidden";
-        hide_window_decorations = "yes";
-        window_padding_width = 0;
-        window_margin_width = 0;
-      };
-    };
-
+    # Other
     direnv.enable = true;
     fzf.enable = true;
     ssh.enable = true;

@@ -17,6 +17,7 @@
     users.jens = { pkgs, ... }: {
       imports = [
         ./home.nix
+        inputs.self.outputs.homeManagerModules.default
         inputs.catppuccin.homeManagerModules.catppuccin
       ];
     };
