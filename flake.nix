@@ -20,25 +20,21 @@
   };
 
   outputs = { self, nix-darwin, nixpkgs, home-manager, ... }@inputs: {
+    homeManagerModules.default = ./modules/home;
     nixosConfigurations.default = nixpkgs.lib.nixosSystem {
       specialArgs = { inherit inputs; };
       modules = [
-        ./configuration.nix
+        ./hosts/default/configuration.nix
         home-manager.nixosModules.default
-        # inputs.stylix.homeManagerModules.stylix
-        # inputs.stylix.nixosModules.stylix
         inputs.catppuccin.nixosModules.catppuccin
-        {
-          home-manager.users.jens = {
-            # extraSpecialArgs = { inherit inputs; };
-            imports = [
-              ./home.nix
-              inputs.catppuccin.homeManagerModules.catppuccin
-              inputs.stylix.homeManagerModules.stylix
-              inputs.niri.homeModules.niri
-            ];
-          };
-        }
+      ];
+    };
+    nixosConfigurations."gmk" = nixpkgs.lib.nixosSystem {
+      specialArgs = { inherit inputs; };
+      modules = [
+        ./hosts/gmk/configuration.nix
+        home-manager.nixosModules.default
+        inputs.catppuccin.nixosModules.catppuccin
       ];
     };
     # Install `nix-darwin` from https://github.com/nix-darwin/nix-darwin?tab=readme-ov-file#readme
@@ -48,22 +44,8 @@
       system = "aarch64-darwin";
       specialArgs = { inherit inputs; };
       modules = [
-        ./darwin.nix
+        ./hosts/macbook/configuration.nix
         home-manager.darwinModules.home-manager
-        {
-          home-manager = {
-            backupFileExtension = "before-nix-darwin";
-            useGlobalPkgs = true;
-            useUserPackages = true;
-            extraSpecialArgs = { inherit inputs; };
-            users.jens = { pkgs, ... }: {
-              imports = [
-                ./home.nix
-                inputs.catppuccin.homeManagerModules.catppuccin
-              ];
-            };
-          };
-        }
       ];
     };
   };

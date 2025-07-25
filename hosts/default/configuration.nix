@@ -6,10 +6,19 @@
 let tuigreet = "${pkgs.greetd.tuigreet}/bin/tuigreet";
 in {
   imports = [ # Include the results of the hardware scan.
-    ./hardware-configuration.nix
+    ./hardware/default.nix
     inputs.home-manager.nixosModules.default
-    ./apple-silicon-support
   ];
+
+  home-manager.users.jens = {
+    # extraSpecialArgs = { inherit inputs; };
+    imports = [
+      ./home.nix
+      inputs.catppuccin.homeManagerModules.catppuccin
+      inputs.stylix.homeManagerModules.stylix
+      inputs.niri.homeModules.niri
+    ];
+  };
 
   security.rtkit.enable = true;
 

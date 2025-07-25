@@ -9,6 +9,19 @@
     bottom
   ];
 
+  home-manager = {
+    backupFileExtension = "before-nix-darwin";
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    extraSpecialArgs = { inherit inputs; };
+    users.jens = { pkgs, ... }: {
+      imports = [
+        ./home.nix
+        inputs.catppuccin.homeManagerModules.catppuccin
+      ];
+    };
+  };
+
   # Necessary for using flakes on this system.
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
