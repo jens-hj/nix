@@ -1,17 +1,21 @@
-{ pkgs, config, lib, ... }:
 {
+  pkgs,
+  config,
+  lib,
+  ...
+}: {
   options = {
-    helix.enable = lib.mkEnableOption "enables custom configured helix";
+    editor.helix.enable = lib.mkEnableOption "enables custom configured helix";
   };
 
-  config = lib.mkIf config.helix.enable {
+  config = lib.mkIf config.editor.helix.enable {
     programs.helix = {
       enable = true;
       settings = {
         editor.cursor-shape = {
-            normal = "block";
-            insert = "bar";
-            select = "underline";
+          normal = "block";
+          insert = "bar";
+          select = "underline";
         };
       };
       languages.language = [
@@ -20,7 +24,7 @@
           auto-format = true;
           formatter.command = "${pkgs.nixfmt-classic}/bin/nixfmt";
         }
-        { name = "kdl"; }
+        {name = "kdl";}
       ];
       defaultEditor = true;
     };

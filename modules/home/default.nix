@@ -7,8 +7,8 @@
     ./shell/fish.nix
     ./shell/zellij.nix
     ./editor/helix.nix
-    ./other/git.nix
-    ./utils/sh.nix
+    ./utils/git.nix
+    ./utils/cli.nix
     ./utils/nix.nix
     ./terminal/ghostty.nix
   ];
@@ -20,7 +20,7 @@
 
   config = lib.mkIf config.base.enable {
     # Utils
-    utils.sh.enable = lib.mkDefault true;
+    utils.cli.enable = lib.mkDefault true;
     utils.nix.enable = lib.mkDefault true;
     utils.git.enable = lib.mkDefault true;
 
