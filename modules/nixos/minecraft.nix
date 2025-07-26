@@ -43,7 +43,8 @@
 
       ${lib.optionalString (config.srv.minecraft.importExistingFiles != null) ''
         # Import existing server files if specified
-        echo "Importing existing Minecraft server files from ''${config.srv.minecraft.importExistingFiles}..."
+        IMPORT_PATH="${config.srv.minecraft.importExistingFiles}"
+        echo "Importing existing Minecraft server files from $IMPORT_PATH..."
 
         # Create backup of current files if they exist
         if [ -d /srv/minecraft/test/world ]; then
@@ -55,14 +56,14 @@
 
         # Copy important directories and files from existing server
         # Exclude files that should be managed by NixOS
-        cp -r "''${config.srv.minecraft.importExistingFiles}/world" /srv/minecraft/test/ 2>/dev/null || true
-        cp -r "''${config.srv.minecraft.importExistingFiles}/world_nether" /srv/minecraft/test/ 2>/dev/null || true
-        cp -r "''${config.srv.minecraft.importExistingFiles}/world_the_end" /srv/minecraft/test/ 2>/dev/null || true
-        cp -r "''${config.srv.minecraft.importExistingFiles}/plugins" /srv/minecraft/test/ 2>/dev/null || true
-        cp -r "''${config.srv.minecraft.importExistingFiles}/datapacks" /srv/minecraft/test/ 2>/dev/null || true
+        cp -r "$IMPORT_PATH/world" /srv/minecraft/test/ 2>/dev/null || true
+        cp -r "$IMPORT_PATH/world_nether" /srv/minecraft/test/ 2>/dev/null || true
+        cp -r "$IMPORT_PATH/world_the_end" /srv/minecraft/test/ 2>/dev/null || true
+        cp -r "$IMPORT_PATH/plugins" /srv/minecraft/test/ 2>/dev/null || true
+        cp -r "$IMPORT_PATH/datapacks" /srv/minecraft/test/ 2>/dev/null || true
 
         # Import player data files
-        cp "''${config.srv.minecraft.importExistingFiles}"/*.json /srv/minecraft/test/ 2>/dev/null || true
+        cp "$IMPORT_PATH"/*.json /srv/minecraft/test/ 2>/dev/null || true
 
         # Fix permissions
         chown -R minecraft:minecraft /srv/minecraft/test
