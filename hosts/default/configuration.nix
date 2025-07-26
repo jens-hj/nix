@@ -1,17 +1,22 @@
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
-
-{ config, pkgs, inputs, ... }:
-let tuigreet = "${pkgs.greetd.tuigreet}/bin/tuigreet";
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}: let
+  tuigreet = "${pkgs.greetd.tuigreet}/bin/tuigreet";
 in {
-  imports = [ # Include the results of the hardware scan.
+  imports = [
+    # Include the results of the hardware scan.
     ./hardware.nix
     inputs.home-manager.nixosModules.default
   ];
 
   home-manager.users.jens = {
-    # extraSpecialArgs = { inherit inputs; };
+    extraSpecialArgs = {inherit inputs;};
     imports = [
       ./home.nix
       inputs.self.outputs.homeManagerModules.default
@@ -74,15 +79,8 @@ in {
     users.jens = {
       isNormalUser = true;
       description = "Jens";
-      extraGroups = [ "networkmanager" "wheel" "audio" "openrazer" ];
-      packages = with pkgs; [ ];
+      extraGroups = ["networkmanager" "wheel" "audio" "openrazer"];
     };
-  };
-
-  # home manager
-  home-manager = {
-    extraSpecialArgs = { inherit inputs; };
-    users = { "jens" = import ./home.nix; };
   };
 
   # Allow unfree packages
@@ -113,7 +111,7 @@ in {
     enable = true;
     wlr = {
       enable = true;
-      settings = { screencast = { screencopy_version = 1; }; };
+      settings = {screencast = {screencopy_version = 1;};};
     };
     extraPortals = with pkgs; [
       xdg-desktop-portal-gtk
@@ -129,11 +127,10 @@ in {
   };
 
   nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
-    substituters = [ "https://niri.cachix.org" ];
-    trusted-public-keys =
-      [ "niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964=" ];
-    trusted-substituters = [ "https://niri.cachix.org" ];
+    experimental-features = ["nix-command" "flakes"];
+    substituters = ["https://niri.cachix.org"];
+    trusted-public-keys = ["niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964="];
+    trusted-substituters = ["https://niri.cachix.org"];
   };
 
   # sound.enable = true;
@@ -161,7 +158,7 @@ in {
       efi.canTouchEfiVariables = true;
       grub = {
         enable = true;
-        devices = [ "nodev" ];
+        devices = ["nodev"];
         efiSupport = true;
         useOSProber = true;
       };
@@ -198,5 +195,4 @@ in {
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "24.05"; # Did you read the comment?
-
 }

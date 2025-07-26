@@ -1,11 +1,18 @@
-{ pkgs, config, lib, ... }: {
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}: {
   options = {
-    base.enable = lib.mkEnableOption "enable baseline packages";
+    base-pkgs.enable = lib.mkEnableOption "enable baseline packages";
   };
 
-  config = lib.mkIf config.base.enable {
+  config = lib.mkIf config.base-pkgs.enable {
     home.packages = with pkgs; [
+      alejandra
       nil
+      nixd
       croc
       dust
       bat
@@ -16,4 +23,4 @@
       curl
     ];
   };
-};
+}

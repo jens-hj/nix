@@ -1,6 +1,4 @@
-{ config, pkgs, lib, ... }:
-
-{
+{pkgs, ...}: {
   home.stateVersion = "24.05";
 
   catppuccin.flavor = "mocha";

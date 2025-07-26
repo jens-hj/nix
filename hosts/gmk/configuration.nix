@@ -1,9 +1,16 @@
-{ config, pkgs, inputs, ... }: {
-  imports = [ ./hardware.nix ];
+{
+  pkgs,
+  inputs,
+  ...
+}: {
+  imports = [./hardware.nix];
+
+  # Enable the Minecraft server
+  srv.minecraft.enable = true;
 
   home-manager = {
     backupFileExtension = "before-home-manager";
-    extraSpecialArgs = { inherit inputs; };
+    extraSpecialArgs = {inherit inputs;};
     useGlobalPkgs = true;
     useUserPackages = true;
     users.nix = {
@@ -16,7 +23,7 @@
   };
 
   # Necessary for using flakes on this system.
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = ["nix-command" "flakes"];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -82,12 +89,11 @@
     users.nix = {
       isNormalUser = true;
       description = "nix";
-      extraGroups = [ "networkmanager" "wheel" ];
+      extraGroups = ["networkmanager" "wheel"];
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPdsaBGuK12xRMbGNPL2utoTc0lziypsWdAKsUCh6lru jens@j-ubuntu"
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILh7s/A2WOBY+O+Q10iwZ5L0dqfbVc+5IaaT9VUHvcl5 jens@Jenss-MacBook-Pro.local"
       ];
-      packages = with pkgs; [ ];
     };
   };
 
@@ -99,7 +105,7 @@
 
   nixpkgs.config.allowUnfree = true;
 
-  environment = { systemPackages = with pkgs; [ helix wget git ]; };
+  environment = {systemPackages = with pkgs; [helix wget git];};
 
   system.stateVersion = "25.05";
 }

@@ -1,16 +1,18 @@
-{ pkgs, inputs, ... }:
-
 {
+  pkgs,
+  inputs,
+  ...
+}: {
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
-  environment.systemPackages = with pkgs; [ helix wget bottom ];
+  environment.systemPackages = with pkgs; [helix wget bottom];
 
   home-manager = {
     backupFileExtension = "before-nix-darwin";
     useGlobalPkgs = true;
     useUserPackages = true;
-    extraSpecialArgs = { inherit inputs; };
-    users.jens = { pkgs, ... }: {
+    extraSpecialArgs = {inherit inputs;};
+    users.jens = {
       imports = [
         ./home.nix
         inputs.self.outputs.homeManagerModules.default
@@ -20,7 +22,7 @@
   };
 
   # Necessary for using flakes on this system.
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = ["nix-command" "flakes"];
 
   # Enable alternative shell support in nix-darwin.
   programs.fish.enable = true;

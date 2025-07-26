@@ -1,4 +1,8 @@
-{ pkgs, config, lib, ... }: {
+{
+  config,
+  lib,
+  ...
+}: {
   imports = [
     ./shell/fish.nix
     ./shell/zellij.nix
@@ -17,7 +21,7 @@
     fish.enable = lib.mkDefault true;
     zellij.enable = lib.mkDefault true;
     helix.enable = lib.mkDefault true;
-    base.enable = lib.mkDefault true;
+    base-pkgs.enable = lib.mkDefault true;
     git.enable = lib.mkDefault true;
     ghostty.enable = lib.mkDefault false;
   };
