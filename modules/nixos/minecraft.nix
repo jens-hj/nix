@@ -35,6 +35,12 @@
       chmod -R 770 /srv/minecraft
     '';
 
+    # Open both TCP and UDP ports explicitly
+    networking.firewall = {
+      allowedTCPPorts = [25565];
+      allowedUDPPorts = [25565];
+    };
+
     services.minecraft-servers = {
       enable = true;
       eula = true;
