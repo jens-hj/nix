@@ -56,23 +56,39 @@
 
         # Copy important directories and files from existing server
         # Exclude files that should be managed by NixOS
+
+        # World directories
         cp -r "$IMPORT_PATH/world" /srv/minecraft/test/ 2>/dev/null || true
         cp -r "$IMPORT_PATH/world_nether" /srv/minecraft/test/ 2>/dev/null || true
         cp -r "$IMPORT_PATH/world_the_end" /srv/minecraft/test/ 2>/dev/null || true
         cp -r "$IMPORT_PATH/plugins" /srv/minecraft/test/ 2>/dev/null || true
+
+        # Datapacks
         cp -r "$IMPORT_PATH/datapacks" /srv/minecraft/test/ 2>/dev/null || true
 
         # Import server icon if it exists
         cp "$IMPORT_PATH/server-icon.png" /srv/minecraft/test/ 2>/dev/null || true
 
-        # Import player data files
-        cp "$IMPORT_PATH"/*.json /srv/minecraft/test/ 2>/dev/null || true
+        # Import configuration files
+        cp "$IMPORT_PATH/bukkit.yml" /srv/minecraft/test/ 2>/dev/null || true
+        cp "$IMPORT_PATH/spigot.yml" /srv/minecraft/test/ 2>/dev/null || true
+        cp "$IMPORT_PATH/paper.yml" /srv/minecraft/test/ 2>/dev/null || true
+        cp "$IMPORT_PATH/commands.yml" /srv/minecraft/test/ 2>/dev/null || true
+        cp "$IMPORT_PATH/permissions.yml" /srv/minecraft/test/ 2>/dev/null || true
+
+        # Import JSON configuration files except whitelist.json and ops.json (managed declaratively)
+        for json_file in "$IMPORT_PATH"/*.json; do
+          base_name=$(basename "$json_file")
+          if [[ "$base_name" != "whitelist.json" && "$base_name" != "ops.json" ]]; then
+            cp "$json_file" /srv/minecraft/test/ 2>/dev/null || true
+          fi
+        done
 
         # Fix permissions
         chown -R minecraft:minecraft /srv/minecraft/test
         chmod -R 770 /srv/minecraft/test
 
-        echo "Import completed."
+        echo "Minecraft server import completed."
       ''}
     '';
 
