@@ -139,7 +139,7 @@
           };
 
           serverProperties = {
-            motd = "§9§l§oBOP §4§l§oBIP";
+            motd = "§9§l§oBOP §4§l§oBIP §5§lSEQUEL";
             white-list = true;
             enforce-whitelist = true;
             enable-rcon = true;
