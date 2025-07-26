@@ -1,10 +1,14 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   home.stateVersion = "24.05";
 
   catppuccin.flavor = "mocha";
   catppuccin.enable = true;
 
-  nixpkgs.config.allowUnfree = true;
+  # nixpkgs.config.allowUnfree has been moved to system-level configuration
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
@@ -17,23 +21,18 @@
     pixi
     pgweb
     dconf
-    pre-commit
     comma
     tokei
     ripgrep
     ripgrep-all
-    sqlite
     tealdeer
-    alejandra
-    difftastic
-    nix-prefetch-github
-    nixfmt-classic
     k9s
     monocraft
   ];
 
   # Enable the custom base configuration from ./../../modules/default.nix
   base.enable = true;
+  shell.brew.enable = lib.mkForce true;
 
   programs = {
     # Enable home-manager itself

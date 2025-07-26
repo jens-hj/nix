@@ -1,9 +1,15 @@
-{ pkgs, config, lib, ... }: {
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}: {
   options = {
-    fish.enable = lib.mkEnableOption "enable custom configured fish";
+    shell.fish.enable = lib.mkEnableOption "enable custom configured fish";
+    shell.brew.enable = lib.mkEnableOption "enable homebrew in fish";
   };
 
-  config = lib.mkIf config.fish.enable {
+  config = lib.mkIf config.shell.fish.enable {
     home.packages = with pkgs; [
       grc
       eza
@@ -20,17 +26,14 @@
           rf = "exec fish";
           rfc = "clear && exec fish";
           dr = "darwin-rebuild switch --flake ~/repos/nix/#macbook";
-          obs =
-            "pushd ~/repos/notes; git status; git add .; gstatus; git commit --message 'commit from abbr'; gstatus; git push; popd;";
+          obs = "pushd ~/repos/notes; git status; git add .; gstatus; git commit --message 'commit from abbr'; gstatus; git push; popd;";
           code = "code-insiders";
-          xc-sim =
-            "xcodebuild -scheme Nanolet -destination 'platform=iOS Simulator,name=iPhone 16' BUILD_DIR=./build; xcrun simctl install booted ./build/Debug-iphonesimulator/Nanolet.app/; xcrun simctl launch booted Unincorporated.Dev.Nanolet";
+          xc-sim = "xcodebuild -scheme Nanolet -destination 'platform=iOS Simulator,name=iPhone 16' BUILD_DIR=./build; xcrun simctl install booted ./build/Debug-iphonesimulator/Nanolet.app/; xcrun simctl launch booted Unincorporated.Dev.Nanolet";
         };
         shellAliases = {
           space = "duf --hide-fs squashfs";
           ls = "eza --icons --group-directories-first --classify --grid";
-          ll =
-            "eza --icons --group-directories-first --classify --long --header --git";
+          ll = "eza --icons --group-directories-first --classify --long --header --git";
         };
         interactiveShellInit = ''
           set fish_greeting # Disable greeting
@@ -48,7 +51,10 @@
               commandline -f repaint
           end
 
-          eval "$(/opt/homebrew/bin/brew shellenv)"
+          ${lib.optionalString config.shell.brew.enable ''
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+          ''}
+
           set -x DIRENV_LOG_FORMAT
           set -x TERM xterm-256color
 

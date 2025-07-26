@@ -1,10 +1,13 @@
-{ pkgs, config, lib, ... }: {
+{
+  config,
+  lib,
+  ...
+}: {
   options = {
-    ghostty.enable = lib.mkEnableOption "enable custom configured ghostty";
+    terminal.ghostty.enable = lib.mkEnableOption "enable custom configured ghostty";
   };
 
-  config = lib.mkIf config.ghostty.enable {
+  config = lib.mkIf config.terminal.ghostty.enable {
     programs.ghostty.enable = true;
-    # home.packages = [ pkgs.ghostty ];
   };
 }

@@ -48,4 +48,7 @@
     home = "/Users/jens";
   };
   system.primaryUser = "jens";
+
+  # Allow unfree packages
+  nixpkgs.config.allowUnfree = true;
 }

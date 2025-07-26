@@ -5,14 +5,11 @@
   ...
 }: {
   options = {
-    base-pkgs.enable = lib.mkEnableOption "enable baseline packages";
+    utils.cli.enable = lib.mkEnableOption "enable baseline cli utils packages";
   };
 
-  config = lib.mkIf config.base-pkgs.enable {
+  config = lib.mkIf config.utils.cli.enable {
     home.packages = with pkgs; [
-      alejandra
-      nil
-      nixd
       croc
       dust
       bat

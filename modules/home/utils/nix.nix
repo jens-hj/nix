@@ -1,0 +1,22 @@
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}: {
+  options = {
+    utils.nix.enable = lib.mkEnableOption "enables nix utilities";
+  };
+
+  config = lib.mkIf config.utils.nix.enable {
+    home.packages = with pkgs; [
+      nix
+      nix-prefetch-github
+      nix-prefetch-url
+      nixfmt-classic
+      alejandra
+      nil
+      nixd
+    ];
+  };
+}

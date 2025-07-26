@@ -1,17 +1,21 @@
-{ pkgs, config, lib, ... }:
 {
+  pkgs,
+  config,
+  lib,
+  ...
+}: {
   options = {
-    zellij.enable = lib.mkEnableOption "enable custom configured zellij";
+    shell.zellij.enable = lib.mkEnableOption "enable custom configured zellij";
   };
 
-  config = lib.mkIf config.zellij.enable {
+  config = lib.mkIf config.shell.zellij.enable {
     home.packages = with pkgs; [
       zellij
     ];
 
     # Configuration
     home.file = {
-        ".config/zellij/layouts/custom-layout.kdl".text = ''
+      ".config/zellij/layouts/custom-layout.kdl".text = ''
         layout {
             default_tab_template {
             children
@@ -35,22 +39,20 @@
             }
             tab name="default" focus=true
         }
-        '';
-        ".config/zellij/plugins/zjstatus.wasm".source = pkgs.fetchurl {
-        url =
-            "https://github.com/dj95/zjstatus/releases/latest/download/zjstatus.wasm";
+      '';
+      ".config/zellij/plugins/zjstatus.wasm".source = pkgs.fetchurl {
+        url = "https://github.com/dj95/zjstatus/releases/latest/download/zjstatus.wasm";
         sha256 = "sha256-p6JTnAyim0T3TkJzGhEitzc3JpPovL5k7jb8gv+oLD4=";
-        };
-        ".config/zellij/plugins/room.wasm".source = pkgs.fetchurl {
+      };
+      ".config/zellij/plugins/room.wasm".source = pkgs.fetchurl {
         url = "https://github.com/rvcas/room/releases/latest/download/room.wasm";
         sha256 = "sha256-t6GPP7OOztf6XtBgzhLF+edUU294twnu0y5uufXwrkw=";
-        };
-        ".config/zellij/plugins/zellij_forgot.wasm".source = pkgs.fetchurl {
-        url =
-            "https://github.com/karimould/zellij-forgot/releases/latest/download/zellij_forgot.wasm";
+      };
+      ".config/zellij/plugins/zellij_forgot.wasm".source = pkgs.fetchurl {
+        url = "https://github.com/karimould/zellij-forgot/releases/latest/download/zellij_forgot.wasm";
         sha256 = "sha256-MRlBRVGdvcEoaFtFb5cDdDePoZ/J2nQvvkoyG6zkSds=";
-        };
-        ".config/zellij/config.kdl".text = ''
+      };
+      ".config/zellij/config.kdl".text = ''
             session_serialization false
             copy_on_select true
             on_force_close "quit"
@@ -133,7 +135,7 @@
                 }
             }
         }
-        '';
+      '';
     };
   };
 }

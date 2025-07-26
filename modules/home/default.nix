@@ -7,8 +7,9 @@
     ./shell/fish.nix
     ./shell/zellij.nix
     ./editor/helix.nix
-    ./other/base.nix
     ./other/git.nix
+    ./utils/sh.nix
+    ./utils/nix.nix
     ./terminal/ghostty.nix
   ];
 
@@ -18,11 +19,20 @@
   };
 
   config = lib.mkIf config.base.enable {
-    fish.enable = lib.mkDefault true;
-    zellij.enable = lib.mkDefault true;
-    helix.enable = lib.mkDefault true;
-    base-pkgs.enable = lib.mkDefault true;
-    git.enable = lib.mkDefault true;
-    ghostty.enable = lib.mkDefault false;
+    # Utils
+    utils.sh.enable = lib.mkDefault true;
+    utils.nix.enable = lib.mkDefault true;
+    utils.git.enable = lib.mkDefault true;
+
+    # Shell
+    shell.fish.enable = lib.mkDefault true;
+    shell.brew.enable = lib.mkDefault false;
+    shell.zellij.enable = lib.mkDefault true;
+
+    # Editor
+    editor.helix.enable = lib.mkDefault true;
+
+    # Terminal
+    terminal.ghostty.enable = lib.mkDefault false;
   };
 }
