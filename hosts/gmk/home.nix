@@ -35,6 +35,7 @@
     nix-prefetch-github
     nixfmt-classic
     nerd-fonts.jetbrains-mono
+    bottom
   ];
 
   # Enable the custom base configuration from ./../../modules/default.nix
