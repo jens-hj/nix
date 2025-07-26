@@ -62,6 +62,9 @@
         cp -r "$IMPORT_PATH/plugins" /srv/minecraft/test/ 2>/dev/null || true
         cp -r "$IMPORT_PATH/datapacks" /srv/minecraft/test/ 2>/dev/null || true
 
+        # Import server icon if it exists
+        cp "$IMPORT_PATH/server-icon.png" /srv/minecraft/test/ 2>/dev/null || true
+
         # Import player data files
         cp "$IMPORT_PATH"/*.json /srv/minecraft/test/ 2>/dev/null || true
 
