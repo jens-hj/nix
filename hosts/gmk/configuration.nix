@@ -8,7 +8,7 @@
   # Enable the Minecraft server
   srv.minecraft = {
     enable = true;
-    importExistingFiles = "/home/nix/srv/minecraft/commune-bak";
+    # importExistingFiles = "/home/nix/srv/minecraft/commune-bak";
   };
 
   home-manager = {
