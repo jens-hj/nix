@@ -18,7 +18,7 @@
       inputs.nix-minecraft.overlay
     ];
 
-    services.minecraft-minecraft-server = {
+    services.minecraft-server = {
       enable = true;
       eula = true;
       dataDir = "/home/nix/srv/minecraft";
