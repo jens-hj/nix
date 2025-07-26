@@ -18,10 +18,27 @@
       inputs.nix-minecraft.overlay
     ];
 
+    # Create the data directory with proper permissions
+    systemd.tmpfiles.rules = [
+      "d /srv/minecraft 0770 minecraft minecraft -"
+      "d /srv/minecraft/test 0770 minecraft minecraft -"
+      "Z /srv/minecraft 0770 minecraft minecraft -"
+    ];
+
+    # Add your user to the minecraft group to access server files
+    users.groups.minecraft.members = ["nix"];
+
+    # Create the server directory ahead of time
+    system.activationScripts.minecraftDir = ''
+      mkdir -p /srv/minecraft/test
+      chown -R minecraft:minecraft /srv/minecraft
+      chmod -R 770 /srv/minecraft
+    '';
+
     services.minecraft-servers = {
       enable = true;
       eula = true;
-      dataDir = "/home/nix/srv/minecraft";
+      # dataDir = "/home/nix/srv/minecraft";
 
       servers = {
         test = {
