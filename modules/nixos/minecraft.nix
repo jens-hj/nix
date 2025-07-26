@@ -12,10 +12,10 @@
   options = {
     srv.minecraft.enable = lib.mkEnableOption "enable minecraft servers";
     srv.minecraft.importExistingFiles = lib.mkOption {
-      type = lib.types.nullOr lib.types.path;
+      type = lib.types.nullOr lib.types.str;
       default = null;
       example = "/path/to/existing/minecraft/server";
-      description = "Path to existing Minecraft server files to import";
+      description = "Path to existing Minecraft server files to import (as string to avoid pure evaluation issues)";
     };
   };
 
@@ -43,7 +43,7 @@
 
       ${lib.optionalString (config.srv.minecraft.importExistingFiles != null) ''
         # Import existing server files if specified
-        echo "Importing existing Minecraft server files from ${config.srv.minecraft.importExistingFiles}..."
+        echo "Importing existing Minecraft server files from ''${config.srv.minecraft.importExistingFiles}..."
 
         # Create backup of current files if they exist
         if [ -d /srv/minecraft/test/world ]; then
@@ -55,14 +55,14 @@
 
         # Copy important directories and files from existing server
         # Exclude files that should be managed by NixOS
-        cp -r ${config.srv.minecraft.importExistingFiles}/world /srv/minecraft/test/ 2>/dev/null || true
-        cp -r ${config.srv.minecraft.importExistingFiles}/world_nether /srv/minecraft/test/ 2>/dev/null || true
-        cp -r ${config.srv.minecraft.importExistingFiles}/world_the_end /srv/minecraft/test/ 2>/dev/null || true
-        cp -r ${config.srv.minecraft.importExistingFiles}/plugins /srv/minecraft/test/ 2>/dev/null || true
-        cp -r ${config.srv.minecraft.importExistingFiles}/datapacks /srv/minecraft/test/ 2>/dev/null || true
+        cp -r "''${config.srv.minecraft.importExistingFiles}/world" /srv/minecraft/test/ 2>/dev/null || true
+        cp -r "''${config.srv.minecraft.importExistingFiles}/world_nether" /srv/minecraft/test/ 2>/dev/null || true
+        cp -r "''${config.srv.minecraft.importExistingFiles}/world_the_end" /srv/minecraft/test/ 2>/dev/null || true
+        cp -r "''${config.srv.minecraft.importExistingFiles}/plugins" /srv/minecraft/test/ 2>/dev/null || true
+        cp -r "''${config.srv.minecraft.importExistingFiles}/datapacks" /srv/minecraft/test/ 2>/dev/null || true
 
         # Import player data files
-        cp ${config.srv.minecraft.importExistingFiles}/*.json /srv/minecraft/test/ 2>/dev/null || true
+        cp "''${config.srv.minecraft.importExistingFiles}"/*.json /srv/minecraft/test/ 2>/dev/null || true
 
         # Fix permissions
         chown -R minecraft:minecraft /srv/minecraft/test
