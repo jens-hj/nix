@@ -1,8 +1,4 @@
-{
-  pkgs,
-  lib,
-  ...
-}: {
+{ pkgs, lib, ... }: {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "nix";
@@ -22,8 +18,6 @@
     flavor = "mocha";
   };
 
-  nixpkgs.config.allowUnfree = true;
-
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
@@ -40,7 +34,7 @@
 
   # Enable the custom base configuration from ./../../modules/default.nix
   base.enable = true;
-  ghostty.enable = lib.mkForce true;
+  terminal.ghostty.enable = lib.mkForce true;
 
   programs = {
     # Enable home-manager itself
