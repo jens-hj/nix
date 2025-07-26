@@ -27,7 +27,7 @@
     # Create the data directory with proper permissions
     systemd.tmpfiles.rules = [
       "d /srv/minecraft 0770 minecraft minecraft -"
-      "d /srv/minecraft/test 0770 minecraft minecraft -"
+      "d /srv/minecraft/commune 0770 minecraft minecraft -"
       "Z /srv/minecraft 0770 minecraft minecraft -"
       "d /srv/minecraft/backups 0770 minecraft minecraft -"
     ];
@@ -37,7 +37,7 @@
 
     # Create the server directory ahead of time
     system.activationScripts.minecraftDir = ''
-      mkdir -p /srv/minecraft/test
+      mkdir -p /srv/minecraft/commune
       chown -R minecraft:minecraft /srv/minecraft
       chmod -R 770 /srv/minecraft
 
@@ -47,10 +47,10 @@
         echo "Importing existing Minecraft server files from $IMPORT_PATH..."
 
         # Create backup of current files if they exist
-        if [ -d /srv/minecraft/test/world ]; then
+        if [ -d /srv/minecraft/commune/world ]; then
           BACKUP_DIR="/srv/minecraft/backups/$(date +%Y%m%d_%H%M%S)"
           mkdir -p "$BACKUP_DIR"
-          cp -r /srv/minecraft/test/world "$BACKUP_DIR/"
+          cp -r /srv/minecraft/commune/world "$BACKUP_DIR/"
           echo "Backed up existing world to $BACKUP_DIR"
         fi
 
@@ -58,35 +58,35 @@
         # Exclude files that should be managed by NixOS
 
         # World directories
-        cp -r "$IMPORT_PATH/world" /srv/minecraft/test/ 2>/dev/null || true
-        cp -r "$IMPORT_PATH/world_nether" /srv/minecraft/test/ 2>/dev/null || true
-        cp -r "$IMPORT_PATH/world_the_end" /srv/minecraft/test/ 2>/dev/null || true
-        cp -r "$IMPORT_PATH/plugins" /srv/minecraft/test/ 2>/dev/null || true
+        cp -r "$IMPORT_PATH/world" /srv/minecraft/commune/ 2>/dev/null || true
+        cp -r "$IMPORT_PATH/world_nether" /srv/minecraft/commune/ 2>/dev/null || true
+        cp -r "$IMPORT_PATH/world_the_end" /srv/minecraft/commune/ 2>/dev/null || true
+        cp -r "$IMPORT_PATH/plugins" /srv/minecraft/commune/ 2>/dev/null || true
 
         # Datapacks
-        cp -r "$IMPORT_PATH/datapacks" /srv/minecraft/test/ 2>/dev/null || true
+        cp -r "$IMPORT_PATH/datapacks" /srv/minecraft/commune/ 2>/dev/null || true
 
         # Import server icon if it exists
-        cp "$IMPORT_PATH/server-icon.png" /srv/minecraft/test/ 2>/dev/null || true
+        cp "$IMPORT_PATH/server-icon.png" /srv/minecraft/commune/ 2>/dev/null || true
 
         # Import configuration files
-        cp "$IMPORT_PATH/bukkit.yml" /srv/minecraft/test/ 2>/dev/null || true
-        cp "$IMPORT_PATH/spigot.yml" /srv/minecraft/test/ 2>/dev/null || true
-        cp "$IMPORT_PATH/paper.yml" /srv/minecraft/test/ 2>/dev/null || true
-        cp "$IMPORT_PATH/commands.yml" /srv/minecraft/test/ 2>/dev/null || true
-        cp "$IMPORT_PATH/permissions.yml" /srv/minecraft/test/ 2>/dev/null || true
+        cp "$IMPORT_PATH/bukkit.yml" /srv/minecraft/commune/ 2>/dev/null || true
+        cp "$IMPORT_PATH/spigot.yml" /srv/minecraft/commune/ 2>/dev/null || true
+        cp "$IMPORT_PATH/paper.yml" /srv/minecraft/commune/ 2>/dev/null || true
+        cp "$IMPORT_PATH/commands.yml" /srv/minecraft/commune/ 2>/dev/null || true
+        cp "$IMPORT_PATH/permissions.yml" /srv/minecraft/commune/ 2>/dev/null || true
 
         # Import JSON configuration files except whitelist.json and ops.json (managed declaratively)
         for json_file in "$IMPORT_PATH"/*.json; do
           base_name=$(basename "$json_file")
           if [[ "$base_name" != "whitelist.json" && "$base_name" != "ops.json" ]]; then
-            cp "$json_file" /srv/minecraft/test/ 2>/dev/null || true
+            cp "$json_file" /srv/minecraft/commune/ 2>/dev/null || true
           fi
         done
 
         # Fix permissions
-        chown -R minecraft:minecraft /srv/minecraft/test
-        chmod -R 770 /srv/minecraft/test
+        chown -R minecraft:minecraft /srv/minecraft/commune
+        chmod -R 770 /srv/minecraft/commune
 
         echo "Minecraft server import completed."
       ''}
@@ -104,7 +104,7 @@
       # dataDir = "/home/nix/srv/minecraft";
 
       servers = {
-        test = {
+        commune = {
           enable = true;
           package = pkgs.papermcServers.papermc-1_21_6;
           openFirewall = true;
