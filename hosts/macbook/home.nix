@@ -31,6 +31,7 @@
     nix-prefetch-github
     nixfmt-classic
     k9s
+    monocraft
   ];
 
   # Enable the custom base configuration from ./../../modules/default.nix

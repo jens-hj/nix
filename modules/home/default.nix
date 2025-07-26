@@ -3,6 +3,7 @@
     ./shell/fish.nix
     ./shell/zellij.nix
     ./editor/helix.nix
+    ./other/base.nix
     ./other/git.nix
     ./terminal/ghostty.nix
   ];
@@ -16,6 +17,7 @@
     fish.enable = lib.mkDefault true;
     zellij.enable = lib.mkDefault true;
     helix.enable = lib.mkDefault true;
+    base.enable = lib.mkDefault true;
     git.enable = lib.mkDefault true;
     ghostty.enable = lib.mkDefault false;
   };

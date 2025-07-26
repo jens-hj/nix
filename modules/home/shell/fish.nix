@@ -8,14 +8,6 @@
       grc
       eza
       tree
-      croc
-      dust
-      bat
-      zip
-      unzip
-      duf
-      wget
-      curl
       sqlite
       pre-commit
     ];
@@ -56,6 +48,7 @@
               commandline -f repaint
           end
 
+          eval "$(/opt/homebrew/bin/brew shellenv)"
           set -x DIRENV_LOG_FORMAT
           set -x TERM xterm-256color
 

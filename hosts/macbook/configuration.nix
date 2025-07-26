@@ -45,4 +45,5 @@
     name = "jens";
     home = "/Users/jens";
   };
+  system.primaryUser = "jens";
 }
