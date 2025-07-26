@@ -5,14 +5,15 @@
   lib,
   ...
 }: {
+  imports = [
+    inputs.nix-minecraft.nixosModules.minecraft-servers
+  ];
+
   options = {
     srv.minecraft.enable = lib.mkEnableOption "enable minecraft servers";
   };
 
   config = lib.mkIf config.srv.minecraft.enable {
-    imports = [
-      inputs.nix-minecraft.nixosModules.minecraft-servers
-    ];
     nixpkgs.overlays = [
       inputs.nix-minecraft.overlay
     ];
