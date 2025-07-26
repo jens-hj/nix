@@ -44,7 +44,7 @@
         test = {
           enable = true;
           package = pkgs.papermcServers.papermc-1_21_6;
-          # openFirewall = true;
+          openFirewall = true;
 
           whitelist = {
             Baltakopa20 = "721a58a5-f31f-4a9b-81ae-3a358fab48ed";
