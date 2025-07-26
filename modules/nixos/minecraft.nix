@@ -11,6 +11,12 @@
 
   options = {
     srv.minecraft.enable = lib.mkEnableOption "enable minecraft servers";
+    srv.minecraft.importExistingFiles = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      example = "/path/to/existing/minecraft/server";
+      description = "Path to existing Minecraft server files to import";
+    };
   };
 
   config = lib.mkIf config.srv.minecraft.enable {
@@ -23,6 +29,7 @@
       "d /srv/minecraft 0770 minecraft minecraft -"
       "d /srv/minecraft/test 0770 minecraft minecraft -"
       "Z /srv/minecraft 0770 minecraft minecraft -"
+      "d /srv/minecraft/backups 0770 minecraft minecraft -"
     ];
 
     # Add your user to the minecraft group to access server files
@@ -33,11 +40,41 @@
       mkdir -p /srv/minecraft/test
       chown -R minecraft:minecraft /srv/minecraft
       chmod -R 770 /srv/minecraft
+
+      ${lib.optionalString (config.srv.minecraft.importExistingFiles != null) ''
+        # Import existing server files if specified
+        echo "Importing existing Minecraft server files from ${config.srv.minecraft.importExistingFiles}..."
+
+        # Create backup of current files if they exist
+        if [ -d /srv/minecraft/test/world ]; then
+          BACKUP_DIR="/srv/minecraft/backups/$(date +%Y%m%d_%H%M%S)"
+          mkdir -p "$BACKUP_DIR"
+          cp -r /srv/minecraft/test/world "$BACKUP_DIR/"
+          echo "Backed up existing world to $BACKUP_DIR"
+        fi
+
+        # Copy important directories and files from existing server
+        # Exclude files that should be managed by NixOS
+        cp -r ${config.srv.minecraft.importExistingFiles}/world /srv/minecraft/test/ 2>/dev/null || true
+        cp -r ${config.srv.minecraft.importExistingFiles}/world_nether /srv/minecraft/test/ 2>/dev/null || true
+        cp -r ${config.srv.minecraft.importExistingFiles}/world_the_end /srv/minecraft/test/ 2>/dev/null || true
+        cp -r ${config.srv.minecraft.importExistingFiles}/plugins /srv/minecraft/test/ 2>/dev/null || true
+        cp -r ${config.srv.minecraft.importExistingFiles}/datapacks /srv/minecraft/test/ 2>/dev/null || true
+
+        # Import player data files
+        cp ${config.srv.minecraft.importExistingFiles}/*.json /srv/minecraft/test/ 2>/dev/null || true
+
+        # Fix permissions
+        chown -R minecraft:minecraft /srv/minecraft/test
+        chmod -R 770 /srv/minecraft/test
+
+        echo "Import completed."
+      ''}
     '';
 
-    # Open both TCP and UDP ports explicitly
+    # Open both TCP and UDP ports for Minecraft and RCON
     networking.firewall = {
-      allowedTCPPorts = [25565];
+      allowedTCPPorts = [25565 25575]; # Minecraft and RCON
       allowedUDPPorts = [25565];
     };
 

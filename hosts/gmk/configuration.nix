@@ -6,7 +6,10 @@
   imports = [./hardware.nix];
 
   # Enable the Minecraft server
-  srv.minecraft.enable = true;
+  srv.minecraft = {
+    enable = true;
+    importExistingFiles = /home/nix/srv/minecraft/commune-bak;
+  };
 
   home-manager = {
     backupFileExtension = "before-home-manager";
