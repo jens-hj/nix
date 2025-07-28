@@ -22,12 +22,9 @@
       fish = {
         enable = true;
         shellAbbrs = {
-          nixb = "sudo nixos-rebuild switch --flake /home/jens/nixos#default";
           rf = "exec fish";
           rfc = "clear && exec fish";
-          dr = "darwin-rebuild switch --flake ~/repos/nix/#macbook";
           obs = "pushd ~/repos/notes; git status; git add .; gstatus; git commit --message 'commit from abbr'; gstatus; git push; popd;";
-          code = "code-insiders";
           xc-sim = "xcodebuild -scheme Nanolet -destination 'platform=iOS Simulator,name=iPhone 16' BUILD_DIR=./build; xcrun simctl install booted ./build/Debug-iphonesimulator/Nanolet.app/; xcrun simctl launch booted Unincorporated.Dev.Nanolet";
         };
         shellAliases = {
@@ -38,7 +35,60 @@
         interactiveShellInit = ''
           set fish_greeting # Disable greeting
 
-          function super-tab
+          ${lib.optionalString config.shell.brew.enable ''
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+          ''}
+
+          set -x DIRENV_LOG_FORMAT
+          set -x TERM xterm-256color
+
+          bind \t 'super-tab'
+
+          if not set -q ZELLIJ
+              zellij
+          end
+        '';
+        shellInit = ''
+          set --universal git_fish_git_status_command gstatus
+        '';
+        functions = {
+          nixr = {
+            description = "Rebuild NixOS configuration with flake";
+            body = ''
+              if test (count $argv) -eq 0
+                  echo "Error: Configuration name is required"
+                  echo "Usage: nixr <config-name>"
+                  echo "Available configurations: default (d), gmk (g), macbook (m)"
+                  return 1
+              end
+
+              set -l input $argv[1]
+              set -l config
+
+              # Map short names to full configuration names
+              switch $input
+                  case d
+                      set config "default"
+                  case g
+                      set config "gmk"
+                  case m
+                      set config "macbook"
+                  case '*'
+                      set config $input
+              end
+
+              if test "$config" = "macbook"
+                  echo "Rebuilding Darwin configuration: $config"
+                  sudo darwin-rebuild switch --flake ~/repos/nix/#$config
+              else
+                  echo "Rebuilding NixOS configuration: $config"
+                  sudo nixos-rebuild switch --flake ~/repos/nix/#$config
+              end
+            '';
+          };
+          super-tab = {
+            description = "Enhanced tab completion that opens repos when empty line";
+            body = ''
               commandline --paging-mode && down-or-search && return
 
               set -l buf (commandline)
@@ -49,24 +99,9 @@
                   commandline -f pager-toggle-search
               end
               commandline -f repaint
-          end
-
-          ${lib.optionalString config.shell.brew.enable ''
-            eval "$(/opt/homebrew/bin/brew shellenv)"
-          ''}
-
-          set -x DIRENV_LOG_FORMAT
-          set -x TERM xterm-256color
-
-          bind \t super-tab
-
-          if not set -q ZELLIJ
-              zellij
-          end
-        '';
-        shellInit = ''
-          set --universal git_fish_git_status_command gstatus
-        '';
+            '';
+          };
+        };
         plugins = [
           # Enable a plugin (here grc for colorized command output) from nixpkgs
           {
