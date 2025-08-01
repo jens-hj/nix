@@ -44,8 +44,9 @@
 
           bind \t 'super-tab'
 
+          # Start or attach to Zellij session
           if not set -q ZELLIJ
-              zellij
+              zellij-auto
           end
         '';
         shellInit = ''
@@ -99,6 +100,103 @@
                   commandline -f pager-toggle-search
               end
               commandline -f repaint
+            '';
+          };
+          zellij-auto = {
+            description = "Smart Zellij session management with terminal-specific sessions";
+            body = ''
+              # Skip if already in a Zellij session
+              if set -q ZELLIJ
+                  return
+              end
+
+              # Determine terminal type and session name
+              set -l term_type "default"
+              set -l is_visor false
+
+              # Better terminal detection
+              set -l term_cmd (ps -p $fish_pid -o ppid= | xargs ps -p -o comm= 2>/dev/null)
+
+              # Get window title and TERM_PROGRAM for additional detection methods
+              set -l term_program (echo $TERM_PROGRAM 2>/dev/null)
+              set -l window_title (echo $KITTY_WINDOW_TITLE $WINDOW_TITLE $WEZTERM_PANE_TITLE 2>/dev/null)
+
+              # Check for iTerm (case-insensitive)
+              if set -q ITERM_SESSION_ID; or string match -qi "*iterm*" "$term_cmd"; or string match -qi "*iterm*" "$term_program"; or string match -qi "*iterm*" "$window_title"
+                  set term_type "iterm"
+
+                  # Check window dimensions for potential visor detection
+                  # Visor is typically a short window at the top of the screen
+                  # Adjust these values based on your visor's typical dimensions
+                  set -l rows (tput lines)
+                  set -l cols (tput cols)
+
+                  if test "$rows" -lt 20
+                      set is_visor true
+                      set term_type "iterm-visor"
+                  end
+
+                  # Alternative: Detect by profile name if you set a specific profile for visor (case-insensitive)
+                  if set -q ITERM_PROFILE; and string match -qi "*visor*" "$ITERM_PROFILE"
+                      set is_visor true
+                      set term_type "iterm-visor"
+                  end
+              end
+
+              # Check for Ghostty (case-insensitive)
+              # Multiple detection methods for better reliability
+              if string match -qi "*ghostty*" "$term_cmd"; or string match -qi "*ghostty*" "$term_program"; or string match -qi "*ghostty*" "$window_title"
+                  set term_type "ghostty"
+              end
+
+              # Check for Alacritty (case-insensitive)
+              if string match -qi "*alacritty*" "$term_cmd"; or string match -qi "*alacritty*" "$term_program"; or string match -qi "*alacritty*" "$window_title"
+                  set term_type "alacritty"
+              end
+
+              # Check for Kitty (case-insensitive)
+              if string match -qi "*kitty*" "$term_cmd"; or set -q KITTY_WINDOW_ID; or string match -qi "*kitty*" "$term_program"; or string match -qi "*kitty*" "$window_title"
+                  set term_type "kitty"
+              end
+
+              # Debug output to verify detection
+              echo "Terminal detection: $term_type"
+              if test "$is_visor" = "true"
+                  echo "Detected as visor mode"
+              end
+              echo "Terminal command: $term_cmd"
+              echo "TERM_PROGRAM: $term_program"
+              echo "Window title: $window_title"
+              echo "Window size: "(tput lines)" rows x "(tput cols)" columns"
+
+              # Construct session name based on terminal type
+              set -l session_name "$term_type-session"
+
+              # List existing sessions
+              set -l sessions (zellij ls 2>/dev/null)
+              set -l session_exists (echo $sessions | grep -q "$session_name"; and echo "yes" || echo "no")
+
+              # Debug: Show available sessions
+              echo "Available Zellij sessions:"
+              printf "%s\n" $sessions
+              echo "Session '$session_name' exists: $session_exists"
+
+              # Handle session creation or attachment
+              if set -q ZELLIJ_CREATE_FORCED
+                  # Force new session with unique name
+                  set -l timestamp (date +%s)
+                  zellij --session "$term_type-$timestamp"
+              else if test "$session_exists" = "yes"
+                  # Attach to existing session for this terminal type
+                  echo "Attaching to existing $term_type session..."
+                  echo "Attaching to session: $session_name"
+                  zellij attach --create "$session_name"
+              else
+                  # Create new session for this terminal type
+                  echo "Creating new $term_type session..."
+                  echo "Creating new session: $session_name"
+                  zellij --session "$session_name"
+              end
             '';
           };
         };
