@@ -45,9 +45,7 @@
           bind \t 'super-tab'
 
           # Start or attach to Zellij session
-          if not set -q ZELLIJ
-              zellij-auto
-          end
+          zellij-auto
         '';
         shellInit = ''
           set --universal git_fish_git_status_command gstatus

@@ -165,7 +165,7 @@ in {
     };
   };
 
-  networking.hostName = "nixos"; # Define your hostname.
+  networking.hostName = "gmk"; # Define your hostname.
 
   # Enable networking
   networking.networkmanager.enable = true;
