@@ -5,9 +5,6 @@
 }: {
   home.stateVersion = "24.05";
 
-  catppuccin.flavor = "mocha";
-  catppuccin.enable = true;
-
   # nixpkgs.config.allowUnfree has been moved to system-level configuration
 
   # The home.packages option allows you to install Nix packages into your
@@ -15,33 +12,17 @@
   home.packages = with pkgs; [
     aichat
     mcrcon
-    typst
-    typstfmt
     just
     pixi
     pgweb
     dconf
-    comma
-    tokei
-    ripgrep
-    ripgrep-all
-    tealdeer
     k9s
-    monocraft
   ];
 
   # Enable the custom base configuration from ./../../modules/default.nix
   base.enable = true;
   shell.brew.enable = lib.mkForce true;
-
-  programs = {
-    # Enable home-manager itself
-    home-manager.enable = true;
-    # Other
-    direnv.enable = true;
-    fzf.enable = true;
-    ssh.enable = true;
-  };
+  typesetters.typst.enable = lib.mkForce true;
 
   home.sessionVariables = {
     MCRCON_HOST = "192.168.0.188";

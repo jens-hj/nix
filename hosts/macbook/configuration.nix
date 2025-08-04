@@ -5,20 +5,14 @@
 }: {
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
-  environment.systemPackages = with pkgs; [helix wget bottom];
+  environment.systemPackages = with pkgs; [helix wget];
 
-  home-manager = {
-    backupFileExtension = "before-nix-darwin";
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    extraSpecialArgs = {inherit inputs;};
-    users.jens = {
-      imports = [
-        ./home.nix
-        inputs.self.outputs.homeManagerModules.default
-        inputs.catppuccin.homeModules.catppuccin
-      ];
-    };
+  home-manager.users.jens = {
+    imports = [
+      ./home.nix
+      inputs.self.outputs.homeManagerModules.default
+      inputs.catppuccin.homeModules.catppuccin
+    ];
   };
 
   # Necessary for using flakes on this system.

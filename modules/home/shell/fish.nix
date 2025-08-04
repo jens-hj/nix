@@ -22,6 +22,16 @@
       fish = {
         enable = true;
         shellAbbrs = {
+          wgradle = "pwsh.exe -c ./gradlew";
+          wgradleb = "pwsh.exe -c ./gradlew build";
+          wgradlebd = "pwsh.exe -c ./gradlew build deploy";
+          wgradled = "pwsh.exe -c ./gradlew deploy";
+          wind = {
+            position = "anywhere";
+            setCursor = true;
+            expansion = "/mnt/c/Users/jjs/%";
+          };
+          PS = "pwsh.exe";
           rf = "exec fish";
           rfc = "clear && exec fish";
           obs = "pushd ~/repos/notes; git status; git add .; gstatus; git commit --message 'commit from abbr'; gstatus; git push; popd;";

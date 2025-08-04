@@ -11,18 +11,12 @@
     # importExistingFiles = "/home/nix/srv/minecraft/commune-bak";
   };
 
-  home-manager = {
-    backupFileExtension = "before-home-manager";
-    extraSpecialArgs = {inherit inputs;};
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    users.nix = {
-      imports = [
-        ./home.nix
-        inputs.self.outputs.homeManagerModules.default
-        inputs.catppuccin.homeModules.catppuccin
-      ];
-    };
+  home-manager.users.nix = {
+    imports = [
+      ./home.nix
+      inputs.self.outputs.homeManagerModules.default
+      inputs.catppuccin.homeModules.catppuccin
+    ];
   };
 
   # Necessary for using flakes on this system.
@@ -36,7 +30,6 @@
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
 
-  time.timeZone = "Europe/Copenhagen";
   i18n.defaultLocale = "en_DK.UTF-8";
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "da_DK.UTF-8";
@@ -64,11 +57,6 @@
     '';
   };
 
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
-
   # Modern audio setup with PipeWire
   # PipeWire provides complete audio stack with ALSA and PulseAudio compatibility
   security.rtkit.enable = true;
@@ -86,18 +74,14 @@
     settings.PasswordAuthentication = false;
   };
 
-  programs.fish.enable = true;
-  users = {
-    defaultUserShell = pkgs.fish;
-    users.nix = {
-      isNormalUser = true;
-      description = "nix";
-      extraGroups = ["networkmanager" "wheel"];
-      openssh.authorizedKeys.keys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPdsaBGuK12xRMbGNPL2utoTc0lziypsWdAKsUCh6lru jens@j-ubuntu"
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILh7s/A2WOBY+O+Q10iwZ5L0dqfbVc+5IaaT9VUHvcl5 jens@Jenss-MacBook-Pro.local"
-      ];
-    };
+  users.users.nix = {
+    isNormalUser = true;
+    description = "nix";
+    extraGroups = ["networkmanager" "wheel"];
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPdsaBGuK12xRMbGNPL2utoTc0lziypsWdAKsUCh6lru jens@j-ubuntu"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILh7s/A2WOBY+O+Q10iwZ5L0dqfbVc+5IaaT9VUHvcl5 jens@Jenss-MacBook-Pro.local"
+    ];
   };
 
   services.displayManager.autoLogin.enable = true;
@@ -108,7 +92,7 @@
 
   nixpkgs.config.allowUnfree = true;
 
-  environment = {systemPackages = with pkgs; [helix wget git];};
+  environment = {systemPackages = with pkgs; [helix wget];};
 
   system.stateVersion = "25.05";
 }
