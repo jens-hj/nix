@@ -40,6 +40,8 @@
   users.users.jens = {
     name = "jens";
     home = "/Users/jens";
+    # # Explicitly set Fish as this user's shell in macOS
+    shell = pkgs.fish;
   };
   system.primaryUser = "jens";
 

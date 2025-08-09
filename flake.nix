@@ -51,13 +51,16 @@
     };
     # Install `nix-darwin` from https://github.com/nix-darwin/nix-darwin?tab=readme-ov-file#readme
     # Build darwin flake using:
-    # $ darwin-rebuild switch --flake .#macbook
+    # $ darwin-rebuild switch --flake ./<path>/<to>/<this>/<repo>/#macbook
+    # Or for the first time to get nix-darwin initially:
+    # $ sudo nix run github:lnl7/nix-darwin/master -- switch --flake ./<path>/<to>/<this>/<repo>/#macbook
     darwinConfigurations."macbook" = nix-darwin.lib.darwinSystem {
       system = "aarch64-darwin";
       specialArgs = {inherit inputs;};
       modules = [
         ./hosts/macbook/configuration.nix
         home-manager.darwinModules.home-manager
+        self.nixosModules.default
       ];
     };
   };

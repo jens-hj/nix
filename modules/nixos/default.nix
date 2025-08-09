@@ -1,11 +1,12 @@
 {
   inputs,
   pkgs,
+  lib,
   ...
 }: {
-  imports = [
-    ./minecraft.nix
-  ];
+  # imports = [
+  #   ./srv/minecraft.nix
+  # ];
 
   home-manager = {
     backupFileExtension = "before-home-manager";
@@ -14,13 +15,8 @@
     extraSpecialArgs = {inherit inputs;};
   };
 
-  time.timeZone = "Europe/Copenhagen";
-
+  # environment.shells = with pkgs; [fish];
   programs.fish.enable = true;
-  users.defaultUserShell = pkgs.fish;
 
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
+  time.timeZone = "Europe/Copenhagen";
 }
