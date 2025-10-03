@@ -1,4 +1,4 @@
-{ inputs, pkgs, lib, ... }: {
+{ inputs, ... }: {
   imports = [ ./srv/minecraft.nix ];
 
   home-manager = {

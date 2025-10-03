@@ -22,6 +22,9 @@
     # Terminal
     ./terminal/ghostty.nix
 
+    # Languages
+    ./lang/flutter.nix
+
     # Visuals
     ./visuals/fonts.nix
     ./visuals/theme.nix
@@ -56,6 +59,9 @@
 
     # Terminal
     terminal.ghostty.enable = lib.mkDefault false;
+
+    # Languages
+    lang.flutter.enable = lib.mkDefault false;
 
     # Visuals
     visuals.fonts.enable = lib.mkDefault true;

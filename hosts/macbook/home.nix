@@ -9,20 +9,13 @@
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
-  home.packages = with pkgs; [
-    aichat
-    mcrcon
-    just
-    pixi
-    pgweb
-    dconf
-    k9s
-  ];
+  home.packages = with pkgs; [aichat mcrcon just pixi pgweb dconf k9s];
 
   # Enable the custom base configuration from ./../../modules/default.nix
   base.enable = true;
   shell.brew.enable = lib.mkForce true;
   typesetters.typst.enable = lib.mkForce true;
+  utils.cli.profile = "extended";
 
   home.sessionVariables = {
     MCRCON_HOST = "192.168.0.188";
@@ -35,5 +28,7 @@
     RELEASE_CONTAINER_ENGINE = "docker";
     DIRENV_LOG_FORMAT = "";
     TERM = "xterm-256color";
+    # CHROME_EXECUTABLE = "/Applications/Arc.app/Contents/MacOS/Arc";
+    CHROME_EXECUTABLE = "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser";
   };
 }
