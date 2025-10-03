@@ -1,13 +1,5 @@
-{
-  pkgs,
-  inputs,
-  config,
-  lib,
-  ...
-}: {
-  imports = [
-    inputs.nix-minecraft.nixosModules.minecraft-servers
-  ];
+{ pkgs, inputs, config, lib, ... }: {
+  imports = [ inputs.nix-minecraft.nixosModules.minecraft-servers ];
 
   options = {
     srv.minecraft.enable = lib.mkEnableOption "enable minecraft servers";
@@ -15,14 +7,13 @@
       type = lib.types.nullOr lib.types.str;
       default = null;
       example = "/path/to/existing/minecraft/server";
-      description = "Path to existing Minecraft server files to import (as string to avoid pure evaluation issues)";
+      description =
+        "Path to existing Minecraft server files to import (as string to avoid pure evaluation issues)";
     };
   };
 
   config = lib.mkIf config.srv.minecraft.enable {
-    nixpkgs.overlays = [
-      inputs.nix-minecraft.overlay
-    ];
+    nixpkgs.overlays = [ inputs.nix-minecraft.overlay ];
 
     # Create the data directory with proper permissions
     systemd.tmpfiles.rules = [
@@ -33,7 +24,7 @@
     ];
 
     # Add your user to the minecraft group to access server files
-    users.groups.minecraft.members = ["nix"];
+    users.groups.minecraft.members = [ "nix" ];
 
     # Create the server directory ahead of time
     system.activationScripts.minecraftDir = ''
@@ -94,8 +85,8 @@
 
     # Open both TCP and UDP ports for Minecraft and RCON
     networking.firewall = {
-      allowedTCPPorts = [25565 25575]; # Minecraft and RCON
-      allowedUDPPorts = [25565];
+      allowedTCPPorts = [ 25565 25575 ]; # Minecraft and RCON
+      allowedUDPPorts = [ 25565 ];
     };
 
     services.minecraft-servers = {
@@ -106,7 +97,7 @@
       servers = {
         commune = {
           enable = true;
-          package = pkgs.papermcServers.papermc-1_21_6;
+          package = pkgs.papermcServers.papermc-1_21_8;
           openFirewall = true;
 
           whitelist = {
@@ -146,7 +137,7 @@
             "rcon.password" = "7568";
           };
 
-          jvmOpts = "-Xmx8G -Xms8G";
+          jvmOpts = "-Xmx12G -Xms12G";
         };
       };
     };
