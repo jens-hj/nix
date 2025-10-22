@@ -24,20 +24,20 @@
       # Base git configuration
       {
         enable = true;
-        extraConfig.diff.external = "difft";
+        settings.diff.external = "difft";
       }
 
       # Personal git configuration
       (lib.mkIf (config.utils.git.profile == "personal") {
-        userName = "Jens";
-        userEmail = "jens.jens@live.dk";
+        settings.user.name = "Jens";
+        settings.user.email = "jens.jens@live.dk";
       })
 
       # Work git configuration
       (lib.mkIf (config.utils.git.profile == "work") {
-        userName = "Jens Jensen";
-        userEmail = "jjs@systematic.com";
-        extraConfig = {
+        settings.user.name = "Jens Jensen";
+        settings.user.email = "jjs@systematic.com";
+        settings = {
           core.longpaths = true;
           core.autocrlf = false;
           merge.renamelimit = 50000;

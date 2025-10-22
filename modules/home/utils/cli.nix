@@ -39,7 +39,18 @@
     programs = {
       direnv.enable = true;
       fzf.enable = true;
-      ssh.enable = true;
+      ssh = {
+        enable = true;
+        enableDefaultConfig = false;
+        matchBlocks."*" = {
+          forwardAgent = true;
+          compression = true;
+          serverAliveInterval = 60;
+          controlMaster = "auto";
+          controlPersist = "10m";
+          controlPath = "~/.ssh/master-%r@%n:%p";
+        };
+      };
     };
   };
 }
