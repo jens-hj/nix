@@ -1,13 +1,10 @@
-{
-  config,
-  lib,
-  ...
-}: {
+{ config, lib, ... }: {
   imports = [
     # Utils
     ./utils/git.nix
     ./utils/cli.nix
     ./utils/nix.nix
+    ./utils/code-stats.nix
 
     # Shell
     ./shell/fish.nix
@@ -18,6 +15,7 @@
 
     # Editor
     ./editor/helix.nix
+    ./editor/zed.nix
 
     # Terminal
     ./terminal/ghostty.nix
@@ -45,6 +43,7 @@
     utils.cli.enable = lib.mkDefault true;
     utils.nix.enable = lib.mkDefault true;
     utils.git.enable = lib.mkDefault true;
+    utils.code-stats.enable = lib.mkDefault true;
 
     # Shell
     shell.fish.enable = lib.mkDefault true;
@@ -56,6 +55,7 @@
 
     # Editor
     editor.helix.enable = lib.mkDefault true;
+    editor.zed.enable = lib.mkDefault false;
 
     # Terminal
     terminal.ghostty.enable = lib.mkDefault false;

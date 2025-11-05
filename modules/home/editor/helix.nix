@@ -1,9 +1,4 @@
-{
-  pkgs,
-  config,
-  lib,
-  ...
-}: {
+{ pkgs, config, lib, ... }: {
   options = {
     editor.helix.enable = lib.mkEnableOption "enables custom configured helix";
   };
@@ -22,9 +17,9 @@
         {
           name = "nix";
           auto-format = true;
-          formatter.command = "${pkgs.nixfmt-classic}/bin/nixfmt";
+          formatter.command = "${pkgs.alejandra}/bin/nixfmt";
         }
-        {name = "kdl";}
+        { name = "kdl"; }
       ];
       defaultEditor = true;
     };
