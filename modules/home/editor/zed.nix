@@ -56,8 +56,8 @@
 
         #   };
         # };
-        ui_font_size = 24;
-        buffer_font_size = 24;
+        ui_font_size = 20;
+        buffer_font_size = 20;
         wrap_guides = [
           80
           100

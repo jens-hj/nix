@@ -3,7 +3,8 @@
   lib,
   config,
   ...
-}: {
+}:
+{
   options = {
     utils.nix.enable = lib.mkEnableOption "enables nix utilities";
   };
@@ -15,6 +16,7 @@
       alejandra
       nil
       nixd
+      nix-search-tv
     ];
   };
 }

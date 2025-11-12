@@ -15,6 +15,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-colors.url = "github:misterio77/nix-colors";
+    # awww.url = "git+https://codeberg.org/LGFae/awww";
 
     vicinae.url = "github:vicinaehq/vicinae"; # tell Nixos where to get Vicinae
 

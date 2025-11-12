@@ -1,4 +1,9 @@
-{ pkgs, lib, ... }:
+{
+  inputs,
+  pkgs,
+  lib,
+  ...
+}:
 {
 
   home.username = "j";
@@ -12,20 +17,34 @@
     just
     pgweb
     telegram-desktop
-    signal-desktop-bin
+    signal-desktop
     yubioath-flutter
     bitwarden-desktop
     appimage-run
-    fuse3
-    fuse
+    # inputs.awww.packages.${pkgs.system}.awww
+    bluetuith
+    p7zip
+    swaybg
+    gtk3
+    webkitgtk_4_1
+    libusb1
+    keymapp
+    wiremix
+    winetricks
   ];
 
   # Enable the custom base configuration from ./../../modules/default.nix
   base.enable = true;
+  shell.fish.autoStart.zellij.enable = lib.mkForce false;
   terminal.ghostty.enable = lib.mkForce true;
   typesetters.typst.enable = lib.mkForce true;
   utils.cli.profile = lib.mkForce "extended";
   editor.zed.enable = lib.mkForce true;
+  editor.vscode.enable = lib.mkForce true;
+
+  # games.enable = true;
+
+  desktop.enable = true;
 
   programs = {
     firefox = {
@@ -49,10 +68,17 @@
       enable = true;
       autoStart = true;
     };
+    # hyprpaper = {
+    #   enable = true;
+    #   # preload = [ "~/Pictures/Wallpapers/wallpaper.png" ];
+    #   # wallpaper = [ "~/Pictures/Wallpapers/wallpaper.png" ];
+    # };
+    # swaybg.enable = true;
     flameshot = {
       enable = true;
       settings = {
         General = {
+          useGrimAdapter = true;
           disabledTrayIcon = true;
           showStartupLaunchMessage = false;
         };
@@ -90,6 +116,7 @@
   };
 
   home.sessionVariables = {
+    PATH = "$PATH:~/.cargo/bin";
     MCRCON_HOST = "localhost";
     MCRCON_PASS = "7568";
     COLORTERM = "truecolor";

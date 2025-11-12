@@ -3,10 +3,13 @@
   config,
   lib,
   ...
-}: {
+}:
+{
   options = {
     shell.fish.enable = lib.mkEnableOption "enable custom configured fish";
     shell.brew.enable = lib.mkEnableOption "enable homebrew in fish";
+    shell.fish.autoStart.zellij.enable =
+      lib.mkEnableOption "Whether fish should automatically enter a suiting zellij session on start";
   };
 
   config = lib.mkIf config.shell.fish.enable {
@@ -41,6 +44,7 @@
           space = "duf --hide-fs squashfs";
           ls = "eza --icons --group-directories-first --classify --grid";
           ll = "eza --icons --group-directories-first --classify --long --header --git";
+          ns = "nix-search-tv print | fzf --preview 'nix-search-tv preview {}' --scheme history";
         };
         interactiveShellInit = ''
           set fish_greeting # Disable greeting
@@ -54,8 +58,10 @@
 
           bind \t 'super-tab'
 
-          # Start or attach to Zellij session
-          zellij-auto
+          ${lib.optionalString config.shell.fish.autoStart.zellij.enable ''
+            # Start or attach to Zellij session
+            zellij-auto
+          ''}
         '';
         shellInit = ''
           set --universal git_fish_git_status_command gstatus

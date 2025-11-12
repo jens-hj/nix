@@ -10,22 +10,44 @@
   };
 
   config = lib.mkIf config.visuals.theme.enable {
-    # home.file.".config/themes/catppuccin-mocha.taml".text =
-    #   ''${inputs.nix-colors.lib.schemeToYAML inputs.nix-colors.colorSchemes.catppuccin-mocha}'';
     stylix = {
       enable = true;
       autoEnable = true;
-      targets.zed.enable = false;
+      targets = {
+        zed.enable = false;
+        vscode.enable = false;
+      };
+
       image = ./wallpaper.png;
       base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
       polarity = "dark";
+
+      fonts = {
+        monospace = {
+          package = pkgs.nerd-fonts.zed-mono;
+          name = "ZedMono NFM";
+        };
+
+        # sizes = {
+        #   applications = 20;
+        #   terminal = 20;
+        # };
+      };
     };
     # specialisation.light.configuration.stylix = {
     #   base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-latte.yaml";
     #   polarity = "light";
     # };
-    # catppuccin.flavor = "mocha";
-    # catppuccin.enable = true;
+
+    home.pointerCursor = {
+      enable = true;
+      name = "Posy_Cursor_Black";
+      package = pkgs.posy-cursors;
+      size = 64;
+      gtk.enable = true;
+      x11.enable = true;
+    };
+
     home.packages = with pkgs; [
       gnomeExtensions.user-themes
       # … other extensions

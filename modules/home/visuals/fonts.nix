@@ -1,4 +1,10 @@
-{ pkgs, config, lib, ... }: {
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
+{
   options = {
     visuals.fonts.enable = lib.mkEnableOption "enable custom fonts";
   };
@@ -11,5 +17,6 @@
     ];
 
     fonts.fontconfig.enable = true;
+    fonts.fontconfig.defaultFonts.monospace = [ "JetBrainsMono NFM" ];
   };
 }
