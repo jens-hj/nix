@@ -12,13 +12,16 @@
       ./home.nix
       inputs.self.outputs.homeManagerModules.default
       inputs.catppuccin.homeModules.catppuccin
+      inputs.stylix.homeModules.stylix
     ];
   };
 
   wsl.enable = true;
-  wsl.defaultUser = "nixos";
+  wsl.defaultUser = "jens";
 
   programs.fish.enable = true;
+
+  visuals.theme.enable = lib.mkForce false;
 
   nix = {
     # package = pkgs.nixFlakes;
@@ -33,7 +36,7 @@
   };
 
   # Create symlink from /mnt/c/Users/<myuser>/repos to ~/repos
-  systemd.tmpfiles.rules = ["L /home/nixos/clones - - - - /mnt/c/Users/jjs/clones"];
+  systemd.tmpfiles.rules = ["L /home/jens/repos - - - - /mnt/c/Users/jjs/clones"];
 
   security.pki = {
     installCACerts = true;
