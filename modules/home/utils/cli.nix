@@ -33,6 +33,7 @@
           wget
           curl
           file
+          fd
         ];
         extendedPackages = [
           tokei

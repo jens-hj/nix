@@ -2,13 +2,26 @@
   description = "Nixos config flake";
 
   inputs = {
+    # Nix packages and Home Manager
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Nix darwin for MacOS
+    nix-darwin = {
+        url = "github:lnl7/nix-darwin";
+        inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Nix WSL for WSL
+    nixos-wsl = {
+        url = "github:nix-community/NixOS-WSL";
+        inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Theming
     catppuccin.url = "github:catppuccin/nix";
     stylix = {
       url = "github:danth/stylix";
@@ -17,18 +30,12 @@
     nix-colors.url = "github:misterio77/nix-colors";
     # awww.url = "git+https://codeberg.org/LGFae/awww";
 
+    # Desktop Environment
     vicinae.url = "github:vicinaehq/vicinae"; # tell Nixos where to get Vicinae
-
     niri.url = "github:sodiboo/niri-flake";
 
-    nix-darwin = {
-      url = "github:lnl7/nix-darwin";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
+    # Gaming
     nix-minecraft.url = "github:Infinidoge/nix-minecraft";
-
-    # zen-browser.url = "github:0xc000022070/zen-browser-flake";
   };
 
   outputs =
@@ -70,7 +77,18 @@
           self.nixosModules.default
           inputs.catppuccin.nixosModules.catppuccin
           inputs.stylix.nixosModules.stylix
-          # inputs.zen-browser.nixosModules.zen-browser
+        ];
+      };
+      nixosConfigurations."systematic" = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit inputs; };
+        modules = [
+          ./hosts/systematic/configuration.nix
+          home-manager.nixosModules.default
+          self.nixosModules.default
+          inputs.nixos-wsl.nixosModules.wsl
+          inputs.catppuccin.nixosModules.catppuccin
+          inputs.stylix.nixosModules.stylix
         ];
       };
       # Install `nix-darwin` from https://github.com/nix-darwin/nix-darwin?tab=readme-ov-file#readme

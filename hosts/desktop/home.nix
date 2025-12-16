@@ -45,7 +45,7 @@
 
   # Enable the custom base configuration from ./../../modules/default.nix
   base.enable = true;
-  shell.fish.autoStart.zellij.enable = lib.mkForce false;
+  shell.fish.zellij.autoStart = lib.mkForce false;
   terminal.ghostty.enable = lib.mkForce true;
   typesetters.typst.enable = lib.mkForce true;
   utils.cli.profile = lib.mkForce "extended";

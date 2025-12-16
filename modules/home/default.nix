@@ -57,11 +57,11 @@
       utils.git.enable = lib.mkDefault true;
       utils.code-stats.enable = lib.mkDefault true;
 
-      # Shell
-      shell.fish.enable = lib.mkDefault true;
-      shell.fish.autoStart.zellij.enable = lib.mkDefault true;
-      shell.brew.enable = lib.mkDefault false;
-      shell.zellij.enable = lib.mkDefault true;
+    # Shell
+    shell.fish.enable = lib.mkDefault true;
+    shell.fish.zellij.autoStart = lib.mkDefault true;
+    shell.brew.enable = lib.mkDefault false;
+    shell.zellij.enable = lib.mkDefault true;
 
       # Typesetters
       typesetters.typst.enable = lib.mkDefault false;

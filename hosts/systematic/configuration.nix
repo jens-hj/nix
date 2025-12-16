@@ -5,11 +5,6 @@
   inputs,
   ...
 }: {
-  imports = [
-    # include NixOS-WSL modules
-    <nixos-wsl/modules>
-  ];
-
   environment.systemPackages = with pkgs; [helix wget];
 
   home-manager.users.jens = {
@@ -45,8 +40,6 @@
     certificateFiles = [./sse_issuing_256.pem ./sse_root_256.pem];
   };
 
-  # environment.etc."ssl/certs/SSERoot.pem".source = "./sse_root_256.cer";
-  # environment.etc."ssl/certs/SSEIssuer.pem".source = "./sse_issuing_256.cer";
   environment.variables = {
     # JAVA_HOME = ""
     JAVAX_NET_SSL_TRUSTSTORE = let

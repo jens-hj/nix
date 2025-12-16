@@ -8,8 +8,7 @@
   options = {
     shell.fish.enable = lib.mkEnableOption "enable custom configured fish";
     shell.brew.enable = lib.mkEnableOption "enable homebrew in fish";
-    shell.fish.autoStart.zellij.enable =
-      lib.mkEnableOption "Whether fish should automatically enter a suiting zellij session on start";
+    shell.fish.zellij.autoStart = lib.mkEnableOption "enable zellij autostart";
   };
 
   config = lib.mkIf config.shell.fish.enable {
@@ -58,7 +57,7 @@
 
           bind \t 'super-tab'
 
-          ${lib.optionalString config.shell.fish.autoStart.zellij.enable ''
+          ${lib.optionalString config.shell.fish.zellij.autoStart ''
             # Start or attach to Zellij session
             zellij-auto
           ''}

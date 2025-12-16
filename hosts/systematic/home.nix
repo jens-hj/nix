@@ -12,12 +12,11 @@
 
   # Enable the custom base configuration from ./../../modules/default.nix
   base.enable = true;
+  typesetters.typst.enable = lib.mkForce true;
   utils.git.profile = lib.mkForce "work";
   utils.cli.profile = lib.mkForce "extended";
 
   programs = {
-    # Enable home-manager itself
-    home-manager.enable = true;
     # Java
     java = {
       enable = true;
