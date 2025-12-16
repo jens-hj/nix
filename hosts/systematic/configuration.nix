@@ -1,11 +1,5 @@
-{
-  pkgs,
-  config,
-  lib,
-  inputs,
-  ...
-}: {
-  environment.systemPackages = with pkgs; [helix wget];
+{ pkgs, config, lib, inputs, ... }: {
+  environment.systemPackages = with pkgs; [ helix wget ];
 
   home-manager.users.jens = {
     imports = [
@@ -26,21 +20,26 @@
   nix = {
     # package = pkgs.nixFlakes;
     settings = {
-      experimental-features = ["nix-command" "flakes"];
-      substituters = ["https://cache.nixos.org" "https://nix-community.cachix.org"];
+      experimental-features = [ "nix-command" "flakes" ];
+      substituters =
+        [ "https://cache.nixos.org" "https://nix-community.cachix.org" ];
       trusted-public-keys = [
         "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       ];
-      trusted-substituters = ["https://cache.nixos.org"];
+      trusted-substituters = [ "https://cache.nixos.org" ];
     };
   };
 
   # Create symlink from /mnt/c/Users/<myuser>/repos to ~/repos
-  systemd.tmpfiles.rules = ["L /home/jens/repos - - - - /mnt/c/Users/jjs/clones"];
+  systemd.tmpfiles.rules =
+    [ "L /home/jens/repos - - - - /mnt/c/Users/jjs/clones" ];
 
   security.pki = {
     installCACerts = true;
-    certificateFiles = [./sse_issuing_256.pem ./sse_root_256.pem];
+    certificateFiles = [
+      /home/nixos/repos/nix/hosts/systematic/sse_issuing_256.pem
+      /home/nixos/repos/nix/hosts/systematic/sse_root_256.pem
+    ];
   };
 
   environment.variables = {
@@ -54,21 +53,20 @@
           (lib.mesonOption "bashcompdir"
             "${placeholder "bin"}/share/bash-completion/completions")
           (lib.mesonOption "trust_paths"
-            (lib.concatStringsSep ":" ["${caBundle}"]))
+            (lib.concatStringsSep ":" [ "${caBundle}" ]))
         ];
       });
-    in
-      derivation {
-        name = "java-cacerts";
-        builder = pkgs.writeShellScript "java-cacerts-builder" ''
-          ${p11kit.bin}/bin/trust \
-            extract \
-            --format=java-cacerts \
-            --purpose=server-auth \
-            $out
-        '';
-        system = builtins.currentSystem;
-      };
+    in derivation {
+      name = "java-cacerts";
+      builder = pkgs.writeShellScript "java-cacerts-builder" ''
+        ${p11kit.bin}/bin/trust \
+          extract \
+          --format=java-cacerts \
+          --purpose=server-auth \
+          $out
+      '';
+      system = builtins.currentSystem;
+    };
   };
 
   system.stateVersion = "23.11"; # Did you read the comment?
