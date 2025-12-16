@@ -18,9 +18,10 @@
     pgweb
     telegram-desktop
     signal-desktop
+    session-desktop
     yubioath-flutter
     bitwarden-desktop
-    appimage-run
+    # appimage-run
     # inputs.awww.packages.${pkgs.system}.awww
     bluetuith
     p7zip
@@ -31,6 +32,15 @@
     keymapp
     wiremix
     winetricks
+    distrobox
+    distrobox-tui
+    obsidian
+    libsoup_2_4
+    speedtest
+    brave
+    radeontop
+    cacert
+    blender
   ];
 
   # Enable the custom base configuration from ./../../modules/default.nix
@@ -42,25 +52,28 @@
   editor.zed.enable = lib.mkForce true;
   editor.vscode.enable = lib.mkForce true;
 
-  # games.enable = true;
+  games.enable = true;
 
   desktop.enable = true;
 
   programs = {
+    niriswitcher = {
+      enable = true;
+    };
     firefox = {
       enable = true;
       profiles.default.extensions.force = true;
     };
-    # zen-browser = {
-    #   enable = true;
-    #   policies = { DisableTelemtry = true; };
-    # };
     ghostty.settings = {
       font-size = 18;
     };
     fish.shellAliases = {
       zed = "zeditor";
     };
+    claude-code = {
+      enable = true;
+    };
+    uv.enable = true;
   };
 
   services = {
@@ -68,12 +81,6 @@
       enable = true;
       autoStart = true;
     };
-    # hyprpaper = {
-    #   enable = true;
-    #   # preload = [ "~/Pictures/Wallpapers/wallpaper.png" ];
-    #   # wallpaper = [ "~/Pictures/Wallpapers/wallpaper.png" ];
-    # };
-    # swaybg.enable = true;
     flameshot = {
       enable = true;
       settings = {
@@ -89,8 +96,6 @@
   xdg.portal = {
     enable = true;
     extraPortals = with pkgs; [
-      # xdg-desktop-portal-gtk
-      # xdg-desktop-portal-wlr
       xdg-desktop-portal-gnome
     ];
     config.common.default = "gnome";
@@ -112,10 +117,21 @@
       "org/gnome/shell/window-switcher" = {
         current-workspace-only = false;
       };
+
+      "org/gnome/desktop/a11y/applications" = {
+        screen-reader-enabled = false;
+      };
+
+      "org/gnome/desktop/interface" = {
+        toolkit-accessibility = false;
+      };
     };
   };
 
   home.sessionVariables = {
+    SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+    SSL_CERT_DIR = "${pkgs.cacert}/etc/ssl/certs";
+    DISTROBOX_HOST_PATH = "$HOME/.local/bin";
     PATH = "$PATH:~/.cargo/bin";
     MCRCON_HOST = "localhost";
     MCRCON_PASS = "7568";
@@ -124,6 +140,6 @@
     LANG = "en_US.UTF-8";
     LC_ALL = "en_US.UTF-8";
     TERM = "xterm-256color";
-    XDG_DATA_DIRS = "$XDG_DATA_DIRS:/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share";
+    XDG_DATA_DIRS = "$XDG_DATA_DIRS:/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share:$HOME/.nix-profile/share";
   };
 }

@@ -1,5 +1,9 @@
-{ inputs, ... }: {
-  imports = [ ./srv/minecraft.nix ./visuals/theme.nix ];
+{ inputs, ... }:
+{
+  imports = [
+    ./srv/minecraft.nix
+    ./visuals/theme.nix
+  ];
 
   srv.minecraft.enable = false;
   visuals.theme.enable = true;

@@ -40,6 +40,11 @@
           ripgrep-all
           bottom
           jq
+          lolcat
+          grex
+          cbonsai
+          asciinema
+          ttyd
         ];
       in
       essentialPackages ++ lib.optionals (config.utils.cli.profile == "extended") extendedPackages;

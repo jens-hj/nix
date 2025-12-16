@@ -19,10 +19,77 @@
       inputs.catppuccin.homeModules.catppuccin
       inputs.stylix.homeModules.stylix
       inputs.vicinae.homeManagerModules.default
-      # inputs.niri.homeModules.niri
-      # inputs.zen-browser.homeModules.zen-browser
     ];
   };
+
+  nixpkgs.overlays = [
+    (final: prev: {
+      modrinth-app-unwrapped = prev.modrinth-app-unwrapped.overrideAttrs (old: {
+        postPatch = ''
+          ${old.postPatch or ""}
+          sed -i '1i #![allow(dead_code)]' packages/app-lib/src/event/mod.rs
+        '';
+      });
+
+      modrinth-app = prev.modrinth-app.overrideAttrs (old: {
+        nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.wrapGAppsHook3 ];
+        buildInputs = (old.buildInputs or [ ]) ++ [ pkgs.gsettings-desktop-schemas ];
+
+        preFixup = ''
+          ${old.preFixup or ""}
+          gappsWrapperArgs+=(
+            --set GDK_BACKEND x11
+            --prefix XDG_DATA_DIRS : "${pkgs.gsettings-desktop-schemas}/share:${pkgs.gtk3}/share"
+          )
+        '';
+      });
+
+      # Replace turbo with a functional stub that runs builds via pnpm
+      turbo-unwrapped = final.writeShellScriptBin "turbo" ''
+        # Stub turbo that delegates to pnpm for actual building
+        echo "Using turbo stub - delegating to pnpm"
+
+        # Parse arguments to extract the actual command and filter
+        COMMAND=""
+        FILTER=""
+        while [[ $# -gt 0 ]]; do
+          case $1 in
+            run)
+              shift
+              COMMAND="$1"
+              shift
+              ;;
+            --filter=*)
+              FILTER="''${1#*=}"
+              shift
+              ;;
+            --filter)
+              shift
+              FILTER="$1"
+              shift
+              ;;
+            *)
+              shift
+              ;;
+          esac
+        done
+
+        # If we have a filter, run the command in that package
+        if [ -n "$FILTER" ] && [ -n "$COMMAND" ]; then
+          echo "Running: pnpm --filter=$FILTER run $COMMAND"
+          exec ${final.pnpm}/bin/pnpm --filter="$FILTER" run "$COMMAND"
+        elif [ -n "$COMMAND" ]; then
+          echo "Running: pnpm run $COMMAND"
+          exec ${final.pnpm}/bin/pnpm run "$COMMAND"
+        else
+          echo "Turbo stub: no command to run"
+          exit 0
+        fi
+      '';
+
+      turbo = final.turbo-unwrapped;
+    })
+  ];
 
   services.pcscd.enable = true;
   services.udev.extraRules = ''
@@ -68,14 +135,34 @@
     };
   };
 
-  hardware.bluetooth = {
-    enable = true;
-    powerOnBoot = true;
-    settings = {
-      General = {
-        Experimental = true;
-        FastConnectable = true;
+  hardware = {
+    bluetooth = {
+      enable = true;
+      powerOnBoot = true;
+      settings = {
+        General = {
+          Experimental = true;
+          FastConnectable = true;
+        };
       };
+    };
+    graphics = {
+      enable = true;
+      enable32Bit = true;
+
+      extraPackages = with pkgs; [
+        mesa
+        libva
+        libvdpau-va-gl
+        libva-vdpau-driver
+      ];
+
+      extraPackages32 = with pkgs.pkgsi686Linux; [
+        mesa
+        libva
+        libvdpau-va-gl
+        libva-vdpau-driver
+      ];
     };
   };
 
@@ -158,6 +245,8 @@
     flatpak.enable = true;
   };
 
+  systemd.user.services.orca.enable = false;
+
   security = {
     rtkit.enable = true;
     pam.services.greetd.enableGnomeKeyring = true;
@@ -179,14 +268,45 @@
 
   # Install firefox.
   programs = {
+    appimage = {
+      enable = true;
+    };
     niri = {
       enable = true;
+    };
+    steam = {
+      enable = true;
+      remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+      dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+      localNetworkGameTransfers.openFirewall = true; # Open ports in the firewall for Steam Local Network Game Transfers
+
+      gamescopeSession.enable = true;
+
+      # And this for better compatibility:
+      extraCompatPackages = with pkgs; [
+        proton-ge-bin
+        xorg.libXcursor
+        xorg.libXi
+        xorg.libXinerama
+        xorg.libXScrnSaver
+        libpng
+        libpulseaudio
+        libvorbis
+        stdenv.cc.cc.lib
+        libkrb5
+        keyutils
+      ];
     };
     # something else?
   };
 
   # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
+  nixpkgs.config = {
+    allowUnfree = true;
+    permittedInsecurePackages = [
+      "libsoup-2.74.3"
+    ];
+  };
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -197,6 +317,20 @@
     xwayland
     xwayland-satellite
     qemu
+    gsettings-desktop-schemas
+    gtk3
+    ffmpeg # Not strictly required, but ensures VAAPI stack is complete
+    libva-utils # For testing with 'vainfo' command
+  ];
+
+  environment.variables = {
+    DISTROBOX_HOST_PATH = "/home/j/.local/bin";
+    LIBVA_DRIVER_NAME = "radeonsi";
+    MOZ_DISABLE_RDD_SANDBOX = "1";
+  };
+
+  environment.pathsToLink = [
+    "/share/gsettings-schemas"
   ];
 
   # Vicinae

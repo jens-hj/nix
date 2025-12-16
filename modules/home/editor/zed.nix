@@ -50,12 +50,6 @@
           diagnostics = false;
           metrics = false;
         };
-        # languages = {
-        #   "Nix" = {
-        #     language_servers = [ "nil" "!nixd" ];
-
-        #   };
-        # };
         ui_font_size = 20;
         buffer_font_size = 20;
         wrap_guides = [
@@ -98,7 +92,7 @@
           show_parameter_hints = true;
           show_other_hints = true;
           show_background = false;
-          toggle_on_modifier_press = {
+          toggle_on_modifiers_press = {
             alt = true;
           };
         };
@@ -106,17 +100,17 @@
           dock = "left";
           default_model = {
             provider = "copilot_chat";
-            model = "claude-sonnet-4.5";
+            model = "gemini-3-pro";
           };
           inline_assistant_model = {
             provider = "copilot_chat";
-            model = "claude-sonnet-4.5";
+            model = "gemini-3-pro";
           };
         };
         project_panel.dock = "right";
         outline_panel.dock = "right";
         notification_panel.dock = "left";
-        chat_panel.dock = "left";
+        # chat_panel.dock = "left";
         git_panel.dock = "right";
         languages = {
           Nix = {
@@ -132,6 +126,9 @@
           };
         };
         lsp_document_colors = "border";
+        file_types = {
+          JSON = [ "meta" ];
+        };
       };
     };
   };

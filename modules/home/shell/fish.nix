@@ -65,6 +65,11 @@
         '';
         shellInit = ''
           set --universal git_fish_git_status_command gstatus
+
+          # Use gh's existing auth for GitHub API
+          if command -v gh &> /dev/null
+            set -gx GITHUB_TOKEN (gh auth token 2>/dev/null)
+          end
         '';
         functions = {
           nixr = {

@@ -3,12 +3,16 @@
   config,
   lib,
   ...
-}: {
+}:
+{
   options = {
     utils.git = {
       enable = lib.mkEnableOption "enables custom configured git";
       profile = lib.mkOption {
-        type = lib.types.enum ["personal" "work"];
+        type = lib.types.enum [
+          "personal"
+          "work"
+        ];
         default = "personal";
         description = "Git profile to use (personal or work)";
       };
@@ -18,6 +22,7 @@
   config = lib.mkIf config.utils.git.enable {
     home.packages = with pkgs; [
       difftastic
+      gh
     ];
 
     programs.git = lib.mkMerge [
