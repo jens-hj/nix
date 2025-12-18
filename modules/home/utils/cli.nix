@@ -46,6 +46,7 @@
           cbonsai
           asciinema
           ttyd
+          openssl
         ];
       in
       essentialPackages ++ lib.optionals (config.utils.cli.profile == "extended") extendedPackages;

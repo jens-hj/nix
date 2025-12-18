@@ -76,13 +76,13 @@
             body = ''
               if test (count $argv) -eq 0
                   echo "Error: Configuration name is required"
-                  echo "Usage: nixr <config-name>"
-                  echo "Available configurations: default (d), gmk (g), macbook (m)"
+                  echo "Usage: nixr <config-name> [extra-flags]"
+                  echo "Available configurations: default (d), gmk (g), macbook (m), systematic (s)"
                   return 1
               end
-
               set -l input $argv[1]
               set -l config
+              set -l extra_flags $argv[2..-1]
 
               # Map short names to full configuration names
               switch $input
@@ -92,16 +92,18 @@
                       set config "gmk"
                   case m
                       set config "macbook"
+                  case s
+                      set config "systematic"
                   case '*'
                       set config $input
               end
 
               if test "$config" = "macbook"
                   echo "Rebuilding Darwin configuration: $config"
-                  sudo darwin-rebuild switch --flake ~/repos/nix/#$config
+                  sudo darwin-rebuild switch --flake ~/repos/nix/#$config $extra_flags
               else
                   echo "Rebuilding NixOS configuration: $config"
-                  sudo nixos-rebuild switch --flake ~/repos/nix/#$config
+                  sudo nixos-rebuild switch --flake ~/repos/nix/#$config $extra_flags
               end
             '';
           };
