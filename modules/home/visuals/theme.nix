@@ -7,50 +7,58 @@
 {
   options = {
     visuals.theme.enable = lib.mkEnableOption "enable custom theming";
+    visuals.wallpaper.enable = lib.mkEnableOption "enable wallpaper";
   };
 
-  config = lib.mkIf config.visuals.theme.enable {
-    stylix = {
-      enable = true;
-      autoEnable = true;
-      targets = {
-        zed.enable = false;
-        vscode.enable = false;
-        waybar.enable = false;
-      };
+  config = lib.mkIf config.visuals.theme.enable (
+    lib.mkMerge [
+      (lib.mkIf config.visuals.wallpaper.enable {
+        stylix.image = ./wallpaper.png;
+      })
+      {
+        stylix = {
+          enable = true;
+          autoEnable = true;
+          targets = {
+            zed.enable = false;
+            vscode.enable = false;
+          };
 
-      base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
-      polarity = "dark";
+          base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
+          polarity = "dark";
 
-      fonts = {
-        monospace = {
-          package = pkgs.nerd-fonts.zed-mono;
-          name = "ZedMono NFM";
+          fonts = {
+            monospace = {
+              package = pkgs.nerd-fonts.zed-mono;
+              name = "ZedMono NFM";
+            };
+          };
         };
-      };
-    };
 
-    home.pointerCursor = {
-      enable = true;
-      name = "Posy_Cursor_Black";
-      package = pkgs.posy-cursors;
-      size = 64;
-      gtk.enable = true;
-      x11.enable = true;
-    };
+        home.pointerCursor = {
+          enable = true;
+          name = "Posy_Cursor_Black";
+          package = pkgs.posy-cursors;
+          size = 64;
+          gtk.enable = true;
+          x11.enable = true;
+        };
 
-    home.packages = with pkgs; [
-      gnomeExtensions.user-themes
-      # … other extensions
-    ];
-
-    dconf.enable = true;
-    dconf.settings = {
-      "org/gnome/shell" = {
-        enabled-extensions = [
-          "user-theme@gnome-shell-extensions.gcampax.github.com"
+        home.packages = with pkgs; [
+          gnomeExtensions.user-themes
+          dconf
+          # … other extensions
         ];
-      };
-    };
-  };
+
+        dconf.enable = lib.mkForce true;
+        dconf.settings = {
+          "org/gnome/shell" = {
+            enabled-extensions = [
+              "user-theme@gnome-shell-extensions.gcampax.github.com"
+            ];
+          };
+        };
+      }
+    ]
+  );
 }

@@ -63,7 +63,7 @@
 
       # Shell
       shell.fish.enable = lib.mkDefault true;
-      shell.fish.autoStart.zellij.enable = lib.mkDefault true;
+      shell.fish.zellij.autoStart = lib.mkDefault true;
       shell.brew.enable = lib.mkDefault false;
       shell.zellij.enable = lib.mkDefault true;
 

@@ -1,4 +1,8 @@
-{inputs, ...}: {
+{
+  pkgs,
+  inputs,
+  ...
+}: {
   imports = [
     ./srv/minecraft.nix
     ./visuals/theme.nix
@@ -15,6 +19,8 @@
     useUserPackages = true;
     extraSpecialArgs = {inherit inputs;};
   };
+
+  users.defaultUserShell = pkgs.fish;
 
   programs.fish.enable = true;
   programs.nix-ld.enable = true;
