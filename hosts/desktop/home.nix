@@ -1,11 +1,10 @@
 {
-  inputs,
   pkgs,
   lib,
+  inputs,
   ...
 }:
 {
-
   home.username = "j";
   home.homeDirectory = "/home/j";
 
@@ -21,6 +20,7 @@
     session-desktop
     yubioath-flutter
     bitwarden-desktop
+    equibop
     # appimage-run
     # inputs.awww.packages.${pkgs.system}.awww
     bluetuith
@@ -41,6 +41,17 @@
     radeontop
     cacert
     blender
+    qutebrowser
+    caprine
+    libsecret
+    pulseaudio
+    python3
+    # parsec-bin
+    # Virtualisation for Windows VM
+    virt-manager
+    virt-viewer
+    spice-gtk
+    virtio-win
   ];
 
   # Enable the custom base configuration from ./../../modules/default.nix
@@ -74,12 +85,18 @@
       enable = true;
     };
     uv.enable = true;
+    vesktop = {
+      enable = true;
+    };
   };
 
   services = {
     vicinae = {
       enable = true;
-      autoStart = true;
+      systemd.enable = true;
+      settings = {
+        font.size = 12;
+      };
     };
     flameshot = {
       enable = true;
@@ -141,5 +158,7 @@
     LC_ALL = "en_US.UTF-8";
     TERM = "xterm-256color";
     XDG_DATA_DIRS = "$XDG_DATA_DIRS:/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share:$HOME/.nix-profile/share";
+    LIBVA_DRIVER_NAME = "radeonsi";
+    VDPAU_DRIVER = "radeonsi";
   };
 }

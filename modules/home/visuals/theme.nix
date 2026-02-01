@@ -16,9 +16,9 @@
       targets = {
         zed.enable = false;
         vscode.enable = false;
+        waybar.enable = false;
       };
 
-      image = ./wallpaper.png;
       base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
       polarity = "dark";
 
@@ -27,17 +27,8 @@
           package = pkgs.nerd-fonts.zed-mono;
           name = "ZedMono NFM";
         };
-
-        # sizes = {
-        #   applications = 20;
-        #   terminal = 20;
-        # };
       };
     };
-    # specialisation.light.configuration.stylix = {
-    #   base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-latte.yaml";
-    #   polarity = "light";
-    # };
 
     home.pointerCursor = {
       enable = true;

@@ -1,5 +1,8 @@
-{ config, lib, ... }:
 {
+  config,
+  lib,
+  ...
+}: {
   imports = [
     # Utils
     ./utils/git.nix
@@ -34,6 +37,7 @@
 
     # Desktop Environment
     ./desktop/waybar.nix
+    ./desktop/noctalia.nix
   ];
 
   options = {
@@ -87,7 +91,8 @@
     })
 
     (lib.mkIf config.desktop.enable {
-      desktop.waybar.enable = lib.mkDefault true;
+      # desktop.waybar.enable = lib.mkDefault true;
+      desktop.noctalia.enable = lib.mkDefault true;
       # TODO: add niri module here
     })
   ];

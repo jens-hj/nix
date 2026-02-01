@@ -3,8 +3,7 @@
   config,
   lib,
   ...
-}:
-{
+}: {
   options = {
     shell.fish.enable = lib.mkEnableOption "enable custom configured fish";
     shell.brew.enable = lib.mkEnableOption "enable homebrew in fish";
@@ -103,6 +102,82 @@
               else
                   echo "Rebuilding NixOS configuration: $config"
                   sudo nixos-rebuild switch --flake ~/repos/nix/#$config
+              end
+            '';
+          };
+          nixu = {
+            description = "Update flake inputs with concise, colorized output";
+            body = ''
+              # Parse arguments
+              set -l verbose false
+              for arg in $argv
+                  if test "$arg" = "--verbose" -o "$arg" = "-v"
+                      set verbose true
+                  end
+              end
+
+              # Colors
+              set -l blue (set_color blue)
+              set -l green (set_color green)
+              set -l yellow (set_color yellow)
+              set -l cyan (set_color cyan)
+              set -l magenta (set_color magenta)
+              set -l red (set_color red)
+              set -l bold (set_color --bold)
+              set -l dim (set_color brblack)
+              set -l reset (set_color normal)
+
+              if test "$verbose" = "true"
+                  # Verbose mode: show full output with colorization
+                  nix flake update 2>&1 | while read -l line
+                      # Colorize different parts of the output
+                      if string match -q "warning:*" -- $line
+                          echo "$yellow$line$reset"
+                      else if string match -q "• Updated input*" -- $line
+                          echo "$green$bold$line$reset"
+                      else if string match -q "*'github:*" -- $line
+                          # Extract and colorize the repo and dates
+                          set -l repo (string match -r "github:([^/]+/[^/]+)" -- $line | tail -n 1)
+                          set -l from_date (string match -r "\((\d{4}-\d{2}-\d{2})\)" -- $line | head -n 2 | tail -n 1)
+                          set -l to_date (string match -r "\((\d{4}-\d{2}-\d{2})\)" -- $line | tail -n 1)
+
+                          if string match -q "*→*" -- $line
+                              echo "$dim  → $cyan$repo$reset $dim($from_date → $magenta$to_date$dim)$reset"
+                          else
+                              echo "$dim    $cyan$repo$reset $dim($from_date)$reset"
+                          end
+                      else
+                          echo "$line"
+                      end
+                  end
+              else
+                  # Concise mode: only show updated inputs with clean formatting
+                  echo "$bold$blue""Updating flake inputs...$reset"
+                  echo ""
+
+                  set -l output (nix flake update 2>&1)
+                  set -l current_input ""
+
+                  for line in $output
+                      if string match -q "• Updated input*" -- $line
+                          # Extract input name
+                          set current_input (string replace -r "^• Updated input '([^']+)'.*" '$1' -- $line)
+
+                          # Format with colors
+                          echo "$green●$reset $bold$current_input$reset"
+                      else if string match -q "*→*" -- $line
+                          # Extract dates from the arrow line
+                          set -l dates (string match -r "\((\d{4}-\d{2}-\d{2})\)" -- $line)
+                          if test (count $dates) -ge 4
+                              set -l from_date $dates[2]
+                              set -l to_date $dates[4]
+                              echo "$dim  $from_date$reset → $magenta$to_date$reset"
+                          end
+                      end
+                  end
+
+                  echo ""
+                  echo "$dim✓ Flake update complete$reset"
               end
             '';
           };

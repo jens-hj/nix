@@ -12,7 +12,6 @@
   config = lib.mkIf config.utils.nix.enable {
     home.packages = with pkgs; [
       nix-prefetch-github
-      nixfmt-classic
       alejandra
       nil
       nixd

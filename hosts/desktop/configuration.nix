@@ -5,8 +5,7 @@
   inputs,
   pkgs,
   ...
-}:
-{
+}: {
   imports = [
     # Include the results of the hardware scan.
     ./hardware.nix
@@ -19,6 +18,7 @@
       inputs.catppuccin.homeModules.catppuccin
       inputs.stylix.homeModules.stylix
       inputs.vicinae.homeManagerModules.default
+      inputs.noctalia.homeModules.default
     ];
   };
 
@@ -32,8 +32,8 @@
       });
 
       modrinth-app = prev.modrinth-app.overrideAttrs (old: {
-        nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.wrapGAppsHook3 ];
-        buildInputs = (old.buildInputs or [ ]) ++ [ pkgs.gsettings-desktop-schemas ];
+        nativeBuildInputs = (old.nativeBuildInputs or []) ++ [pkgs.wrapGAppsHook3];
+        buildInputs = (old.buildInputs or []) ++ [pkgs.gsettings-desktop-schemas];
 
         preFixup = ''
           ${old.preFixup or ""}
@@ -133,6 +133,14 @@
         setSocketVariable = true;
       };
     };
+    libvirtd = {
+      enable = true;
+      # qemu = {
+      #   package = pkgs.qemu_kvm;
+      #   ovmf.packages = [ pkgs.OVMFFull.fd ];
+      # };
+    };
+    spiceUSBRedirection.enable = true;
   };
 
   hardware = {
@@ -155,6 +163,11 @@
         libva
         libvdpau-va-gl
         libva-vdpau-driver
+        # TBoI compat attempt
+        libva
+        libGL
+        SDL2
+        libglvnd
       ];
 
       extraPackages32 = with pkgs.pkgsi686Linux; [
@@ -162,6 +175,11 @@
         libva
         libvdpau-va-gl
         libva-vdpau-driver
+        # TBoI compat attempt
+        libva
+        libGL
+        SDL2
+        libglvnd
       ];
     };
   };
@@ -172,7 +190,7 @@
       efi.canTouchEfiVariables = true;
     };
     kernelPackages = pkgs.linuxPackages_latest;
-    kernelParams = [ "acpi_backlight=vendor" ];
+    kernelParams = ["acpi_backlight=vendor"];
     binfmt = {
       emulatedSystems = [
         "aarch64-linux"
@@ -254,7 +272,7 @@
   };
 
   users.defaultUserShell = pkgs.fish;
-  users.groups.plugdev = { };
+  users.groups.plugdev = {};
   users.users.j = {
     isNormalUser = true;
     description = "j";
@@ -263,17 +281,19 @@
       "wheel"
       "docker"
       "plugdev"
+      "libvirtd"
+      "kvm"
+      "video"
+      "render"
+      "i2c"
     ];
   };
 
   # Install firefox.
   programs = {
-    appimage = {
-      enable = true;
-    };
-    niri = {
-      enable = true;
-    };
+    virt-manager.enable = true;
+    appimage.enable = true;
+    niri.enable = true;
     steam = {
       enable = true;
       remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
@@ -321,6 +341,9 @@
     gtk3
     ffmpeg # Not strictly required, but ensures VAAPI stack is complete
     libva-utils # For testing with 'vainfo' command
+    # For Windows VM
+    swtpm
+    OVMF
   ];
 
   environment.variables = {
@@ -335,8 +358,8 @@
 
   # Vicinae
   nix.settings = {
-    extra-substituters = [ "https://vicinae.cachix.org" ];
-    extra-trusted-public-keys = [ "vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc=" ];
+    extra-substituters = ["https://vicinae.cachix.org"];
+    extra-trusted-public-keys = ["vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="];
   };
 
   system.stateVersion = "25.05";
