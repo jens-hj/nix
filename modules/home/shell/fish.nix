@@ -2,6 +2,7 @@
   pkgs,
   config,
   lib,
+  inputs,
   ...
 }: {
   options = {
@@ -63,6 +64,7 @@
         '';
         shellInit = ''
           set --universal git_fish_git_status_command gstatus
+          set -gx NIXOS_FLAKE ~/repos/nix
 
           # Use gh's existing auth for GitHub API
           if command -v gh &> /dev/null
@@ -99,10 +101,10 @@
 
               if test "$config" = "macbook"
                   echo "Rebuilding Darwin configuration: $config"
-                  sudo darwin-rebuild switch --flake ~/repos/nix/#$config $extra_flags
+                  sudo darwin-rebuild switch --flake $NIXOS_FLAKE#$config $extra_flags
               else
                   echo "Rebuilding NixOS configuration: $config"
-                  sudo nixos-rebuild switch --flake ~/repos/nix/#$config $extra_flags
+                  sudo nixos-rebuild switch --flake $NIXOS_FLAKE#$config $extra_flags
               end
             '';
           };
@@ -130,10 +132,12 @@
 
               if test "$verbose" = "true"
                   # Verbose mode: show full output with colorization
-                  nix flake update 2>&1 | while read -l line
+                  fish -c "cd $NIXOS_FLAKE && nix flake update" 2>&1 | while read -l line
                       # Colorize different parts of the output
                       if string match -q "warning:*" -- $line
                           echo "$yellow$line$reset"
+                      else if string match -q "error:*" -- $line
+                          echo "$red$bold$line$reset"
                       else if string match -q "• Updated input*" -- $line
                           echo "$green$bold$line$reset"
                       else if string match -q "*'github:*" -- $line
@@ -156,8 +160,11 @@
                   echo "$bold$blue""Updating flake inputs...$reset"
                   echo ""
 
-                  set -l output (nix flake update 2>&1)
+                  set -l output (fish -c "cd $NIXOS_FLAKE && nix flake update" 2>&1)
+                  set -l update_status $status
                   set -l current_input ""
+                  set -l has_errors false
+                  set -l error_inputs
 
                   for line in $output
                       if string match -q "• Updated input*" -- $line
@@ -174,11 +181,38 @@
                               set -l to_date $dates[4]
                               echo "$dim  $from_date$reset → $magenta$to_date$reset"
                           end
+                      else if string match -q "error: input '*' has an override but no corresponding*" -- $line
+                          # Extract the input name from the error
+                          set -l failed_input (string replace -r "^error: input '([^']+)'.*" '$1' -- $line)
+                          set has_errors true
+                          set -a error_inputs $failed_input
+                      else if string match -q "error:*input*'*'*" -- $line
+                          # Generic input error - try to extract input name
+                          set -l failed_input (string match -r "input '([^']+)'" -- $line)
+                          if test (count $failed_input) -ge 2
+                              set has_errors true
+                              set -a error_inputs $failed_input[2]
+                          end
+                      else if string match -q "error:*" -- $line
+                          set has_errors true
                       end
                   end
 
                   echo ""
-                  echo "$dim✓ Flake update complete$reset"
+                  if test "$has_errors" = "true"
+                      if test (count $error_inputs) -gt 0
+                          for ei in $error_inputs
+                              echo "$red✗$reset $bold$ei$reset $red(failed)$reset"
+                          end
+                      else
+                          echo "$red✗ Update completed with errors$reset $dim(run with -v for details)$reset"
+                      end
+                      echo ""
+                      echo "$yellow⚠ Flake update completed with errors$reset $dim(run with -v for details)$reset"
+                      return 1
+                  else
+                      echo "$dim✓ Flake update complete$reset"
+                  end
               end
             '';
           };
@@ -363,12 +397,7 @@
           }
           {
             name = "git";
-            src = pkgs.fetchFromGitHub {
-              owner = "kpbaks";
-              repo = "git.fish";
-              rev = "07fe31960a9f6bcf735aba1bb60cb6b517f2c707";
-              sha256 = "sha256-uX8s0D4/a0hiuB84E1RDVvah2nnuZL44ykB6wMiIEO4=";
-            };
+            src = inputs.git-fish;
           }
           # {
           #   name = "rust";

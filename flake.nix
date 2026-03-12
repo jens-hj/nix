@@ -38,8 +38,32 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Fish plugins
+    git-fish = {
+      url = "github:kpbaks/git.fish";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Gaming
     nix-minecraft.url = "github:Infinidoge/nix-minecraft";
+
+    # Browsers
+    zen-browser = {
+      url = "github:0xc000022070/zen-browser-flake";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        home-manager.follows = "home-manager";
+      };
+    };
+
+    # Firefox/browser extensions
+    nur = {
+      url = "github:nix-community/NUR";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # T3 Code
+    t3code.url = "github:omarcresp/t3code-flake";
   };
 
   outputs = {

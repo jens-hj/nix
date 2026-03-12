@@ -1,9 +1,13 @@
-{ pkgs, inputs, ... }: {
-  imports = [ ./hardware.nix ];
+{
+  pkgs,
+  inputs,
+  ...
+}: {
+  imports = [./hardware.nix];
 
   # Enable the Minecraft server
   srv.minecraft = {
-    enable = true;
+    enable = false;
     # importExistingFiles = "/home/nix/srv/minecraft/commune-bak";
   };
 
@@ -16,7 +20,7 @@
   };
 
   # Necessary for using flakes on this system.
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = ["nix-command" "flakes"];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -77,9 +81,8 @@
   users.users.nix = {
     isNormalUser = true;
     description = "nix";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = ["networkmanager" "wheel"];
     openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPdsaBGuK12xRMbGNPL2utoTc0lziypsWdAKsUCh6lru jens@j-ubuntu"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILh7s/A2WOBY+O+Q10iwZ5L0dqfbVc+5IaaT9VUHvcl5 jens@Jenss-MacBook-Pro.local"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPPIvVodq02iIsuc1TtTS/OHg60ep76xlf3WTxU26jcc j@nixos"
     ];
@@ -93,7 +96,7 @@
 
   nixpkgs.config.allowUnfree = true;
 
-  environment = { systemPackages = with pkgs; [ helix wget ]; };
+  environment = {systemPackages = with pkgs; [helix wget];};
 
   system.stateVersion = "25.05";
 }

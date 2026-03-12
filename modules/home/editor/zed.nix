@@ -3,8 +3,7 @@
   config,
   lib,
   ...
-}:
-{
+}: {
   options = {
     editor.zed.enable = lib.mkEnableOption "enables custom configured zed";
     editor.zed.remote.enable = lib.mkEnableOption "enables remote server installation for zed";
@@ -83,7 +82,7 @@
             agent_review = true;
             code_actions = true;
           };
-          resize_all_panels_in_dock = [ "left" ];
+          resize_all_panels_in_dock = ["left"];
           tabs = {
             git_status = true;
             close_position = "right";
@@ -132,7 +131,7 @@
           };
           lsp_document_colors = "border";
           file_types = {
-            JSON = [ "meta" ];
+            JSON = ["meta"];
           };
         };
       };

@@ -3,8 +3,7 @@
   lib,
   pkgs,
   ...
-}:
-{
+}: {
   options = {
     visuals.theme.enable = lib.mkEnableOption "enable custom theming";
     visuals.wallpaper.enable = lib.mkEnableOption "enable wallpaper";
@@ -22,6 +21,9 @@
           targets = {
             zed.enable = false;
             vscode.enable = false;
+            vesktop.enable = false;
+            firefox.profileNames = ["default"];
+            zen-browser.profileNames = ["default"];
           };
 
           base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";

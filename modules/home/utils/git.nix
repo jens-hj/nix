@@ -3,8 +3,7 @@
   config,
   lib,
   ...
-}:
-{
+}: {
   options = {
     utils.git = {
       enable = lib.mkEnableOption "enables custom configured git";
@@ -23,6 +22,7 @@
     home.packages = with pkgs; [
       difftastic
       gh
+      lazygit
     ];
 
     programs.git = lib.mkMerge [

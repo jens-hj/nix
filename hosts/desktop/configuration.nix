@@ -19,10 +19,12 @@
       inputs.stylix.homeModules.stylix
       inputs.vicinae.homeManagerModules.default
       inputs.noctalia.homeModules.default
+      inputs.zen-browser.homeModules.beta
     ];
   };
 
   nixpkgs.overlays = [
+    inputs.nur.overlays.default
     (final: prev: {
       modrinth-app-unwrapped = prev.modrinth-app-unwrapped.overrideAttrs (old: {
         postPatch = ''
@@ -133,24 +135,23 @@
         setSocketVariable = true;
       };
     };
-    libvirtd = {
-      enable = true;
-      # qemu = {
-      #   package = pkgs.qemu_kvm;
-      #   ovmf.packages = [ pkgs.OVMFFull.fd ];
-      # };
-    };
+    libvirtd.enable = true;
     spiceUSBRedirection.enable = true;
+    waydroid.enable = true;
   };
 
   hardware = {
     bluetooth = {
       enable = true;
       powerOnBoot = true;
+      input = {
+        General.UserspaceHID = true;
+      };
       settings = {
         General = {
           Experimental = true;
           FastConnectable = true;
+          # Privacy = "off";
         };
       };
     };
@@ -190,6 +191,7 @@
       efi.canTouchEfiVariables = true;
     };
     kernelPackages = pkgs.linuxPackages_latest;
+    kernelModules = ["hid-magicmouse" "hid-playstation"];
     kernelParams = ["acpi_backlight=vendor"];
     binfmt = {
       emulatedSystems = [
@@ -291,6 +293,7 @@
 
   # Install firefox.
   programs = {
+    obs-studio.enable = true;
     virt-manager.enable = true;
     appimage.enable = true;
     niri.enable = true;
@@ -305,10 +308,10 @@
       # And this for better compatibility:
       extraCompatPackages = with pkgs; [
         proton-ge-bin
-        xorg.libXcursor
-        xorg.libXi
-        xorg.libXinerama
-        xorg.libXScrnSaver
+        libXcursor
+        libXi
+        libXinerama
+        libXScrnSaver
         libpng
         libpulseaudio
         libvorbis
@@ -349,7 +352,18 @@
   environment.variables = {
     DISTROBOX_HOST_PATH = "/home/j/.local/bin";
     LIBVA_DRIVER_NAME = "radeonsi";
+    LIBVA_DRIVERS_PATH = "/run/opengl-driver/lib/dri";
+    VDPAU_DRIVER_PATH = "/run/opengl-driver/lib/vdpau";
     MOZ_DISABLE_RDD_SANDBOX = "1";
+    # Enable native Wayland mode for all Chromium/Electron apps (Brave, Vesktop, etc.)
+    # Without this they fall back to XWayland and lose GPU acceleration + PipeWire screen capture
+    NIXOS_OZONE_WL = "1";
+    ELECTRON_OZONE_PLATFORM_HINT = "auto";
+    # Hint Electron apps to use PipeWire for screen capture
+    ELECTRON_ENABLE_PIPEWIRE = "1";
+    # Force Vulkan to prefer the discrete AMD GPU over the Intel iGPU
+    # Fixes WebGPU adapter selection and ensures Vulkan apps use the RX 9070 XT
+    MESA_VK_DEVICE_SELECT = "1002:7550";
   };
 
   environment.pathsToLink = [
