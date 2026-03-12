@@ -14,15 +14,16 @@
 
   # Enable the custom base configuration from ./../../modules/default.nix
   base.enable = true;
-  terminal.ghostty.enable = lib.mkForce true;
+  visuals.theme.enable = lib.mkForce false;
+  # terminal.ghostty.enable = lib.mkForce true;
   utils.cli.profile = lib.mkForce "extended";
 
-  programs = {
-    firefox = {
-      enable = true;
-      profiles.default.extensions.force = true;
-    };
-  };
+  # programs = {
+  #   firefox = {
+  #     enable = true;
+  #     profiles.default.extensions.force = true;
+  #   };
+  # };
 
   home.sessionVariables = {
     MCRCON_HOST = "localhost";

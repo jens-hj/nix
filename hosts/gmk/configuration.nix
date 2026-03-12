@@ -16,6 +16,10 @@
       ./home.nix
       inputs.self.outputs.homeManagerModules.default
       inputs.catppuccin.homeModules.catppuccin
+      inputs.stylix.homeModules.stylix
+      inputs.vicinae.homeManagerModules.default
+      inputs.noctalia.homeModules.default
+      inputs.zen-browser.homeModules.beta
     ];
   };
 
@@ -42,23 +46,23 @@
     LC_TELEPHONE = "da_DK.UTF-8";
     LC_TIME = "da_DK.UTF-8";
   };
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
-  services.xserver.enable = true;
-  services.displayManager.gdm = {
-    enable = true;
-    autoSuspend = false;
-  };
-  services.desktopManager.gnome = {
-    enable = true;
-    extraGSettingsOverrides = ''
-      [org.gnome.settings-daemon.plugins.power]
-      sleep-inactive-ac-type='nothing'
-      sleep-inactive-battery-type='nothing'
-    '';
-  };
+  # services.xserver.xkb = {
+  #   layout = "us";
+  #   variant = "";
+  # };
+  # services.xserver.enable = true;
+  # services.displayManager.gdm = {
+  #   enable = true;
+  #   autoSuspend = false;
+  # };
+  # services.desktopManager.gnome = {
+  #   enable = true;
+  #   extraGSettingsOverrides = ''
+  #     [org.gnome.settings-daemon.plugins.power]
+  #     sleep-inactive-ac-type='nothing'
+  #     sleep-inactive-battery-type='nothing'
+  #   '';
+  # };
 
   # Modern audio setup with PipeWire
   # PipeWire provides complete audio stack with ALSA and PulseAudio compatibility
@@ -88,15 +92,15 @@
     ];
   };
 
-  services.displayManager.autoLogin.enable = true;
-  services.displayManager.autoLogin.user = "nix";
+  # services.displayManager.autoLogin.enable = true;
+  # services.displayManager.autoLogin.user = "nix";
 
-  systemd.services."getty@tty1".enable = false;
-  systemd.services."autovt@tty1".enable = false;
+  # systemd.services."getty@tty1".enable = false;
+  # systemd.services."autovt@tty1".enable = false;
 
   nixpkgs.config.allowUnfree = true;
 
-  environment = {systemPackages = with pkgs; [helix wget];};
+  environment = {systemPackages = with pkgs; [helix wget git];};
 
   system.stateVersion = "25.05";
 }
