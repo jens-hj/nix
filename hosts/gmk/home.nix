@@ -3,8 +3,8 @@
   lib,
   ...
 }: {
-  home.username = "nix";
-  home.homeDirectory = "/home/nix";
+  home.username = "gmk";
+  home.homeDirectory = "/home/gmk";
 
   home.stateVersion = "25.05";
 
