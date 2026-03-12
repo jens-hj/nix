@@ -31,7 +31,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
-  networking.hostName = "gmk";
+  networking.hostName = "gmk1";
   networking.networkmanager.enable = true;
 
   i18n.defaultLocale = "en_DK.UTF-8";
@@ -46,23 +46,6 @@
     LC_TELEPHONE = "da_DK.UTF-8";
     LC_TIME = "da_DK.UTF-8";
   };
-  # services.xserver.xkb = {
-  #   layout = "us";
-  #   variant = "";
-  # };
-  # services.xserver.enable = true;
-  # services.displayManager.gdm = {
-  #   enable = true;
-  #   autoSuspend = false;
-  # };
-  # services.desktopManager.gnome = {
-  #   enable = true;
-  #   extraGSettingsOverrides = ''
-  #     [org.gnome.settings-daemon.plugins.power]
-  #     sleep-inactive-ac-type='nothing'
-  #     sleep-inactive-battery-type='nothing'
-  #   '';
-  # };
 
   # Modern audio setup with PipeWire
   # PipeWire provides complete audio stack with ALSA and PulseAudio compatibility
@@ -78,25 +61,19 @@
 
   services.openssh = {
     enable = true;
-    settings.PasswordAuthentication = false;
+    settings.PasswordAuthentication = true;
   };
 
   users.defaultUserShell = pkgs.fish;
-  users.users.nix = {
+  users.users.gmk = {
     isNormalUser = true;
-    description = "nix";
+    description = "gmk";
     extraGroups = ["networkmanager" "wheel"];
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILh7s/A2WOBY+O+Q10iwZ5L0dqfbVc+5IaaT9VUHvcl5 jens@Jenss-MacBook-Pro.local"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPPIvVodq02iIsuc1TtTS/OHg60ep76xlf3WTxU26jcc j@nixos"
     ];
   };
-
-  # services.displayManager.autoLogin.enable = true;
-  # services.displayManager.autoLogin.user = "nix";
-
-  # systemd.services."getty@tty1".enable = false;
-  # systemd.services."autovt@tty1".enable = false;
 
   nixpkgs.config.allowUnfree = true;
 
