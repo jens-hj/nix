@@ -59,7 +59,7 @@
       utils.cli.enable = lib.mkDefault true;
       utils.nix.enable = lib.mkDefault true;
       utils.git.enable = lib.mkDefault true;
-      utils.code-stats.enable = lib.mkDefault true;
+      utils.code-stats.enable = lib.mkDefault false;
 
       # Shell
       shell.fish.enable = lib.mkDefault true;

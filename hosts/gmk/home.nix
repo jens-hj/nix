@@ -19,13 +19,6 @@
   shell.fish.zellij.autoStart = lib.mkForce false;
   utils.cli.profile = lib.mkForce "extended";
 
-  # programs = {
-  #   firefox = {
-  #     enable = true;
-  #     profiles.default.extensions.force = true;
-  #   };
-  # };
-
   home.sessionVariables = {
     MCRCON_HOST = "localhost";
     MCRCON_PASS = "7568";
