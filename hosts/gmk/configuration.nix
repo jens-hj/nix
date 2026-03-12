@@ -8,10 +8,10 @@
   # Enable the Minecraft server
   srv.minecraft = {
     enable = false;
-    # importExistingFiles = "/home/nix/srv/minecraft/commune-bak";
+    # importExistingFiles = "/home/gmk/srv/minecraft/commune-bak";
   };
 
-  home-manager.users.nix = {
+  home-manager.users.gmk = {
     imports = [
       ./home.nix
       inputs.self.outputs.homeManagerModules.default
