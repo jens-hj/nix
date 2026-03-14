@@ -94,6 +94,16 @@
         inputs.catppuccin.nixosModules.catppuccin
       ];
     };
+    nixosConfigurations."rp4j" = nixpkgs.lib.nixosSystem {
+      specialArgs = {inherit inputs;};
+      modules = [
+        ./hosts/rp4j/configuration.nix
+        home-manager.nixosModules.default
+        self.nixosModules.default
+        inputs.catppuccin.nixosModules.catppuccin
+        inputs.stylix.nixosModules.stylix
+      ];
+    };
     nixosConfigurations."desktop" = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = {inherit inputs;};

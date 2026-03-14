@@ -72,25 +72,35 @@
           end
         '';
         functions = {
-          nixr = {
+          nr = {
             description = "Rebuild NixOS configuration with flake";
             body = ''
-              if test (count $argv) -eq 0
-                  echo "Error: Configuration name is required"
-                  echo "Usage: nixr <config-name> [extra-flags]"
-                  echo "Available configurations: default (d), gmk (g), macbook (m), systematic (s)"
-                  return 1
-              end
-              set -l input $argv[1]
-              set -l config
-              set -l extra_flags $argv[2..-1]
+              set -l input
+              set -l extra_flags
 
+              if test (count $argv) -eq 0
+                  if set -q NIXOS_DEFAULT_CONFIG; and test -n "$NIXOS_DEFAULT_CONFIG"
+                      set input $NIXOS_DEFAULT_CONFIG
+                  else
+                      echo "Error: Configuration name is required (no argument given and NIXOS_DEFAULT_CONFIG is not set)"
+                      echo "Usage: nr <config-name> [extra-flags]"
+                      echo "Available configurations: desktop (d), gmk (g), rp4j (r), macbook (m), systematic (s)"
+                      return 1
+                  end
+              else
+                  set input $argv[1]
+                  set extra_flags $argv[2..-1]
+              end
+
+              set -l config
               # Map short names to full configuration names
               switch $input
                   case d
-                      set config "default"
+                      set config "desktop"
                   case g
                       set config "gmk"
+                  case r
+                      set config "rp4j"
                   case m
                       set config "macbook"
                   case s
@@ -108,7 +118,7 @@
               end
             '';
           };
-          nixu = {
+          nu = {
             description = "Update flake inputs with concise, colorized output";
             body = ''
               # Parse arguments
