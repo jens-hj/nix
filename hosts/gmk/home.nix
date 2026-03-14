@@ -14,8 +14,6 @@
 
   # Enable the custom base configuration from ./../../modules/default.nix
   base.enable = true;
-  visuals.theme.enable = lib.mkForce false;
-  # terminal.ghostty.enable = lib.mkForce true;
   shell.fish.zellij.autoStart = lib.mkForce false;
   utils.cli.profile = lib.mkForce "extended";
 
