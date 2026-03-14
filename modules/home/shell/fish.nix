@@ -350,10 +350,6 @@
             src = pkgs.fishPlugins.z.src;
           }
           {
-            name = "sponge";
-            src = pkgs.fishPlugins.sponge.src;
-          }
-          {
             name = "puffer";
             src = pkgs.fishPlugins.puffer.src;
           }

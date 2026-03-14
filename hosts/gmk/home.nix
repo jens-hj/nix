@@ -25,5 +25,6 @@
     LANG = "en_US.UTF-8";
     LC_ALL = "en_US.UTF-8";
     TERM = "xterm-256color";
+    NIXOS_DEFAULT_CONFIG = "gmk";
   };
 }
