@@ -38,6 +38,7 @@
           rfc = "clear && exec fish";
           obs = "pushd ~/repos/notes; git status; git add .; gstatus; git commit --message 'commit from abbr'; gstatus; git push; popd;";
           xc-sim = "xcodebuild -scheme Nanolet -destination 'platform=iOS Simulator,name=iPhone 16' BUILD_DIR=./build; xcrun simctl install booted ./build/Debug-iphonesimulator/Nanolet.app/; xcrun simctl launch booted Unincorporated.Dev.Nanolet";
+          lg = "lazygit";
           e = "exit";
         };
         shellAliases = {

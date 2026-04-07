@@ -106,7 +106,10 @@
     };
     nixosConfigurations."desktop" = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
-      specialArgs = {inherit inputs;};
+      specialArgs = {
+        inherit inputs;
+        nur = inputs.nur.legacyPackages.x86_64-linux;
+      };
       modules = [
         ./hosts/desktop/configuration.nix
         home-manager.nixosModules.default

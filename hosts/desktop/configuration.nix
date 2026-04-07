@@ -4,6 +4,7 @@
 {
   inputs,
   pkgs,
+  nur,
   ...
 }: {
   imports = [
@@ -121,19 +122,25 @@
     SUBSYSTEMS=="usb", ATTRS{idVendor}=="3297", MODE:="0666", SYMLINK+="ignition_dfu"
   '';
 
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
+  nix = {
+    gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 7d";
+    };
+    optimise.automatic = true;
+    settings.experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
+  };
 
   virtualisation = {
     containers.enable = true;
-    docker = {
+    podman = {
       enable = true;
-      rootless = {
-        enable = true;
-        setSocketVariable = true;
-      };
+      dockerCompat = true;
+      defaultNetwork.settings.dns_enabled = true;
     };
     libvirtd.enable = true;
     spiceUSBRedirection.enable = true;
@@ -201,9 +208,17 @@
       registrations = {
         aarch64-linux = {
           fixBinary = true;
+          wrapInterpreterInShell = false;
+          interpreter = "${nur.repos.xddxdd.qemu-user-static}/bin/qemu-aarch64-static";
+          magicOrExtension = ''\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xb7\x00'';
+          # mask = lib.mkForce ''\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'';
         };
         armv7l-linux = {
           fixBinary = true;
+          wrapInterpreterInShell = false;
+          interpreter = "${nur.repos.xddxdd.qemu-user-static}/bin/qemu-arm-static";
+          magicOrExtension = ''\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00'';
+          # mask = lib.mkForce ''\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'';
         };
       };
     };
@@ -328,6 +343,7 @@
     allowUnfree = true;
     permittedInsecurePackages = [
       "libsoup-2.74.3"
+      "openclaw-2026.3.12"
     ];
   };
 
@@ -344,6 +360,7 @@
     gtk3
     ffmpeg # Not strictly required, but ensures VAAPI stack is complete
     libva-utils # For testing with 'vainfo' command
+    firefoxpwa
     # For Windows VM
     swtpm
     OVMF

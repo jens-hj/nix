@@ -10,6 +10,16 @@
   home.stateVersion = "25.05";
 
   home.packages = with pkgs; [
+    (pkgs.writeShellScriptBin "chat-pwa" ''
+      for f in ~/.local/share/applications/FFPWA-*.desktop; do
+        if grep -q "Chat" "$f"; then
+          id=$(grep -oP 'launch \K[A-Z0-9]+' "$f")
+          exec firefoxpwa site launch "$id"
+        fi
+      done
+      echo "Chat PWA not installed" >&2
+      exit 1
+    '')
     wl-clipboard
     mcrcon
     k9s
@@ -41,6 +51,9 @@
     speedtest
     brave
     inputs.t3code.packages.${system}.t3-code
+    firefoxpwa
+    # cross compile container
+    qemu-user
     # zen-browser
     radeontop
     cacert
@@ -69,6 +82,7 @@
   editor.vscode.enable = lib.mkForce true;
 
   games.enable = true;
+  games.minecraft.enable = lib.mkForce false;
 
   desktop.enable = true;
 
@@ -102,6 +116,7 @@
     zen-browser = {
       enable = true;
       profiles.default.extensions.force = true;
+      nativeMessagingHosts = [pkgs.firefoxpwa];
       profiles.default.extensions.packages = with pkgs.nur.repos.rycee.firefox-addons; [
         ublock-origin
         bitwarden
@@ -110,6 +125,7 @@
         enhanced-h264ify
         sponsorblock
         twitch-auto-points
+        pwas-for-firefox
         # 7TV and IVE not in NUR - install manually
       ];
       profiles.default.settings = {
@@ -330,6 +346,22 @@
     };
   };
 
+  # home.activation.firefoxpwaUserChrome = lib.hm.dag.entryAfter ["writeBoundary"] ''
+  #       for profile_dir in "$HOME/.local/share/firefoxpwa/profiles"/*/; do
+  #         [ -d "$profile_dir" ] || continue
+  #         mkdir -p "$profile_dir/chrome"
+  #         cat > "$profile_dir/chrome/userChrome.css" << 'EOF'
+  #   #navigator-toolbox {
+  #     display: none !important;
+  #   }
+  #   EOF
+  #         user_js="$profile_dir/user.js"
+  #         if ! grep -q "legacyUserProfileCustomizations" "$user_js" 2>/dev/null; then
+  #           echo 'user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);' >> "$user_js"
+  #         fi
+  #       done
+  # '';
+
   services = {
     vicinae = {
       enable = true;
@@ -401,5 +433,6 @@
     XDG_DATA_DIRS = "$XDG_DATA_DIRS:/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share:$HOME/.nix-profile/share";
     LIBVA_DRIVER_NAME = "radeonsi";
     VDPAU_DRIVER = "radeonsi";
+    NIXOS_DEFAULT_CONFIG = "desktop";
   };
 }
