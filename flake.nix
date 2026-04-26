@@ -19,20 +19,21 @@
     };
 
     nix-minecraft.url = "github:Infinidoge/nix-minecraft";
+
+    git.url = "github:kpbaks/git.fish";
+    ctrl-z.url = "github:kpbaks/ctrl-z.fish";
+    autols.url = "github:kpbaks/autols.fish";
+    border.url = "github:kpbaks/border.fish";
+    what-changed.url = "github:kpbaks/what-changed.fish";
   };
 
-  outputs = {
-    self,
-    nix-darwin,
-    nixpkgs,
-    home-manager,
-    ...
-  } @ inputs: {
+  outputs = { self, nix-darwin, nixpkgs, home-manager, ... }@inputs: {
     homeManagerModules.default = ./modules/home;
     nixosModules.default = ./modules/nixos;
 
     nixosConfigurations.default = nixpkgs.lib.nixosSystem {
-      specialArgs = {inherit inputs;};
+      # inherit pkgs;
+      specialArgs = { inherit inputs; };
       modules = [
         ./hosts/default/configuration.nix
         home-manager.nixosModules.default
@@ -41,7 +42,8 @@
       ];
     };
     nixosConfigurations."gmk" = nixpkgs.lib.nixosSystem {
-      specialArgs = {inherit inputs;};
+      # inherit pkgs;
+      specialArgs = { inherit inputs; };
       modules = [
         ./hosts/gmk/configuration.nix
         home-manager.nixosModules.default
@@ -55,12 +57,22 @@
     # Or for the first time to get nix-darwin initially:
     # $ sudo nix run github:lnl7/nix-darwin/master -- switch --flake ./<path>/<to>/<this>/<repo>/#macbook
     darwinConfigurations."macbook" = nix-darwin.lib.darwinSystem {
+      # inherit pkgs;
       system = "aarch64-darwin";
-      specialArgs = {inherit inputs;};
+      specialArgs = { inherit inputs; };
       modules = [
         ./hosts/macbook/configuration.nix
         home-manager.darwinModules.home-manager
         self.nixosModules.default
+        {
+          nixpkgs.overlays = [
+            inputs.git.overlays.default
+            inputs.ctrl-z.overlays.default
+            inputs.what-changed.overlays.default
+            inputs.autols.overlays.default
+            inputs.border.overlays.default
+          ];
+        }
       ];
     };
   };
