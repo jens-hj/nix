@@ -1,7 +1,14 @@
-{ pkgs, config, lib, ... }: {
+{
+  pkgs,
+  config,
+  lib,
+  inputs,
+  ...
+}: {
   options = {
     shell.fish.enable = lib.mkEnableOption "enable custom configured fish";
     shell.brew.enable = lib.mkEnableOption "enable homebrew in fish";
+    shell.fish.zellij.autoStart = lib.mkEnableOption "enable zellij autostart";
   };
 
   config = lib.mkIf config.shell.fish.enable {
@@ -23,16 +30,16 @@
           PS = "pwsh.exe";
           rf = "exec fish";
           rfc = "clear && exec fish";
-          obs =
-            "pushd ~/repos/notes; git status; git add .; gstatus; git commit --message 'commit from abbr'; gstatus; git push; popd;";
-          xc-sim =
-            "xcodebuild -scheme Nanolet -destination 'platform=iOS Simulator,name=iPhone 16' BUILD_DIR=./build; xcrun simctl install booted ./build/Debug-iphonesimulator/Nanolet.app/; xcrun simctl launch booted Unincorporated.Dev.Nanolet";
+          obs = "pushd ~/repos/notes; git status; git add .; gstatus; git commit --message 'commit from abbr'; gstatus; git push; popd;";
+          xc-sim = "xcodebuild -scheme Nanolet -destination 'platform=iOS Simulator,name=iPhone 16' BUILD_DIR=./build; xcrun simctl install booted ./build/Debug-iphonesimulator/Nanolet.app/; xcrun simctl launch booted Unincorporated.Dev.Nanolet";
+          lg = "lazygit";
+          e = "exit";
         };
         shellAliases = {
           space = "duf --hide-fs squashfs";
           ls = "eza --icons --group-directories-first --classify --grid";
-          ll =
-            "eza --icons --group-directories-first --classify --long --header --git";
+          ll = "eza --icons --group-directories-first --classify --long --header --git";
+          ns = "nix-search-tv print | fzf --preview 'nix-search-tv preview {}' --scheme history";
         };
         interactiveShellInit = ''
           set fish_greeting # Disable greeting
@@ -46,47 +53,175 @@
 
           bind \t 'super-tab'
 
-          # Start or attach to Zellij session
-          zellij-auto
+          ${lib.optionalString config.shell.fish.zellij.autoStart ''
+            # Start or attach to Zellij session
+            zellij-auto
+          ''}
         '';
         shellInit = ''
           set --universal git_fish_git_status_command gstatus
 
           string match -q "$TERM_PROGRAM" "vscode"
           and . (code --locate-shell-integration-path fish)
+          set -gx NIXOS_FLAKE ~/repos/nix
+
+          # Use gh's existing auth for GitHub API
+          if command -v gh &> /dev/null
+            set -gx GITHUB_TOKEN (gh auth token 2>/dev/null)
+          end
         '';
         functions = {
-          nixr = {
+          nr = {
             description = "Rebuild NixOS configuration with flake";
             body = ''
+              set -l input
+              set -l extra_flags
+
               if test (count $argv) -eq 0
-                  echo "Error: Configuration name is required"
-                  echo "Usage: nixr <config-name>"
-                  echo "Available configurations: default (d), gmk (g), macbook (m)"
-                  return 1
+                  if set -q NIXOS_DEFAULT_CONFIG; and test -n "$NIXOS_DEFAULT_CONFIG"
+                      set input $NIXOS_DEFAULT_CONFIG
+                  else
+                      echo "Error: Configuration name is required (no argument given and NIXOS_DEFAULT_CONFIG is not set)"
+                      echo "Usage: nr <config-name> [extra-flags]"
+                      echo "Available configurations: desktop (d), gmk (g), rp4j (r), macbook (m), systematic (s)"
+                      return 1
+                  end
+              else
+                  set input $argv[1]
+                  set extra_flags $argv[2..-1]
               end
 
-              set -l input $argv[1]
               set -l config
-
               # Map short names to full configuration names
               switch $input
                   case d
-                      set config "default"
+                      set config "desktop"
                   case g
                       set config "gmk"
+                  case r
+                      set config "rp4j"
                   case m
                       set config "macbook"
+                  case s
+                      set config "systematic"
                   case '*'
                       set config $input
               end
 
               if test "$config" = "macbook"
                   echo "Rebuilding Darwin configuration: $config"
-                  sudo darwin-rebuild switch --flake ~/repos/nix/#$config
+                  sudo darwin-rebuild switch --flake $NIXOS_FLAKE#$config $extra_flags
               else
                   echo "Rebuilding NixOS configuration: $config"
-                  sudo nixos-rebuild switch --flake ~/repos/nix/#$config
+                  sudo nixos-rebuild switch --flake $NIXOS_FLAKE#$config $extra_flags
+              end
+            '';
+          };
+          nu = {
+            description = "Update flake inputs with concise, colorized output";
+            body = ''
+              # Parse arguments
+              set -l verbose false
+              for arg in $argv
+                  if test "$arg" = "--verbose" -o "$arg" = "-v"
+                      set verbose true
+                  end
+              end
+
+              # Colors
+              set -l blue (set_color blue)
+              set -l green (set_color green)
+              set -l yellow (set_color yellow)
+              set -l cyan (set_color cyan)
+              set -l magenta (set_color magenta)
+              set -l red (set_color red)
+              set -l bold (set_color --bold)
+              set -l dim (set_color brblack)
+              set -l reset (set_color normal)
+
+              if test "$verbose" = "true"
+                  # Verbose mode: show full output with colorization
+                  fish -c "cd $NIXOS_FLAKE && nix flake update" 2>&1 | while read -l line
+                      # Colorize different parts of the output
+                      if string match -q "warning:*" -- $line
+                          echo "$yellow$line$reset"
+                      else if string match -q "error:*" -- $line
+                          echo "$red$bold$line$reset"
+                      else if string match -q "• Updated input*" -- $line
+                          echo "$green$bold$line$reset"
+                      else if string match -q "*'github:*" -- $line
+                          # Extract and colorize the repo and dates
+                          set -l repo (string match -r "github:([^/]+/[^/]+)" -- $line | tail -n 1)
+                          set -l from_date (string match -r "\((\d{4}-\d{2}-\d{2})\)" -- $line | head -n 2 | tail -n 1)
+                          set -l to_date (string match -r "\((\d{4}-\d{2}-\d{2})\)" -- $line | tail -n 1)
+
+                          if string match -q "*→*" -- $line
+                              echo "$dim  → $cyan$repo$reset $dim($from_date → $magenta$to_date$dim)$reset"
+                          else
+                              echo "$dim    $cyan$repo$reset $dim($from_date)$reset"
+                          end
+                      else
+                          echo "$line"
+                      end
+                  end
+              else
+                  # Concise mode: only show updated inputs with clean formatting
+                  echo "$bold$blue""Updating flake inputs...$reset"
+                  echo ""
+
+                  set -l output (fish -c "cd $NIXOS_FLAKE && nix flake update" 2>&1)
+                  set -l update_status $status
+                  set -l current_input ""
+                  set -l has_errors false
+                  set -l error_inputs
+
+                  for line in $output
+                      if string match -q "• Updated input*" -- $line
+                          # Extract input name
+                          set current_input (string replace -r "^• Updated input '([^']+)'.*" '$1' -- $line)
+
+                          # Format with colors
+                          echo "$green●$reset $bold$current_input$reset"
+                      else if string match -q "*→*" -- $line
+                          # Extract dates from the arrow line
+                          set -l dates (string match -r "\((\d{4}-\d{2}-\d{2})\)" -- $line)
+                          if test (count $dates) -ge 4
+                              set -l from_date $dates[2]
+                              set -l to_date $dates[4]
+                              echo "$dim  $from_date$reset → $magenta$to_date$reset"
+                          end
+                      else if string match -q "error: input '*' has an override but no corresponding*" -- $line
+                          # Extract the input name from the error
+                          set -l failed_input (string replace -r "^error: input '([^']+)'.*" '$1' -- $line)
+                          set has_errors true
+                          set -a error_inputs $failed_input
+                      else if string match -q "error:*input*'*'*" -- $line
+                          # Generic input error - try to extract input name
+                          set -l failed_input (string match -r "input '([^']+)'" -- $line)
+                          if test (count $failed_input) -ge 2
+                              set has_errors true
+                              set -a error_inputs $failed_input[2]
+                          end
+                      else if string match -q "error:*" -- $line
+                          set has_errors true
+                      end
+                  end
+
+                  echo ""
+                  if test "$has_errors" = "true"
+                      if test (count $error_inputs) -gt 0
+                          for ei in $error_inputs
+                              echo "$red✗$reset $bold$ei$reset $red(failed)$reset"
+                          end
+                      else
+                          echo "$red✗ Update completed with errors$reset $dim(run with -v for details)$reset"
+                      end
+                      echo ""
+                      echo "$yellow⚠ Flake update completed with errors$reset $dim(run with -v for details)$reset"
+                      return 1
+                  else
+                      echo "$dim✓ Flake update complete$reset"
+                  end
               end
             '';
           };

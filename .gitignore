@@ -1,2 +1,9 @@
-result
-.DS_Store
+*.pem
+*.cer
+
+# Large wallpaper files
+**/wallpaper.png
+**/wallpaper.jpg
+**/wallpaper.jpeg
+
+*Zone.Identifier

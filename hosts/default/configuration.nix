@@ -6,9 +6,11 @@
   pkgs,
   inputs,
   ...
-}: let
+}:
+let
   tuigreet = "${pkgs.greetd.tuigreet}/bin/tuigreet";
-in {
+in
+{
   imports = [
     # Include the results of the hardware scan.
     ./hardware.nix
@@ -16,7 +18,7 @@ in {
   ];
 
   home-manager.users.jens = {
-    extraSpecialArgs = {inherit inputs;};
+    extraSpecialArgs = { inherit inputs; };
     imports = [
       ./home.nix
       inputs.self.outputs.homeManagerModules.default
@@ -79,7 +81,12 @@ in {
     users.jens = {
       isNormalUser = true;
       description = "Jens";
-      extraGroups = ["networkmanager" "wheel" "audio" "openrazer"];
+      extraGroups = [
+        "networkmanager"
+        "wheel"
+        "audio"
+        "openrazer"
+      ];
     };
   };
 
@@ -111,7 +118,11 @@ in {
     enable = true;
     wlr = {
       enable = true;
-      settings = {screencast = {screencopy_version = 1;};};
+      settings = {
+        screencast = {
+          screencopy_version = 1;
+        };
+      };
     };
     extraPortals = with pkgs; [
       xdg-desktop-portal-gtk
@@ -127,10 +138,13 @@ in {
   };
 
   nix.settings = {
-    experimental-features = ["nix-command" "flakes"];
-    substituters = ["https://niri.cachix.org"];
-    trusted-public-keys = ["niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964="];
-    trusted-substituters = ["https://niri.cachix.org"];
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
+    substituters = [ "https://niri.cachix.org" ];
+    trusted-public-keys = [ "niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964=" ];
+    trusted-substituters = [ "https://niri.cachix.org" ];
   };
 
   # sound.enable = true;
@@ -158,7 +172,7 @@ in {
       efi.canTouchEfiVariables = true;
       grub = {
         enable = true;
-        devices = ["nodev"];
+        devices = [ "nodev" ];
         efiSupport = true;
         useOSProber = true;
       };

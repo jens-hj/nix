@@ -1,7 +1,20 @@
-{inputs, ...}: {
+{
+  pkgs,
+  inputs,
+  ...
+}: {
   imports = [
-    # ./srv/minecraft.nix
+    ./srv/minecraft.nix
+    ./visuals/theme.nix
+    ./desktop/noctalia.nix
+    ./srv/k3s-agent.nix
   ];
+
+  srv.minecraft.enable = false;
+  srv.k3s.agent.enable = false;
+
+  visuals.theme.enable = true;
+  desktop.noctalia.enable = true;
 
   home-manager = {
     backupFileExtension = "before-home-manager";
@@ -10,8 +23,10 @@
     extraSpecialArgs = {inherit inputs;};
   };
 
-  # environment.shells = with pkgs; [fish];
+  users.defaultUserShell = pkgs.fish;
+
   programs.fish.enable = true;
+  programs.nix-ld.enable = true;
 
   time.timeZone = "Europe/Copenhagen";
 }

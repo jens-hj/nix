@@ -3,8 +3,8 @@
   lib,
   ...
 }: {
-  home.username = "nix";
-  home.homeDirectory = "/home/nix";
+  home.username = "gmk";
+  home.homeDirectory = "/home/gmk";
 
   home.stateVersion = "25.05";
 
@@ -14,15 +14,8 @@
 
   # Enable the custom base configuration from ./../../modules/default.nix
   base.enable = true;
-  terminal.ghostty.enable = lib.mkForce true;
+  shell.fish.zellij.autoStart = lib.mkForce false;
   utils.cli.profile = lib.mkForce "extended";
-
-  programs = {
-    firefox = {
-      enable = true;
-      profiles.default.extensions.force = true;
-    };
-  };
 
   home.sessionVariables = {
     MCRCON_HOST = "localhost";
@@ -32,5 +25,6 @@
     LANG = "en_US.UTF-8";
     LC_ALL = "en_US.UTF-8";
     TERM = "xterm-256color";
+    NIXOS_DEFAULT_CONFIG = "gmk";
   };
 }

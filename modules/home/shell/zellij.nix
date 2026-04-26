@@ -42,11 +42,11 @@
       '';
       ".config/zellij/plugins/zjstatus.wasm".source = pkgs.fetchurl {
         url = "https://github.com/dj95/zjstatus/releases/latest/download/zjstatus.wasm";
-        sha256 = "sha256-p6JTnAyim0T3TkJzGhEitzc3JpPovL5k7jb8gv+oLD4=";
+        sha256 = "sha256-TeQm0gscv4YScuknrutbSdksF/Diu50XP4W/fwFU3VM=";
       };
       ".config/zellij/plugins/room.wasm".source = pkgs.fetchurl {
         url = "https://github.com/rvcas/room/releases/latest/download/room.wasm";
-        sha256 = "sha256-t6GPP7OOztf6XtBgzhLF+edUU294twnu0y5uufXwrkw=";
+        sha256 = "sha256-kLSDpAt2JGj7dYYhYFh6BfvtzVwTrcs+0jHwG/nActE=";
       };
       ".config/zellij/plugins/zellij_forgot.wasm".source = pkgs.fetchurl {
         url = "https://github.com/karimould/zellij-forgot/releases/latest/download/zellij_forgot.wasm";

@@ -8,6 +8,7 @@
     ./utils/git.nix
     ./utils/cli.nix
     ./utils/nix.nix
+    ./utils/code-stats.nix
 
     # Shell
     ./shell/fish.nix
@@ -18,6 +19,8 @@
 
     # Editor
     ./editor/helix.nix
+    ./editor/zed.nix
+    ./editor/vscode.nix
 
     # Terminal
     ./terminal/ghostty.nix
@@ -28,43 +31,69 @@
     # Visuals
     ./visuals/fonts.nix
     ./visuals/theme.nix
+
+    # Games
+    ./games/minecraft.nix
+
+    # Desktop Environment
+    ./desktop/waybar.nix
+    ./desktop/noctalia.nix
   ];
 
   options = {
-    base.enable =
-      lib.mkEnableOption "enables fish, zellij, helix, and git configurations";
+    base.enable = lib.mkEnableOption "enables fish, zellij, helix, and git configurations";
+    games.enable = lib.mkEnableOption "enables games; minecraft";
+    desktop.enable = lib.mkEnableOption "enables custom desktop environment";
   };
 
-  config = lib.mkIf config.base.enable {
-    programs = {
-      # Enable home-manager itself
-      home-manager.enable = true;
-    };
+  config = lib.mkMerge [
+    {
+      programs = {
+        # Enable home-manager itself
+        home-manager.enable = true;
+      };
+    }
 
-    # Utils
-    utils.cli.enable = lib.mkDefault true;
-    utils.nix.enable = lib.mkDefault true;
-    utils.git.enable = lib.mkDefault true;
+    (lib.mkIf config.base.enable {
+      # Utils
+      utils.cli.enable = lib.mkDefault true;
+      utils.nix.enable = lib.mkDefault true;
+      utils.git.enable = lib.mkDefault true;
+      utils.code-stats.enable = lib.mkDefault false;
 
-    # Shell
-    shell.fish.enable = lib.mkDefault true;
-    shell.brew.enable = lib.mkDefault false;
-    shell.zellij.enable = lib.mkDefault true;
+      # Shell
+      shell.fish.enable = lib.mkDefault true;
+      shell.fish.zellij.autoStart = lib.mkDefault true;
+      shell.brew.enable = lib.mkDefault false;
+      shell.zellij.enable = lib.mkDefault true;
 
-    # Typesetters
-    typesetters.typst.enable = lib.mkDefault false;
+      # Typesetters
+      typesetters.typst.enable = lib.mkDefault false;
 
-    # Editor
-    editor.helix.enable = lib.mkDefault true;
+      # Editor
+      editor.helix.enable = lib.mkDefault true;
+      editor.zed.enable = lib.mkDefault false;
+      editor.vscode.enable = lib.mkDefault false;
 
-    # Terminal
-    terminal.ghostty.enable = lib.mkDefault false;
+      # Terminal
+      terminal.ghostty.enable = lib.mkDefault false;
 
-    # Languages
-    lang.flutter.enable = lib.mkDefault false;
+      # Languages
+      lang.flutter.enable = lib.mkDefault false;
 
-    # Visuals
-    visuals.fonts.enable = lib.mkDefault true;
-    visuals.theme.enable = lib.mkDefault true;
-  };
+      # Visuals
+      visuals.fonts.enable = lib.mkDefault true;
+      visuals.theme.enable = lib.mkDefault true;
+    })
+
+    (lib.mkIf config.games.enable {
+      games.minecraft.enable = lib.mkDefault true;
+    })
+
+    (lib.mkIf config.desktop.enable {
+      # desktop.waybar.enable = lib.mkDefault true;
+      desktop.noctalia.enable = lib.mkDefault true;
+      # TODO: add niri module here
+    })
+  ];
 }
