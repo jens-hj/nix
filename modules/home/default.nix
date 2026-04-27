@@ -30,20 +30,14 @@
 
     # Visuals
     ./visuals/fonts.nix
-    ./visuals/theme.nix
 
     # Games
     ./games/minecraft.nix
-
-    # Desktop Environment
-    ./desktop/waybar.nix
-    ./desktop/noctalia.nix
   ];
 
   options = {
     base.enable = lib.mkEnableOption "enables fish, zellij, helix, and git configurations";
     games.enable = lib.mkEnableOption "enables games; minecraft";
-    desktop.enable = lib.mkEnableOption "enables custom desktop environment";
   };
 
   config = lib.mkMerge [
@@ -83,17 +77,10 @@
 
       # Visuals
       visuals.fonts.enable = lib.mkDefault true;
-      visuals.theme.enable = lib.mkDefault true;
     })
 
     (lib.mkIf config.games.enable {
       games.minecraft.enable = lib.mkDefault true;
-    })
-
-    (lib.mkIf config.desktop.enable {
-      # desktop.waybar.enable = lib.mkDefault true;
-      desktop.noctalia.enable = lib.mkDefault true;
-      # TODO: add niri module here
     })
   ];
 }

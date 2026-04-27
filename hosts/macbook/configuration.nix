@@ -1,7 +1,7 @@
 { pkgs, inputs, ... }: {
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
-  environment.systemPackages = with pkgs; [ helix wget ];
+  environment.systemPackages = with pkgs; [ helix wget nixos-rebuild ];
 
   home-manager.users.jens = {
     imports = [

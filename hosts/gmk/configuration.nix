@@ -15,6 +15,7 @@
     imports = [
       ./home.nix
       inputs.self.outputs.homeManagerModules.default
+      inputs.self.outputs.homeManagerModules.linux
       inputs.catppuccin.homeModules.catppuccin
       inputs.stylix.homeModules.stylix
       inputs.vicinae.homeManagerModules.default

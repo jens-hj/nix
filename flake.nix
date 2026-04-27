@@ -1,6 +1,13 @@
 {
   description = "Nixos config flake";
 
+  nixConfig = {
+    extra-substituters = ["https://nixos-raspberrypi.cachix.org"];
+    extra-trusted-public-keys = [
+      "nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
+    ];
+  };
+
   inputs = {
     # Nix packages and Home Manager
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -69,15 +76,29 @@
 
     # T3 Code
     t3code.url = "github:omarcresp/t3code-flake";
+
+    # Raspberry Pi 5 support (firmware, kernel, bootloader).
+    # NOTE: do NOT override `inputs.nixpkgs.follows` here — the upstream cachix
+    # only has artifacts built against their pinned nixpkgs. Following our
+    # nixpkgs invalidates the kernel/firmware cache and forces source rebuilds.
+    nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
   };
 
-  outputs = { self, nix-darwin, nixpkgs, home-manager, ... }@inputs: {
+  outputs = {
+    self,
+    nix-darwin,
+    nixpkgs,
+    home-manager,
+    ...
+  } @ inputs: {
     homeManagerModules.default = ./modules/home;
+    homeManagerModules.linux = ./modules/home-linux;
     nixosModules.default = ./modules/nixos;
+    darwinModules.default = ./modules/darwin;
 
     nixosConfigurations.default = nixpkgs.lib.nixosSystem {
       # inherit pkgs;
-      specialArgs = { inherit inputs; };
+      specialArgs = {inherit inputs;};
       modules = [
         ./hosts/default/configuration.nix
         home-manager.nixosModules.default
@@ -87,7 +108,7 @@
     };
     nixosConfigurations."gmk" = nixpkgs.lib.nixosSystem {
       # inherit pkgs;
-      specialArgs = { inherit inputs; };
+      specialArgs = {inherit inputs;};
       modules = [
         ./hosts/gmk/configuration.nix
         home-manager.nixosModules.default
@@ -103,6 +124,46 @@
         self.nixosModules.default
         inputs.catppuccin.nixosModules.catppuccin
         inputs.stylix.nixosModules.stylix
+      ];
+    };
+    nixosConfigurations."rp5j" = inputs.nixos-raspberrypi.lib.nixosSystem {
+      specialArgs = {inherit inputs;};
+      modules = [
+        ({...}: {
+          imports = with inputs.nixos-raspberrypi.nixosModules; [
+            raspberry-pi-5.base
+            raspberry-pi-5.page-size-16k
+          ];
+        })
+        ./hosts/rp5j/configuration.nix
+        home-manager.nixosModules.default
+        self.nixosModules.default
+        # Catppuccin's nixos module references options (e.g.
+        # `services.displayManager.generic`) that don't exist on the older
+        # nixpkgs pinned by nixos-raspberrypi, so stub `catppuccin` here
+        # instead. `visuals.theme.enable = false` on this host means none of
+        # the catppuccin assignments actually fire.
+        ({lib, ...}: {
+          options.catppuccin = {
+            enable = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+            };
+            flavor = lib.mkOption {
+              type = lib.types.str;
+              default = "mocha";
+            };
+          };
+        })
+        {
+          nixpkgs.overlays = [
+            inputs.git.overlays.default
+            inputs.ctrl-z.overlays.default
+            inputs.what-changed.overlays.default
+            inputs.autols.overlays.default
+            inputs.border.overlays.default
+          ];
+        }
       ];
     };
     nixosConfigurations."desktop" = nixpkgs.lib.nixosSystem {
@@ -139,11 +200,11 @@
     darwinConfigurations."macbook" = nix-darwin.lib.darwinSystem {
       # inherit pkgs;
       system = "aarch64-darwin";
-      specialArgs = { inherit inputs; };
+      specialArgs = {inherit inputs;};
       modules = [
         ./hosts/macbook/configuration.nix
         home-manager.darwinModules.home-manager
-        self.nixosModules.default
+        self.darwinModules.default
         {
           nixpkgs.overlays = [
             inputs.git.overlays.default
