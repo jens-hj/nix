@@ -18,6 +18,7 @@
         stylix = {
           enable = true;
           autoEnable = true;
+          overlays.enable = false;
           targets = {
             zed.enable = false;
             vscode.enable = false;
@@ -36,6 +37,8 @@
             };
           };
         };
+
+        gtk.gtk4.theme = config.gtk.theme;
 
         home.pointerCursor = {
           enable = true;

@@ -74,24 +74,27 @@
           end
         '';
         functions = {
-          nr = {
-            description = "Rebuild NixOS configuration with flake";
+          __nr-rebuild = {
+            description = "Internal: rebuild NixOS/Darwin config with given action (switch|boot)";
             body = ''
+              set -l action $argv[1]
+              set -l rest $argv[2..-1]
+
               set -l input
               set -l extra_flags
 
-              if test (count $argv) -eq 0
+              if test (count $rest) -eq 0
                   if set -q NIXOS_DEFAULT_CONFIG; and test -n "$NIXOS_DEFAULT_CONFIG"
                       set input $NIXOS_DEFAULT_CONFIG
                   else
                       echo "Error: Configuration name is required (no argument given and NIXOS_DEFAULT_CONFIG is not set)"
-                      echo "Usage: nr <config-name> [extra-flags]"
+                      echo "Usage: nr|nrb <config-name> [extra-flags]"
                       echo "Available configurations: desktop (d), gmk (g), rp4j (r), macbook (m), systematic (s)"
                       return 1
                   end
               else
-                  set input $argv[1]
-                  set extra_flags $argv[2..-1]
+                  set input $rest[1]
+                  set extra_flags $rest[2..-1]
               end
 
               set -l config
@@ -112,13 +115,24 @@
               end
 
               if test "$config" = "macbook"
+                  if test "$action" = "boot"
+                      echo "Note: darwin-rebuild has no 'boot' action; falling back to 'switch'"
+                  end
                   echo "Rebuilding Darwin configuration: $config"
                   sudo darwin-rebuild switch --flake $NIXOS_FLAKE#$config $extra_flags
               else
-                  echo "Rebuilding NixOS configuration: $config"
-                  sudo nixos-rebuild switch --flake $NIXOS_FLAKE#$config $extra_flags
+                  echo "Rebuilding NixOS configuration ($action): $config"
+                  sudo nixos-rebuild $action --flake $NIXOS_FLAKE#$config $extra_flags
               end
             '';
+          };
+          nr = {
+            description = "Rebuild NixOS configuration with flake (switch)";
+            body = "__nr-rebuild switch $argv";
+          };
+          nrb = {
+            description = "Rebuild NixOS configuration with flake (boot - apply at next reboot)";
+            body = "__nr-rebuild boot $argv";
           };
           nu = {
             description = "Update flake inputs with concise, colorized output";

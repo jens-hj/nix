@@ -37,6 +37,10 @@
       url = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    noctalia-plugins = {
+      url = "github:noctalia-dev/noctalia-plugins";
+      flake = false;
+    };
 
     # Fish plugins
     git-fish = {
@@ -64,6 +68,9 @@
 
     # T3 Code
     t3code.url = "github:omarcresp/t3code-flake";
+
+    # Cursor
+    cursor.url = "github:omarcresp/cursor-flake";
   };
 
   outputs = {
@@ -98,6 +105,16 @@
       specialArgs = {inherit inputs;};
       modules = [
         ./hosts/rp4j/configuration.nix
+        home-manager.nixosModules.default
+        self.nixosModules.default
+        inputs.catppuccin.nixosModules.catppuccin
+        inputs.stylix.nixosModules.stylix
+      ];
+    };
+    nixosConfigurations."rp5j" = nixpkgs.lib.nixosSystem {
+      specialArgs = {inherit inputs;};
+      modules = [
+        ./hosts/rp5j/configuration.nix
         home-manager.nixosModules.default
         self.nixosModules.default
         inputs.catppuccin.nixosModules.catppuccin

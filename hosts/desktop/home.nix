@@ -24,6 +24,7 @@
     mcrcon
     k9s
     just
+    nono
     pgweb
     telegram-desktop
     signal-desktop
@@ -33,6 +34,7 @@
     equibop
     notion-app-enhanced
     heroic
+    inputs.cursor.packages.${pkgs.stdenv.hostPlatform.system}.default
     # appimage-run
     # inputs.awww.packages.${pkgs.system}.awww
     bluetuith
@@ -50,7 +52,8 @@
     libsoup_2_4
     speedtest
     brave
-    inputs.t3code.packages.${system}.t3-code
+    inputs.t3code.packages.${pkgs.stdenv.hostPlatform.system}.t3-code
+    r2modman
     firefoxpwa
     # cross compile container
     qemu-user
@@ -70,6 +73,8 @@
     virt-viewer
     spice-gtk
     virtio-win
+    # gnome utilities (no longer auto-installed since dropping desktopManager.gnome)
+    nautilus
   ];
 
   # Enable the custom base configuration from ./../../modules/default.nix
@@ -89,6 +94,7 @@
   programs = {
     firefox = {
       enable = true;
+      configPath = ".mozilla/firefox";
       profiles.default.extensions.force = true;
       profiles.default.extensions.packages = with pkgs.nur.repos.rycee.firefox-addons; [
         ublock-origin
@@ -329,9 +335,9 @@
     fish.shellAliases = {
       zed = "zeditor";
     };
-    claude-code = {
-      enable = true;
-    };
+    # claude-code = {
+    #   enable = true;
+    # };
     uv.enable = true;
     vesktop = {
       enable = true;
@@ -434,5 +440,7 @@
     LIBVA_DRIVER_NAME = "radeonsi";
     VDPAU_DRIVER = "radeonsi";
     NIXOS_DEFAULT_CONFIG = "desktop";
+    # OPENAI_BASE_URL = "http://127.0.0.1:1234/v1";
+    # OPENAI_API_KEY = "dummy";
   };
 }

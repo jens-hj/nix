@@ -3,7 +3,7 @@
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 {inputs, ...}: {
   imports = [
-    ./hardware.nix
+    # ./hardware.nix # Uncomment once hardware.nix is acquired
   ];
 
   home-manager.users.pi = {
@@ -24,7 +24,7 @@
   boot.loader.grub.enable = false;
   boot.loader.generic-extlinux-compatible.enable = true;
 
-  networking.hostName = "rp4j";
+  networking.hostName = "rp5j";
 
   system.stateVersion = "26.05";
 }

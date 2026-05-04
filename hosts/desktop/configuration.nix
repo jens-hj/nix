@@ -158,10 +158,11 @@
         General = {
           Experimental = true;
           FastConnectable = true;
-          # Privacy = "off";
         };
+        Policy.AutoEnable = true;
       };
     };
+    i2c.enable = true;
     graphics = {
       enable = true;
       enable32Bit = true;
@@ -198,7 +199,12 @@
       efi.canTouchEfiVariables = true;
     };
     kernelPackages = pkgs.linuxPackages_latest;
-    kernelModules = ["hid-magicmouse" "hid-playstation"];
+    kernelModules = ["hid-magicmouse" "hid-playstation" "v4l2loopback"];
+    # v4l2loopback: virtual webcam device used by OBS Virtual Camera
+    extraModulePackages = [pkgs.linuxPackages_latest.v4l2loopback];
+    extraModprobeConfig = ''
+      options v4l2loopback devices=1 video_nr=1 card_label="OBS Cam" exclusive_caps=1
+    '';
     kernelParams = ["acpi_backlight=vendor"];
     binfmt = {
       emulatedSystems = [
@@ -247,22 +253,15 @@
       variant = "";
     };
 
-    # displayManager.gdm.enable = true;
-    # displayManager.startx.enable = true;
-    desktopManager.gnome.enable = true;
-
     gnome.gnome-keyring.enable = true;
 
-    # xserver.enable = true;
-    greetd = {
+    displayManager.ly = {
       enable = true;
-      settings = {
-        default_session = {
-          command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd ${pkgs.niri}/bin/niri-session";
-          user = "greeter";
-        };
-      };
     };
+
+    # ly + cage: ly runs inside a single-output cage Wayland kiosk on DP-2.
+    # Custom display-manager.service replaces the stock services.displayManager.ly module
+    # so we control the launch chain (cage → foot → ly) and constrain output via WLR_OUTPUTS.
 
     printing.enable = true;
 
@@ -284,8 +283,12 @@
 
   security = {
     rtkit.enable = true;
-    pam.services.greetd.enableGnomeKeyring = true;
     pam.services.login.enableGnomeKeyring = true;
+    pam.services.ly = {
+      startSession = true;
+      unixAuth = true;
+      enableGnomeKeyring = true;
+    };
   };
 
   users.defaultUserShell = pkgs.fish;
@@ -308,7 +311,12 @@
 
   # Install firefox.
   programs = {
-    obs-studio.enable = true;
+    obs-studio = {
+      enable = true;
+      # iPhone camera via OBS Media Source (RTSP/MJPEG) — no plugin needed
+      # Install any free "IP camera" app on iPhone, paste the stream URL into
+      # OBS → Add Source → Media Source, then Start Virtual Camera → /dev/video1
+    };
     virt-manager.enable = true;
     appimage.enable = true;
     niri.enable = true;
@@ -386,6 +394,36 @@
   environment.pathsToLink = [
     "/share/gsettings-schemas"
   ];
+
+  # environment.etc = {
+  #   "ly/blackhole.dur".source = ./assets/blackhole-smooth-240x67.dur;
+  #   "ly/config.ini".source = lyConfigIni;
+  # };
+
+  # systemd.services.display-manager = {
+  #   description = "Cage + Ly login screen (single-output Wayland kiosk)";
+  #   after = [
+  #     "systemd-user-sessions.service"
+  #     "plymouth-quit.service"
+  #     "getty@tty1.service"
+  #   ];
+  #   conflicts = ["getty@tty1.service"];
+  #   wantedBy = ["graphical.target"];
+  #   serviceConfig = {
+  #     Type = "simple";
+  #     ExecStart = cageLyRunner;
+  #     Restart = "always";
+  #     RestartSec = 1;
+  #     User = "root";
+  #     StandardInput = "tty";
+  #     StandardOutput = "journal";
+  #     StandardError = "journal";
+  #     TTYPath = "/dev/tty1";
+  #     TTYReset = true;
+  #     TTYVHangup = true;
+  #     TTYVTDisallocate = true;
+  #   };
+  # };
 
   # Vicinae
   nix.settings = {

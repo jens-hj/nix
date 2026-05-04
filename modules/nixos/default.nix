@@ -5,6 +5,7 @@
 }: {
   imports = [
     ./srv/minecraft.nix
+    ./srv/cluster-node.nix
     ./visuals/theme.nix
     ./desktop/noctalia.nix
     ./srv/k3s-agent.nix
@@ -12,6 +13,7 @@
 
   srv.minecraft.enable = false;
   srv.k3s.agent.enable = false;
+  srv.clusterNode.enable = false;
 
   visuals.theme.enable = true;
   desktop.noctalia.enable = true;
