@@ -1,5 +1,8 @@
-{ config, lib, ... }:
 {
+  config,
+  lib,
+  ...
+}: {
   options = {
     visuals.theme.enable = lib.mkEnableOption "enables system theming with catppuccin";
   };
@@ -9,5 +12,6 @@
     # stylix.image = ./wallpaper.jpg;
     catppuccin.flavor = "mocha";
     catppuccin.enable = true;
+    catppuccin.autoEnable = true;
   };
 }
