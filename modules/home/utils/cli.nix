@@ -3,8 +3,7 @@
   config,
   lib,
   ...
-}:
-{
+}: {
   options = {
     utils.cli = {
       enable = lib.mkEnableOption "enable baseline cli utils packages";
@@ -20,35 +19,33 @@
   };
 
   config = lib.mkIf config.utils.cli.enable {
-    home.packages =
-      with pkgs;
-      let
-        essentialPackages = [
-          croc
-          dust
-          bat
-          zip
-          unzip
-          duf
-          wget
-          curl
-          file
-          fd
-        ];
-        extendedPackages = [
-          tokei
-          ripgrep
-          ripgrep-all
-          bottom
-          jq
-          lolcat
-          grex
-          cbonsai
-          asciinema
-          ttyd
-          openssl
-        ];
-      in
+    home.packages = with pkgs; let
+      essentialPackages = [
+        croc
+        dust
+        bat
+        zip
+        unzip
+        duf
+        wget
+        curl
+        file
+        fd
+      ];
+      extendedPackages = [
+        tokei
+        ripgrep
+        ripgrep-all
+        bottom
+        jq
+        lolcat
+        grex
+        cbonsai
+        asciinema
+        ttyd
+        openssl
+      ];
+    in
       essentialPackages ++ lib.optionals (config.utils.cli.profile == "extended") extendedPackages;
 
     programs = {
@@ -57,7 +54,7 @@
       ssh = {
         enable = true;
         enableDefaultConfig = false;
-        matchBlocks."*" = {
+        settings."*" = {
           forwardAgent = true;
           compression = true;
           serverAliveInterval = 60;
