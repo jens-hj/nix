@@ -37,10 +37,6 @@
       url = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    noctalia-plugins = {
-      url = "github:noctalia-dev/noctalia-plugins";
-      flake = false;
-    };
 
     # Fish plugins
     git-fish = {
@@ -67,10 +63,7 @@
     };
 
     # T3 Code
-    t3code.url = "github:omarcresp/t3code-flake";
-
-    # Cursor
-    cursor.url = "github:omarcresp/cursor-flake";
+    # t3code.url = "github:omarcresp/t3code-flake";
   };
 
   outputs = {

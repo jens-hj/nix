@@ -4,33 +4,7 @@
   inputs,
   pkgs,
   ...
-}: let
-  noctaliaPluginsUrl = "https://github.com/noctalia-dev/noctalia-plugins";
-
-  enabledPlugins = [
-    "privacy-indicator"
-    "usb-drive-manager"
-    "show-keys"
-  ];
-
-  pluginFiles = builtins.listToAttrs (map (id: {
-      name = "noctalia/plugins/${id}";
-      value = {
-        source = "${inputs.noctalia-plugins}/${id}";
-        recursive = true;
-      };
-    })
-    enabledPlugins);
-
-  pluginStates = builtins.listToAttrs (map (id: {
-      name = id;
-      value = {
-        enabled = true;
-        sourceUrl = noctaliaPluginsUrl;
-      };
-    })
-    enabledPlugins);
-in {
+}: {
   options = {
     desktop.noctalia.enable = lib.mkEnableOption "Enable noctalia shell";
   };
@@ -38,115 +12,100 @@ in {
   config = lib.mkIf config.desktop.noctalia.enable {
     home.packages = with pkgs; [
       ddcutil
-      imagemagick
-      python3
-      git
       brightnessctl
-      cliphist
     ];
-    xdg.configFile = pluginFiles;
     programs = {
       cava.enable = true;
-      noctalia-shell = {
+      noctalia = {
         enable = true;
         package =
-          (inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default.override
-            {calendarSupport = true;})
-          .overrideAttrs (old: {
+          inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs
+          (old: {
+            # Drop the "°C" suffix from CPU/GPU temperature sysmon widgets so the
+            # value fits on the narrow vertical bar. The format string appears
+            # twice (CpuTemp, GpuTemp); both are replaced.
             postPatch =
               (old.postPatch or "")
               + ''
-                # Force fresh object reference so QML's autoConnectSettingsChanged
-                # signal fires and per-device Auto-connect checkbox updates live.
-                substituteInPlace Services/Networking/BluetoothService.qml \
-                  --replace-fail \
-                    'let settings = cacheAdapter.autoConnectSettings || ({});' \
-                    'let settings = Object.assign({}, cacheAdapter.autoConnectSettings || {});'
+                substituteInPlace src/shell/bar/widgets/sysmon_widget.cpp \
+                  --replace-fail '"{:.0f}°C"' '"{:.0f}"'
               '';
           });
-        plugins = {
-          version = 2;
-          sources = [
-            {
-              name = "Noctalia Plugins";
-              url = noctaliaPluginsUrl;
-              enabled = true;
-            }
-          ];
-          states = pluginStates;
-        };
+        # v5 config.toml schema (TOML). Settings can still be tweaked at runtime
+        # via the Settings panel; those overrides live in settings.toml.
         settings = {
-          settingsVersion = 46;
-          bar = {
-            barType = "framed";
-            position = "left";
-            density = "comfortable";
-            # backgroundOpacity = lib.mkForce 0.8;
-            # useSeparateOpacity = true;
-            frameRadius = 24;
-            frameThickness = 8;
-            widgets = {
-              left = [
-                {id = "Clock";}
-                {id = "SystemMonitor";}
-                {id = "plugin:privacy-indicator";}
-                {id = "ActiveWindow";}
-                {id = "MediaMini";}
-              ];
-              center = [
-                {id = "Workspace";}
-              ];
-              right = [
-                {id = "plugin:usb-drive-manager";}
-                {id = "Tray";}
-                {id = "Battery";}
-                {id = "Volume";}
-                {
-                  id = "Brightness";
-                  applyToAllMonitors = true;
-                }
-                {id = "Bluetooth";}
-                {id = "ControlCenter";}
-              ];
-            };
+          shell.screen_corners = {
+            enabled = true;
+            size = 42;
           };
-          general = {
-            showScreenCorners = true;
-            forceBlackScreenCorners = true;
-            enableShadows = false;
-            screenRadiusRatio = 1.5;
+          shell.panel = {
+            open_near_click_control_center = true;
+            open_near_click_launcher = true;
+            open_near_click_clipboard = true;
+            open_near_click_wallpaper = true;
+            open_near_click_session = true;
           };
-          location = {
-            name = "Risskov";
-            showWeekNumberInCalendar = true;
-            firstDayOfWeek = 1;
+
+          theme = {
+            mode = "dark";
+            source = "builtin";
+            builtin = "Catppuccin";
           };
-          systemMonitor = {
-            enableDgpuMonitoring = true;
+
+          wallpaper = {
+            enabled = true;
+            directory = "${config.home.homeDirectory}/Pictures/Wallpapers";
+            default.path = "${config.home.homeDirectory}/Pictures/Wallpapers/wallpaper.webp";
           };
-          brightness = {
-            enableDdcSupport = true;
+
+          location.address = "Risskov";
+
+          system.monitor = {
+            enabled = true;
+            # gpu_poll_seconds defaults to 0 (disabled), unlike the other
+            # metrics — GPU widgets stay empty without this opt-in.
+            gpu_poll_seconds = 5.0;
           };
-          sessionMenu = {
-            enableCountdown = false;
-            showHeader = false;
-            largeButtonsStyle = true;
-          };
-          osd = {
-            location = "top_left";
-          };
+          brightness.enable_ddcutil = true;
+          osd.position = "top_left";
           dock.enabled = false;
-          network.wifiEnabled = false;
-          notifications.enabled = false;
+          notification.enable_daemon = false;
+
+          bar.main = {
+            position = "left";
+            background_opacity = 0.75;
+            capsule = true;
+            radius = 24;
+            margin_edge = 5;
+            margin_ends = 5;
+            padding = 4;
+            shadow = false;
+            start = ["clock" "cpu" "temp" "ram" "gpu" "gpu_temp" "active_window" "media"];
+            center = ["workspaces"];
+            end = ["tray" "battery" "volume" "brightness" "bluetooth" "control-center"];
+          };
+
+          # cpu (cpu_usage), temp (cpu_temp), ram are built-in sysmon aliases;
+          # GPU stats need explicit instances. ram defaults to ram_used ("8.2
+          # GiB") — switch to ram_pct so the vertical bar shows a bare integer
+          # (% is auto-stripped on vertical bars; see displaySysmonLabel).
+          widget.ram.stat = "ram_pct";
+          widget.gpu = {
+            type = "sysmon";
+            stat = "gpu_usage";
+          };
+          widget.gpu_temp = {
+            type = "sysmon";
+            stat = "gpu_temp";
+          };
+
+          widget.tray.drawer = true;
+          widget.workspaces = {
+            hide_when_empty = true;
+            occupied_color = "surface_variant";
+            empty_color = "surface_variant";
+          };
         };
-      };
-      quickshell = {
-        enable = true;
-      };
-    };
-    home.file.".cache/noctalia/wallpapers.json" = {
-      text = builtins.toJSON {
-        defaultWallpaper = "${config.home.homeDirectory}/Pictures/Wallpapers/wallpaper.webp";
       };
     };
   };
