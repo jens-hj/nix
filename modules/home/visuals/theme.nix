@@ -38,7 +38,7 @@
           };
         };
 
-        gtk.gtk4.theme = config.gtk.theme;
+        gtk.gtk4.theme = lib.mkDefault config.gtk.theme;
 
         home.pointerCursor = {
           enable = true;
