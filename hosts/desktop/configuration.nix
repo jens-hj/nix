@@ -27,6 +27,16 @@
   nixpkgs.overlays = [
     inputs.nur.overlays.default
     (final: prev: {
+      # wrapFirefox touches "$out/lib/firefoxpwa/is-packaged-app", but the
+      # unwrapped package only ships lib/mozilla, so the dir is missing and the
+      # build fails. Create it so the wrapper has somewhere to write.
+      firefoxpwa-unwrapped = prev.firefoxpwa-unwrapped.overrideAttrs (old: {
+        postInstall = ''
+          ${old.postInstall or ""}
+          mkdir -p $out/lib/firefoxpwa
+        '';
+      });
+
       modrinth-app-unwrapped = prev.modrinth-app-unwrapped.overrideAttrs (old: {
         postPatch = ''
           ${old.postPatch or ""}
@@ -194,6 +204,7 @@
   };
 
   boot = {
+    supportedFilesystems = ["ntfs"];
     loader = {
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
@@ -352,6 +363,7 @@
     permittedInsecurePackages = [
       "libsoup-2.74.3"
       "openclaw-2026.3.12"
+      "electron-39.8.10"
     ];
   };
 

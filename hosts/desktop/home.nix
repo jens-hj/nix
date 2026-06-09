@@ -34,7 +34,8 @@
     equibop
     notion-app-enhanced
     heroic
-    inputs.cursor.packages.${pkgs.stdenv.hostPlatform.system}.default
+    code-cursor
+    # openscad
     # appimage-run
     # inputs.awww.packages.${pkgs.system}.awww
     bluetuith
@@ -52,7 +53,6 @@
     libsoup_2_4
     speedtest
     brave
-    inputs.t3code.packages.${pkgs.stdenv.hostPlatform.system}.t3-code
     r2modman
     firefoxpwa
     # cross compile container
