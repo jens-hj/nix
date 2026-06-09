@@ -52,6 +52,13 @@
         # Enable home-manager itself
         home-manager.enable = true;
       };
+
+      # catppuccin/nix is splitting `enable` (global toggle) from `autoEnable`
+      # (auto-enroll all ports). We theme via stylix, so keep ports off.
+      catppuccin = {
+        enable = true;
+        autoEnable = false;
+      };
     }
 
     (lib.mkIf config.base.enable {
