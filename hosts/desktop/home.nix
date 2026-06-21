@@ -34,6 +34,7 @@
     equibop
     notion-app-enhanced
     heroic
+    onedriver
     code-cursor
     # openscad
     # appimage-run
@@ -50,7 +51,7 @@
     distrobox
     distrobox-tui
     obsidian
-    libsoup_2_4
+    libsoup_3
     speedtest
     brave
     r2modman
@@ -66,6 +67,7 @@
     libsecret
     pulseaudio
     python3
+    nodejs # required by caveman Claude Code plugin hooks
     parsec-bin
     lmstudio
     # Virtualisation for Windows VM
@@ -92,6 +94,9 @@
   desktop.enable = true;
 
   programs = {
+    thunderbird = {
+      enable = true;
+    };
     firefox = {
       enable = true;
       configPath = ".mozilla/firefox";
@@ -367,6 +372,34 @@
   #         fi
   #       done
   # '';
+
+  # onedriver: FUSE filesystem that shows the full OneDrive tree and downloads
+  # files lazily on first access (no full mirror). Auth token + content cache
+  # live under ~/.cache/onedriver. First run needs an interactive login once:
+  #   onedriver -a ~/OneDrive   (opens an OAuth window, stores the token)
+  # then `systemctl --user start onedriver` (autostarts on login thereafter).
+  systemd.user.services.onedriver = {
+    Unit = {
+      Description = "onedriver OneDrive lazy mount";
+      After = ["network-online.target"];
+      Wants = ["network-online.target"];
+      StartLimitIntervalSec = 60;
+      StartLimitBurst = 3;
+    };
+    Service = {
+      # This onedriver build has no sd_notify support, so Type=notify would hang
+      # until the start-job timeout. It runs in the foreground, so Type=simple is
+      # correct. onedriver unmounts itself on SIGTERM; the ExecStopPost is just a
+      # best-effort backstop (leading "-" so a failed/no-op unmount is ignored).
+      Type = "simple";
+      ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p %h/OneDrive";
+      ExecStart = "${pkgs.onedriver}/bin/onedriver %h/OneDrive";
+      ExecStopPost = "-${pkgs.fuse3}/bin/fusermount3 -uz %h/OneDrive";
+      Restart = "on-abnormal";
+      RestartSec = 3;
+    };
+    Install.WantedBy = ["default.target"];
+  };
 
   services = {
     vicinae = {

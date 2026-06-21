@@ -284,9 +284,6 @@
       alsa.support32Bit = true;
       pulse.enable = true;
     };
-
-    onedrive.enable = true;
-
     flatpak.enable = true;
   };
 
