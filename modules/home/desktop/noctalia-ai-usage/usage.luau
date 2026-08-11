@@ -227,6 +227,24 @@ function M.remainingText(win)
   return tostring(win.remaining)
 end
 
+-- The windows a provider actually reports, in display order.
+--
+-- A missing window means the provider has no such concept — Codex plans have no
+-- 5-hour bucket at all — which is different from a window we failed to read.
+-- Absent windows are omitted entirely rather than rendered as a placeholder, so
+-- a provider with only a weekly limit shows one number, not one number and a
+-- gap. A read failure sets `err` instead and is handled by the caller.
+function M.presentWindows(result)
+  local out = {}
+  if result.session then
+    table.insert(out, { name = "Session", win = result.session })
+  end
+  if result.weekly then
+    table.insert(out, { name = "Weekly", win = result.weekly })
+  end
+  return out
+end
+
 -- Colour by headroom, not by usage: the bar answers "how much is left".
 -- `normal` differs between call sites — text reads best in the plain foreground
 -- role, while a progress fill needs an accent to separate it from its track.

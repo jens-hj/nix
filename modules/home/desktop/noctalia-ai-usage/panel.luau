@@ -55,49 +55,51 @@ local function label(text, color, size)
   }
 end
 
+-- Only called for windows the provider actually reports, so `win` is always set.
 local function windowRow(name, win)
-  local children = {
-    {
-      type = "row",
-      props = { gap = 6, align = "center" },
-      children = {
-        { type = "label", props = { text = name, color = "on_surface_variant", fontSize = 12, width = 56 } },
-        {
-          type = "progress",
-          props = {
-            -- The bar fills with what is left, matching the number beside it.
-            progress = if win then win.remaining / 100 else 0,
-            fill = usage.remainingFill(win),
-            track = "surface_variant",
-            flexGrow = 1,
-            height = 6,
-            radius = 3,
+  return {
+    type = "column",
+    props = { gap = 2 },
+    children = {
+      {
+        type = "row",
+        props = { gap = 6, align = "center" },
+        children = {
+          { type = "label", props = { text = name, color = "on_surface_variant", fontSize = 12, width = 56 } },
+          {
+            type = "progress",
+            props = {
+              -- The bar fills with what is left, matching the number beside it.
+              progress = win.remaining / 100,
+              fill = usage.remainingFill(win),
+              track = "surface_variant",
+              flexGrow = 1,
+              height = 6,
+              radius = 3,
+            },
+          },
+          {
+            type = "label",
+            props = {
+              text = usage.remainingText(win) .. "%",
+              color = usage.remainingColor(win),
+              fontSize = 12,
+              width = 36,
+              textAlign = "right",
+            },
           },
         },
-        {
-          type = "label",
-          props = {
-            text = usage.remainingText(win) .. (if win then "%" else ""),
-            color = usage.remainingColor(win),
-            fontSize = 12,
-            width = 36,
-            textAlign = "right",
-          },
+      },
+      {
+        type = "row",
+        props = { gap = 6 },
+        children = {
+          { type = "label", props = { text = "", width = 56 } },
+          label("resets " .. usage.resetText(win), "on_surface_variant", 11),
         },
       },
     },
   }
-  if win then
-    table.insert(children, {
-      type = "row",
-      props = { gap = 6 },
-      children = {
-        { type = "label", props = { text = "", width = 56 } },
-        label("resets " .. usage.resetText(win), "on_surface_variant", 11),
-      },
-    })
-  end
-  return { type = "column", props = { gap = 2 }, children = children }
 end
 
 local function providerSection(provider)
@@ -119,8 +121,11 @@ local function providerSection(provider)
   if result.err then
     table.insert(children, label(result.err, "on_surface_variant", 12))
   else
-    table.insert(children, windowRow("Session", result.session))
-    table.insert(children, windowRow("Weekly", result.weekly))
+    -- Only the windows this provider actually has; Codex plans carry no
+    -- 5-hour bucket, so it gets a single row rather than an empty one.
+    for _, entry in usage.presentWindows(result) do
+      table.insert(children, windowRow(entry.name, entry.win))
+    end
     -- Codex has no live endpoint; these numbers are only as fresh as the last
     -- time Codex ran, so say when that was rather than implying they are live.
     if result.observedAt then

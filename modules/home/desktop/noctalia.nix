@@ -98,9 +98,9 @@ in {
             margin_ends = 5;
             padding = 4;
             shadow = false;
-            start = ["clock" "cpu" "temp" "ram" "gpu" "gpu_temp" "ai_usage" "active_window" "media"];
+            start = ["clock" "cpu" "temp" "ram" "gpu" "gpu_temp" "active_window" "media"];
             center = ["workspaces"];
-            end = ["tray" "battery" "volume" "brightness" "bluetooth" "control-center"];
+            end = ["ai_usage" "tray" "battery" "volume" "brightness" "bluetooth" "control-center"];
           };
 
           # cpu (cpu_usage), temp (cpu_temp), ram are built-in sysmon aliases;

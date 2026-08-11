@@ -5,7 +5,10 @@ author = "jens"
 license = "MIT"
 description = "Remaining quota for Claude Code and Codex, per rolling window."
 tags = ["bar", "monitoring"]
-plugin_api = 24
+# 22 is the lowest level that has module require(), which is the newest host
+# feature this plugin uses. Declaring the minimum rather than the current level
+# keeps it loadable on older noctalia builds.
+plugin_api = 22
 
 [[widget]]
 id = "usage"

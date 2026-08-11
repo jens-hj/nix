@@ -12,49 +12,53 @@ local snapshot = {}
 
 local function providerColumn(provider)
   local result = snapshot[provider.key] or {}
-  return {
-    type = "column",
-    props = { key = provider.key, gap = 0, align = "center" },
-    children = {
-      {
-        type = "image",
-        props = {
-          key = "logo",
-          path = usage.logoPath(provider),
-          width = LOGO_SIZE,
-          height = LOGO_SIZE,
-          -- A provider we could not read at all is dimmed as a whole rather
-          -- than showing a confident-looking logo above two placeholders.
-          opacity = if result.err then 0.4 else 1.0,
-        },
-      },
-      {
-        type = "label",
-        props = {
-          key = "session",
-          text = usage.remainingText(result.session),
-          fontSize = VALUE_FONT_SIZE,
-          color = usage.remainingColor(result.session),
-        },
-      },
-      {
-        type = "label",
-        props = {
-          key = "weekly",
-          text = usage.remainingText(result.weekly),
-          fontSize = VALUE_FONT_SIZE,
-          color = usage.remainingColor(result.weekly),
-        },
+  local children = {
+    {
+      type = "image",
+      props = {
+        key = "logo",
+        path = usage.logoPath(provider),
+        width = LOGO_SIZE,
+        height = LOGO_SIZE,
+        -- A provider we could not read at all is dimmed as a whole rather
+        -- than showing a confident-looking logo above a placeholder.
+        opacity = if result.err then 0.4 else 1.0,
       },
     },
   }
-end
 
-local function windowLine(label, win)
-  if not win then
-    return label .. ": n/a"
+  local windows = usage.presentWindows(result)
+  if #windows == 0 then
+    -- Nothing readable yet: one placeholder, so the cell keeps a sane height
+    -- instead of collapsing to a bare logo.
+    table.insert(children, {
+      type = "label",
+      props = {
+        key = "none",
+        text = usage.PLACEHOLDER,
+        fontSize = VALUE_FONT_SIZE,
+        color = usage.remainingColor(nil),
+      },
+    })
+  else
+    for _, entry in windows do
+      table.insert(children, {
+        type = "label",
+        props = {
+          key = entry.name,
+          text = usage.remainingText(entry.win),
+          fontSize = VALUE_FONT_SIZE,
+          color = usage.remainingColor(entry.win),
+        },
+      })
+    end
   end
-  return string.format("%s: %d%% left, resets %s", label, win.remaining, usage.resetText(win))
+
+  return {
+    type = "column",
+    props = { key = provider.key, gap = 0, align = "center" },
+    children = children,
+  }
 end
 
 local function tooltipText()
@@ -65,8 +69,12 @@ local function tooltipText()
       table.insert(lines, provider.name .. ": " .. result.err)
     else
       table.insert(lines, provider.name)
-      table.insert(lines, "  " .. windowLine("Session", result.session))
-      table.insert(lines, "  " .. windowLine("Weekly", result.weekly))
+      for _, entry in usage.presentWindows(result) do
+        table.insert(
+          lines,
+          string.format("  %s: %d%% left, resets %s", entry.name, entry.win.remaining, usage.resetText(entry.win))
+        )
+      end
     end
   end
   return table.concat(lines, "\n")
