@@ -19,3 +19,8 @@ id = "detail"
 entry = "panel.luau"
 width = 340
 height = 320
+# Defaults are "floating" + false, which parks the panel in the middle of the
+# bar instead of beside the widget that opened it. These become the
+# detail_placement / detail_open_near_click settings, overridable at runtime.
+placement = "attached"
+open_near_click = true
