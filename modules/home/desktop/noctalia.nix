@@ -4,7 +4,9 @@
   inputs,
   pkgs,
   ...
-}: {
+}: let
+  aiUsagePlugin = pkgs.callPackage ./noctalia-ai-usage-plugin.nix {};
+in {
   options = {
     desktop.noctalia.enable = lib.mkEnableOption "Enable noctalia shell";
   };
@@ -60,6 +62,22 @@
 
           location.address = "Risskov";
 
+          # Declaring any source replaces the two git sources noctalia seeds by
+          # default (official, community), which is what we want here — no
+          # runtime clones into ~/.local/state. A "path" source is treated as an
+          # immutable read-only root, so the store path works directly.
+          # Discovery alone does not load a plugin; the id must be in `enabled`.
+          plugins = {
+            enabled = ["jens/ai-usage"];
+            source = [
+              {
+                name = "nixstore";
+                kind = "path";
+                location = "${aiUsagePlugin}";
+              }
+            ];
+          };
+
           system.monitor = {
             enabled = true;
             # gpu_poll_seconds defaults to 0 (disabled), unlike the other
@@ -80,7 +98,7 @@
             margin_ends = 5;
             padding = 4;
             shadow = false;
-            start = ["clock" "cpu" "temp" "ram" "gpu" "gpu_temp" "active_window" "media"];
+            start = ["clock" "cpu" "temp" "ram" "gpu" "gpu_temp" "ai_usage" "active_window" "media"];
             center = ["workspaces"];
             end = ["tray" "battery" "volume" "brightness" "bluetooth" "control-center"];
           };
@@ -98,6 +116,9 @@
             type = "sysmon";
             stat = "gpu_temp";
           };
+
+          # Plugin widget types are "<author>/<plugin>:<entry>".
+          widget.ai_usage.type = "jens/ai-usage:usage";
 
           widget.tray.drawer = true;
           widget.workspaces = {

@@ -1,0 +1,18 @@
+id = "jens/ai-usage"
+name = "AI Usage"
+version = "0.1.0"
+author = "jens"
+license = "MIT"
+description = "Remaining quota for Claude Code and Codex, per rolling window."
+tags = ["bar", "monitoring"]
+plugin_api = 24
+
+[[widget]]
+id = "usage"
+entry = "widget.luau"
+
+[[panel]]
+id = "detail"
+entry = "panel.luau"
+width = 340
+height = 320
