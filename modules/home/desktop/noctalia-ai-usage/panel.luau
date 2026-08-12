@@ -210,9 +210,7 @@ function update()
   -- A watch only delivers *changes*. If this runtime started after the widget's
   -- last poll, the next change could be a full backoff interval away, so read
   -- the current value directly until there is something to show.
-  if next(snapshot) == nil then
-    snapshot = noctalia.state.get(usage.STATE_KEY) or {}
-  end
+  snapshot = usage.restoreIfEmpty(snapshot)
 
   local now = noctalia.nowMs()
   if now - lastTokensMs >= TOKENS_REFRESH_MS then

@@ -108,6 +108,9 @@ end
 
 function update()
   noctalia.setUpdateInterval(pollInterval())
+  -- Recover across a runtime reload before painting, otherwise the first render
+  -- after a reload is blank and a failed poll has nothing to retain.
+  snapshot = usage.restoreIfEmpty(snapshot)
   -- Paint immediately from whatever the last poll produced, so a slow or failed
   -- fetch never blanks the bar.
   render()

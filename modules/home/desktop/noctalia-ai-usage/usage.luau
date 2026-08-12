@@ -223,6 +223,17 @@ end
 -- extra requests against a rate-limited endpoint.
 M.STATE_KEY = "snapshot"
 
+-- The state store outlives an entry's Luau runtime, so a reloaded widget or a
+-- freshly opened panel recovers the last reading instead of starting blank.
+-- Without this a reload followed by one failed poll leaves nothing to fall back
+-- on, and the bar shows a bare error while the panel still has the data.
+function M.restoreIfEmpty(snapshot)
+  if next(snapshot) == nil then
+    return noctalia.state.get(M.STATE_KEY) or {}
+  end
+  return snapshot
+end
+
 -- A failed poll dims the numbers rather than erasing them: a rate-limited or
 -- briefly unreachable endpoint should not blank a reading that was correct 60
 -- seconds ago. `stale` carries the reason so the UI can say why.
