@@ -218,6 +218,29 @@ function M.fetchAll(callback)
   end
 end
 
+-- Key in the per-plugin shared state store. The widget is the only poller; the
+-- panel reads this instead of fetching again, so opening the panel costs no
+-- extra requests against a rate-limited endpoint.
+M.STATE_KEY = "snapshot"
+
+-- A failed poll dims the numbers rather than erasing them: a rate-limited or
+-- briefly unreachable endpoint should not blank a reading that was correct 60
+-- seconds ago. `stale` carries the reason so the UI can say why.
+function M.merge(previous, result)
+  if not result.err then
+    return result
+  end
+  if not previous or (not previous.session and not previous.weekly) then
+    return result
+  end
+  return {
+    session = previous.session,
+    weekly = previous.weekly,
+    observedAt = previous.observedAt,
+    stale = result.err,
+  }
+end
+
 M.PLACEHOLDER = "--"
 
 function M.remainingText(win)
@@ -266,7 +289,12 @@ local PALETTE = {
   fill = { unknown = "surface_variant", critical = "error", low = "tertiary", normal = "primary" },
 }
 
-function M.remainingColor(win)
+-- `dimmed` marks a retained-but-stale reading, which is shown in the muted role
+-- regardless of how much headroom it reports.
+function M.remainingColor(win, dimmed)
+  if dimmed then
+    return PALETTE.text.unknown
+  end
   return PALETTE.text[severity(win)]
 end
 

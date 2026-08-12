@@ -4,9 +4,10 @@
 
 local usage = require("./usage.luau")
 
--- Second ticks drive the reset countdown; fetching is throttled independently so
--- the panel does not hammer the endpoint once a second while it is open.
-local REFRESH_MS = 30000
+-- Second ticks drive the reset countdown. The panel never polls the providers
+-- itself — the bar widget owns that and publishes through the shared state
+-- store, so opening this panel costs no additional requests. Only the local
+-- token scan below runs here, and it touches nothing but disk.
 local TOKENS_REFRESH_MS = 60000
 local LOGO_SIZE = 16
 
@@ -32,8 +33,8 @@ cutoff=$(@coreutils@/date -u -d '24 hours ago' +%Y-%m-%dT%H:%M:%S)
 
 local snapshot = {}
 local tokens = nil
-local lastFetchMs = 0
 local lastTokensMs = 0
+local watching = false
 
 local function compact(n)
   if type(n) ~= "number" then
@@ -120,7 +121,13 @@ local function providerSection(provider)
 
   if result.err then
     table.insert(children, label(result.err, "on_surface_variant", 12))
-  else
+  elseif result.stale then
+    -- Values retained from the last good poll; say so rather than presenting
+    -- them as current.
+    table.insert(children, label("last known — " .. result.stale, "on_surface_variant", 11))
+  end
+
+  if not result.err then
     -- Only the windows this provider actually has; Codex plans carry no
     -- 5-hour bucket, so it gets a single row rather than an empty one.
     for _, entry in usage.presentWindows(result) do
@@ -187,18 +194,27 @@ local function render()
 end
 
 function update()
-  -- Ticks every second for the countdown; the network and disk work below is
-  -- rate-limited on its own clock.
+  -- Ticks every second so the reset countdown stays live. Nothing expensive
+  -- happens per tick: provider data arrives by watch, and the token scan has its
+  -- own clock.
   panel.setWantsSecondTicks(true)
 
-  local now = noctalia.nowMs()
-  if now - lastFetchMs >= REFRESH_MS then
-    lastFetchMs = now
-    usage.fetchAll(function(results)
-      snapshot = results
+  if not watching then
+    watching = true
+    noctalia.state.watch(usage.STATE_KEY, function(value)
+      snapshot = value or {}
       render()
     end)
   end
+
+  -- A watch only delivers *changes*. If this runtime started after the widget's
+  -- last poll, the next change could be a full backoff interval away, so read
+  -- the current value directly until there is something to show.
+  if next(snapshot) == nil then
+    snapshot = noctalia.state.get(usage.STATE_KEY) or {}
+  end
+
+  local now = noctalia.nowMs()
   if now - lastTokensMs >= TOKENS_REFRESH_MS then
     lastTokensMs = now
     noctalia.runAsync(TOKENS_COMMAND, function(res)
