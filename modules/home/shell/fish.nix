@@ -70,6 +70,17 @@
           # This runs after conf.d, so it overrides fish's generated
           # fish_frozen_theme.fish and shadows the SETUVARs in fish_variables.
           if set -q TERMY_TERM_PROGRAM
+            # Stylix's base16-fish integration (sourced above, from its own
+            # generated block) repaints the whole terminal via OSC 4/10/11/12
+            # on every shell start. That is how ghostty gets its catppuccin
+            # palette -- its own config carries no colours -- but in termy it
+            # overrides the app's theme from inside the shell, leaving the
+            # cells catppuccin while the padding keeps termy's background.
+            # Undo it here: 104 resets the palette, 110/111/112 the
+            # foreground, background and cursor, so termy falls back to its
+            # own theme and runtime theme switching works again.
+            printf '\e]104\a\e]110\a\e]111\a\e]112\a'
+
             set -g fish_color_autosuggestion brblack
             set -g fish_color_comment brblack
             set -g fish_color_param normal
