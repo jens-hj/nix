@@ -83,6 +83,7 @@
   base.enable = true;
   shell.fish.zellij.autoStart = lib.mkForce false;
   terminal.ghostty.enable = lib.mkForce true;
+  terminal.termy.enable = lib.mkForce true;
   typesetters.typst.enable = lib.mkForce true;
   utils.cli.profile = lib.mkForce "extended";
   editor.zed.enable = lib.mkForce true;

@@ -24,6 +24,7 @@
 
     # Terminal
     ./terminal/ghostty.nix
+    ./terminal/termy.nix
 
     # Languages
     ./lang/flutter.nix
@@ -84,6 +85,7 @@
 
       # Terminal
       terminal.ghostty.enable = lib.mkDefault false;
+      terminal.termy.enable = lib.mkDefault false;
 
       # Languages
       lang.flutter.enable = lib.mkDefault false;

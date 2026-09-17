@@ -38,6 +38,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Terminal
+    termy = {
+      url = "github:lassejlv/termy";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Fish plugins
     git-fish = {
       url = "github:kpbaks/git.fish";
