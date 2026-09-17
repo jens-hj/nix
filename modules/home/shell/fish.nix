@@ -50,6 +50,47 @@
         interactiveShellInit = ''
           set fish_greeting # Disable greeting
 
+          # Let the terminal own the colour scheme. Every value below is an
+          # ANSI palette name rather than a hex literal, so fish renders with
+          # whatever palette the emulator supplies -- stylix's catppuccin in
+          # ghostty, or termy's own theme, which can then be switched at
+          # runtime and takes effect without reloading the shell.
+          #
+          # This runs after conf.d, so it deliberately overrides fish's
+          # generated fish_frozen_theme.fish and shadows the stale hex
+          # SETUVARs in fish_variables. Hard-coded hex there is what made
+          # fish disagree with termy, leaving the padding in termy's
+          # background and the cells in fish's.
+          set -g fish_color_normal normal
+          set -g fish_color_command green
+          set -g fish_color_keyword blue
+          set -g fish_color_quote yellow
+          set -g fish_color_redirection cyan
+          set -g fish_color_end brblack
+          set -g fish_color_error red
+          set -g fish_color_param normal
+          set -g fish_color_comment brblack
+          set -g fish_color_operator blue
+          set -g fish_color_escape yellow
+          set -g fish_color_autosuggestion brblack
+          set -g fish_color_cwd green
+          set -g fish_color_cwd_root red
+          set -g fish_color_user brgreen
+          set -g fish_color_host normal
+          set -g fish_color_host_remote yellow
+          set -g fish_color_status red
+          set -g fish_color_cancel -r
+          set -g fish_color_match --background=brblue
+          set -g fish_color_selection white --bold --background=brblack
+          set -g fish_color_search_match bryellow --background=brblack
+          set -g fish_color_history_current --bold
+          set -g fish_color_valid_path --underline
+          set -g fish_pager_color_completion normal
+          set -g fish_pager_color_description yellow --dim
+          set -g fish_pager_color_prefix white --bold
+          set -g fish_pager_color_progress brwhite --background=cyan
+          set -g fish_pager_color_selected_background -r
+
           ${lib.optionalString config.shell.brew.enable ''
             eval "$(/opt/homebrew/bin/brew shellenv)"
           ''}
