@@ -1,5 +1,6 @@
 {
   pkgs,
+  lib,
   inputs,
   ...
 }: {
@@ -11,9 +12,9 @@
     ./srv/k3s-agent.nix
   ];
 
-  srv.minecraft.enable = false;
-  srv.k3s.agent.enable = false;
-  srv.clusterNode.enable = false;
+  srv.minecraft.enable = lib.mkDefault false;
+  srv.k3s.agent.enable = lib.mkDefault false;
+  srv.clusterNode.enable = lib.mkDefault false;
 
   visuals.theme.enable = true;
   desktop.noctalia.enable = true;

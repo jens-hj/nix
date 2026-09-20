@@ -24,7 +24,7 @@
             vscode.enable = false;
             vesktop.enable = false;
             firefox.profileNames = ["default"];
-            zen-browser.profileNames = ["default"];
+            zen-browser.enable = false;
           };
 
           base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";

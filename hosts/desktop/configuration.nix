@@ -37,72 +37,83 @@
         '';
       });
 
-      modrinth-app-unwrapped = prev.modrinth-app-unwrapped.overrideAttrs (old: {
-        postPatch = ''
-          ${old.postPatch or ""}
-          sed -i '1i #![allow(dead_code)]' packages/app-lib/src/event/mod.rs
-        '';
-      });
-
+      # Nixpkgs invokes wrapGAppsHook manually from postBuild without the
+      # output name that newer versions of the hook require.
       modrinth-app = prev.modrinth-app.overrideAttrs (old: {
-        nativeBuildInputs = (old.nativeBuildInputs or []) ++ [pkgs.wrapGAppsHook3];
-        buildInputs = (old.buildInputs or []) ++ [pkgs.gsettings-desktop-schemas];
-
-        preFixup = ''
-          ${old.preFixup or ""}
-          gappsWrapperArgs+=(
-            --set GDK_BACKEND x11
-            --prefix XDG_DATA_DIRS : "${pkgs.gsettings-desktop-schemas}/share:${pkgs.gtk3}/share"
-          )
+        postBuild = ''
+          output=out
+          ${old.postBuild or ""}
         '';
       });
 
-      # Replace turbo with a functional stub that runs builds via pnpm
-      turbo-unwrapped = final.writeShellScriptBin "turbo" ''
-        # Stub turbo that delegates to pnpm for actual building
-        echo "Using turbo stub - delegating to pnpm"
+      #     modrinth-app-unwrapped = prev.modrinth-app-unwrapped.overrideAttrs (old: {
+      #       postPatch = ''
+      #         ${old.postPatch or ""}
+      #         sed -i '1i #![allow(dead_code)]' packages/app-lib/src/event/mod.rs
+      #       '';
+      #     });
 
-        # Parse arguments to extract the actual command and filter
-        COMMAND=""
-        FILTER=""
-        while [[ $# -gt 0 ]]; do
-          case $1 in
-            run)
-              shift
-              COMMAND="$1"
-              shift
-              ;;
-            --filter=*)
-              FILTER="''${1#*=}"
-              shift
-              ;;
-            --filter)
-              shift
-              FILTER="$1"
-              shift
-              ;;
-            *)
-              shift
-              ;;
-          esac
-        done
+      #     modrinth-app = prev.modrinth-app.overrideAttrs (old: {
+      #       nativeBuildInputs = (old.nativeBuildInputs or []) ++ [pkgs.wrapGAppsHook3];
+      #       buildInputs = (old.buildInputs or []) ++ [pkgs.gsettings-desktop-schemas];
 
-        # If we have a filter, run the command in that package
-        if [ -n "$FILTER" ] && [ -n "$COMMAND" ]; then
-          echo "Running: pnpm --filter=$FILTER run $COMMAND"
-          exec ${final.pnpm}/bin/pnpm --filter="$FILTER" run "$COMMAND"
-        elif [ -n "$COMMAND" ]; then
-          echo "Running: pnpm run $COMMAND"
-          exec ${final.pnpm}/bin/pnpm run "$COMMAND"
-        else
-          echo "Turbo stub: no command to run"
-          exit 0
-        fi
-      '';
+      #       preFixup = ''
+      #         ${old.preFixup or ""}
+      #         gappsWrapperArgs+=(
+      #           --set GDK_BACKEND x11
+      #           --prefix XDG_DATA_DIRS : "${pkgs.gsettings-desktop-schemas}/share:${pkgs.gtk3}/share"
+      #         )
+      #       '';
+      #     });
 
-      turbo = final.turbo-unwrapped;
+      #     # Replace turbo with a functional stub that runs builds via pnpm
+      #     turbo-unwrapped = final.writeShellScriptBin "turbo" ''
+      #       # Stub turbo that delegates to pnpm for actual building
+      #       echo "Using turbo stub - delegating to pnpm"
+
+      #       # Parse arguments to extract the actual command and filter
+      #       COMMAND=""
+      #       FILTER=""
+      #       while [[ $# -gt 0 ]]; do
+      #         case $1 in
+      #           run)
+      #             shift
+      #             COMMAND="$1"
+      #             shift
+      #             ;;
+      #           --filter=*)
+      #             FILTER="''${1#*=}"
+      #             shift
+      #             ;;
+      #           --filter)
+      #             shift
+      #             FILTER="$1"
+      #             shift
+      #             ;;
+      #           *)
+      #             shift
+      #             ;;
+      #         esac
+      #       done
+
+      #       # If we have a filter, run the command in that package
+      #       if [ -n "$FILTER" ] && [ -n "$COMMAND" ]; then
+      #         echo "Running: pnpm --filter=$FILTER run $COMMAND"
+      #         exec ${final.pnpm}/bin/pnpm --filter="$FILTER" run "$COMMAND"
+      #       elif [ -n "$COMMAND" ]; then
+      #         echo "Running: pnpm run $COMMAND"
+      #         exec ${final.pnpm}/bin/pnpm run "$COMMAND"
+      #       else
+      #         echo "Turbo stub: no command to run"
+      #         exit 0
+      #       fi
+      #     '';
+
+      #     turbo = final.turbo-unwrapped;
     })
   ];
+
+  srv.minecraft.enable = true;
 
   services.pcscd.enable = true;
   services.udev.extraRules = ''
@@ -259,6 +270,7 @@
   };
 
   services = {
+    tailscale.enable = true;
     xserver.xkb = {
       layout = "us";
       variant = "";
@@ -326,7 +338,12 @@
       # OBS → Add Source → Media Source, then Start Virtual Camera → /dev/video1
     };
     virt-manager.enable = true;
-    appimage.enable = true;
+    appimage = {
+      enable = true;
+      # binfmt_misc registration: kernel detects AppImage magic bytes and runs
+      # them through appimage-run, so ./foo.AppImage just works
+      binfmt = true;
+    };
     niri.enable = true;
     steam = {
       enable = true;
@@ -361,6 +378,7 @@
       "libsoup-2.74.3"
       "openclaw-2026.3.12"
       "electron-39.8.10"
+      "pnpm-10.29.2"
     ];
   };
 

@@ -30,7 +30,7 @@ in {
               (old.postPatch or "")
               + ''
                 substituteInPlace src/shell/bar/widgets/sysmon_widget.cpp \
-                  --replace-fail '"{:.0f}°C"' '"{:.0f}"'
+                  --replace-fail '"{:.0F}°C"' '"{:.0F}"'
               '';
           });
         # v5 config.toml schema (TOML). Settings can still be tweaked at runtime
@@ -48,11 +48,11 @@ in {
             open_near_click_session = true;
           };
 
-          theme = {
-            mode = "dark";
-            source = "builtin";
-            builtin = "Catppuccin";
-          };
+          # theme = {
+          #   mode = "dark";
+          #   source = "builtin";
+          #   builtin = "Catppuccin";
+          # };
 
           wallpaper = {
             enabled = true;

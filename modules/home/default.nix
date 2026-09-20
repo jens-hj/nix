@@ -39,6 +39,7 @@
     # Desktop Environment
     ./desktop/waybar.nix
     ./desktop/noctalia.nix
+    ./desktop/tuicommander.nix
   ];
 
   options = {
