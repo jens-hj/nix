@@ -83,7 +83,7 @@
                   else
                       echo "Error: Configuration name is required (no argument given and NIXOS_DEFAULT_CONFIG is not set)"
                       echo "Usage: nr <config-name> [extra-flags]"
-                      echo "Available configurations: desktop (d), gmk (g), rp4j (r), macbook (m), systematic (s)"
+                      echo "Available configurations: desktop (d), gmk (g), rp4j (r), macbook (m), systematic (s), wsl (w)"
                       return 1
                   end
               else
@@ -104,6 +104,8 @@
                       set config "macbook"
                   case s
                       set config "systematic"
+                  case w
+                      set config "wsl"
                   case '*'
                       set config $input
               end

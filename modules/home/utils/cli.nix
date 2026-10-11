@@ -57,13 +57,13 @@
       ssh = {
         enable = true;
         enableDefaultConfig = false;
-        matchBlocks."*" = {
-          forwardAgent = true;
-          compression = true;
-          serverAliveInterval = 60;
-          controlMaster = "auto";
-          controlPersist = "10m";
-          controlPath = "~/.ssh/master-%r@%n:%p";
+        settings."*" = {
+          ForwardAgent = true;
+          Compression = true;
+          ServerAliveInterval = 60;
+          ControlMaster = "auto";
+          ControlPersist = "10m";
+          ControlPath = "~/.ssh/master-%r@%n:%p";
         };
       };
     };
