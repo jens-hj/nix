@@ -180,6 +180,15 @@
         inputs.stylix.nixosModules.stylix
       ];
     };
+    nixosConfigurations."wsl" = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      specialArgs = {inherit inputs;};
+      modules = [
+        ./hosts/wsl/configuration.nix
+        home-manager.nixosModules.default
+        inputs.nixos-wsl.nixosModules.wsl
+      ];
+    };
     nixosConfigurations."systematic" = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = {inherit inputs;};
