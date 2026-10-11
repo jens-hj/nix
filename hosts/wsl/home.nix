@@ -1,55 +1,20 @@
-{pkgs, ...}: {
+{...}: {
   imports = [
-    ../../modules/home/utils/cli.nix
-    ../../modules/home/utils/git.nix
-    ../../modules/home/utils/nix.nix
-    ../../modules/home/editor/helix.nix
+    ../../modules/home
   ];
 
   home.stateVersion = "26.05";
-  programs.home-manager.enable = true;
-
-  utils.cli = {
-    enable = true;
-    profile = "extended";
-  };
-  utils.git = {
-    enable = true;
-    profile = "personal";
-  };
-  utils.nix.enable = true;
-  editor.helix.enable = true;
+  home.sessionVariables.NIXOS_DEFAULT_CONFIG = "wsl";
+  base.enable = true;
+  utils.cli.profile = "extended";
+  utils.git.profile = "personal";
+  shell.fish.zellij.autoStart = false;
   programs.helix.settings.theme = "catppuccin_mocha";
-
-  home.packages = with pkgs; [eza tree sqlite pre-commit];
 
   programs.direnv.nix-direnv.enable = true;
 
   programs.fish = {
-    enable = true;
-    shellAbbrs = {
-      lg = "lazygit";
-      rf = "exec fish";
-    };
-    shellAliases = {
-      ls = "eza --group-directories-first --classify --grid";
-      ll = "eza --group-directories-first --classify --long --header --git";
-      space = "duf --hide-fs squashfs";
-      ns = "nix-search-tv print | fzf --preview 'nix-search-tv preview {}' --scheme history";
-    };
-    plugins = [
-      {
-        name = "pure";
-        src = pkgs.fishPlugins.pure.src;
-      }
-      {
-        name = "fzf-fish";
-        src = pkgs.fishPlugins.fzf-fish.src;
-      }
-    ];
     interactiveShellInit = ''
-      set -g fish_greeting
-
       # Catppuccin Mocha, using terminal colors without desktop theming.
       set -g fish_color_normal cdd6f4
       set -g fish_color_command 89b4fa
