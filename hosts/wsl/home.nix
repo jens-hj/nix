@@ -1,9 +1,10 @@
-{...}: {
+{pkgs, ...}: {
   imports = [
     ../../modules/home
   ];
 
   home.stateVersion = "26.05";
+  home.packages = [pkgs.bubblewrap];
   home.sessionVariables.NIXOS_DEFAULT_CONFIG = "wsl";
   base.enable = true;
   utils.cli.profile = "extended";
