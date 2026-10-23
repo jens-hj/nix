@@ -96,6 +96,22 @@
 
   desktop.enable = true;
   desktop.tuicommander.enable = true;
+  craft = {
+    vectorcraft.enable = true;
+    cadcraft.enable = true;
+    pdfcraft.enable = true;
+    figcraft.enable = true;
+    effectcraft.enable = true;
+    photocraft.enable = true;
+    lightcraft.enable = true;
+    filmcraft.enable = true;
+    soundcraft.enable = true;
+    designcraft.enable = true;
+    wordcraft.enable = true;
+    deckcraft.enable = true;
+    gridcraft.enable = true;
+    launcher.enable = true;
+  };
 
   programs = {
     vicinae = {

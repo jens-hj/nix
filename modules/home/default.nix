@@ -36,6 +36,9 @@
     # Games
     ./games/minecraft.nix
 
+    # Craft apps
+    ./craft
+
     # Desktop Environment
     ./desktop/waybar.nix
     ./desktop/noctalia.nix
