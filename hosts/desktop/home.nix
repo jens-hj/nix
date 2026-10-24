@@ -64,6 +64,7 @@
     radeontop
     cacert
     blender
+    inputs.solidcraft.packages.${pkgs.stdenv.hostPlatform.system}.solidcraft
     qutebrowser
     caprine
     libsecret
@@ -89,6 +90,7 @@
   typesetters.typst.enable = lib.mkForce true;
   utils.cli.profile = lib.mkForce "extended";
   editor.zed.enable = lib.mkForce true;
+  editor.vis.enable = true;
   editor.vscode.enable = lib.mkForce true;
 
   games.enable = true;
@@ -117,6 +119,8 @@
     vicinae = {
       enable = true;
       systemd.enable = true;
+      # Avoid the Qt Quick OpenGL initialization crash when opening the launcher.
+      systemd.environment.QT_QUICK_BACKEND = "software";
       settings = {
         font.size = 12;
       };

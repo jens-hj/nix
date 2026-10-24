@@ -53,6 +53,12 @@
     # Gaming
     nix-minecraft.url = "github:Infinidoge/nix-minecraft";
 
+    # CAD
+    solidcraft = {
+      url = "github:tangency-labs/solidcraft";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Browsers
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
@@ -124,7 +130,6 @@
       system = "x86_64-linux";
       specialArgs = {
         inherit inputs;
-        nur = inputs.nur.legacyPackages.x86_64-linux;
       };
       modules = [
         ./hosts/desktop/configuration.nix

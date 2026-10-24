@@ -4,7 +4,6 @@
 {
   inputs,
   pkgs,
-  nur,
   ...
 }: {
   imports = [
@@ -40,9 +39,17 @@
       # Nixpkgs invokes wrapGAppsHook manually from postBuild without the
       # output name that newer versions of the hook require.
       modrinth-app = prev.modrinth-app.overrideAttrs (old: {
-        postBuild = ''
+        # Minecraft 26.3 uses SDL3. Its libOpenGL loader fails under XWayland;
+        # provide the native Wayland libraries and the Vulkan fallback loader.
+        runtimeDependencies = old.runtimeDependencies + ":" + prev.lib.makeLibraryPath [
+          prev.wayland
+          prev.libxkbcommon
+          prev.vulkan-loader
+        ];
+        buildCommand = ''
           output=out
-          ${old.postBuild or ""}
+          gappsWrapperArgs+=(--set-default SDL_VIDEO_DRIVER wayland)
+          ${old.buildCommand}
         '';
       });
 
@@ -233,22 +240,8 @@
         "aarch64-linux"
         "armv7l-linux"
       ];
-      registrations = {
-        aarch64-linux = {
-          fixBinary = true;
-          wrapInterpreterInShell = false;
-          interpreter = "${nur.repos.xddxdd.qemu-user-static}/bin/qemu-aarch64-static";
-          magicOrExtension = ''\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xb7\x00'';
-          # mask = lib.mkForce ''\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'';
-        };
-        armv7l-linux = {
-          fixBinary = true;
-          wrapInterpreterInShell = false;
-          interpreter = "${nur.repos.xddxdd.qemu-user-static}/bin/qemu-arm-static";
-          magicOrExtension = ''\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00'';
-          # mask = lib.mkForce ''\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'';
-        };
-      };
+      # Use Nixpkgs static emulators so ARM binaries also work in containers.
+      preferStaticEmulators = true;
     };
   };
 
