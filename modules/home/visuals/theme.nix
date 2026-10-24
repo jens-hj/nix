@@ -25,6 +25,8 @@
             vesktop.enable = false;
             firefox.profileNames = ["default"];
             zen-browser.enable = false;
+            # Work around Stylix writing the deprecated programs.rofi.font option.
+            rofi.fonts.enable = false;
           };
 
           base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
@@ -37,6 +39,10 @@
             };
           };
         };
+
+        programs.rofi.settings.font = lib.mkIf config.stylix.targets.rofi.enable (
+          "${config.stylix.fonts.monospace.name} ${toString config.stylix.fonts.sizes.popups}"
+        );
 
         gtk.gtk4.theme = lib.mkDefault config.gtk.theme;
 
