@@ -1,9 +1,4 @@
-{
-  pkgs,
-  config,
-  lib,
-  ...
-}: {
+{ pkgs, config, lib, ... }: {
   options = {
     utils.git = {
       enable = lib.mkEnableOption "enables custom configured git";

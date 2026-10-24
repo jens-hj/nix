@@ -3,7 +3,12 @@
   config,
   lib,
   ...
-}: {
+}: let
+  plugins = builtins.fromJSON (builtins.readFile ./zellij-plugins.json);
+  fetchPlugin = name: pkgs.fetchurl {
+    inherit (plugins.${name}) url hash;
+  };
+in {
   options = {
     shell.zellij.enable = lib.mkEnableOption "enable custom configured zellij";
   };
@@ -40,18 +45,9 @@
             tab name="default" focus=true
         }
       '';
-      ".config/zellij/plugins/zjstatus.wasm".source = pkgs.fetchurl {
-        url = "https://github.com/dj95/zjstatus/releases/latest/download/zjstatus.wasm";
-        sha256 = "sha256-TeQm0gscv4YScuknrutbSdksF/Diu50XP4W/fwFU3VM=";
-      };
-      ".config/zellij/plugins/room.wasm".source = pkgs.fetchurl {
-        url = "https://github.com/rvcas/room/releases/latest/download/room.wasm";
-        sha256 = "sha256-kLSDpAt2JGj7dYYhYFh6BfvtzVwTrcs+0jHwG/nActE=";
-      };
-      ".config/zellij/plugins/zellij_forgot.wasm".source = pkgs.fetchurl {
-        url = "https://github.com/karimould/zellij-forgot/releases/latest/download/zellij_forgot.wasm";
-        sha256 = "sha256-MRlBRVGdvcEoaFtFb5cDdDePoZ/J2nQvvkoyG6zkSds=";
-      };
+      ".config/zellij/plugins/zjstatus.wasm".source = fetchPlugin "zjstatus.wasm";
+      ".config/zellij/plugins/room.wasm".source = fetchPlugin "room.wasm";
+      ".config/zellij/plugins/zellij_forgot.wasm".source = fetchPlugin "zellij_forgot.wasm";
       ".config/zellij/config.kdl".text = ''
             session_serialization false
             copy_on_select true

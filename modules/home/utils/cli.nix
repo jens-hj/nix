@@ -55,12 +55,12 @@
         enable = true;
         enableDefaultConfig = false;
         settings."*" = {
-          forwardAgent = true;
-          compression = true;
-          serverAliveInterval = 60;
-          controlMaster = "auto";
-          controlPersist = "10m";
-          controlPath = "~/.ssh/master-%r@%n:%p";
+          ForwardAgent = true;
+          Compression = true;
+          ServerAliveInterval = 60;
+          ControlMaster = "auto";
+          ControlPersist = "10m";
+          ControlPath = "~/.ssh/master-%r@%n:%p";
         };
       };
     };

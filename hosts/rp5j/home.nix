@@ -3,10 +3,12 @@
   home.homeDirectory = "/home/pi";
   home.stateVersion = "26.05";
 
-  # Enable the custom base configuration from ./../../modules/default.nix
   base.enable = true;
   shell.fish.zellij.autoStart = lib.mkForce false;
   utils.cli.profile = lib.mkForce "extended";
+
+  # Headless worker — no theming
+  visuals.theme.enable = lib.mkForce false;
 
   home.sessionVariables = {
     COLORTERM = "truecolor";

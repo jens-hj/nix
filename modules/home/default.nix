@@ -1,5 +1,6 @@
 {
   config,
+  options,
   lib,
   ...
 }: {
@@ -32,24 +33,14 @@
 
     # Visuals
     ./visuals/fonts.nix
-    ./visuals/theme.nix
 
     # Games
     ./games/minecraft.nix
-
-    # Craft apps
-    ./craft
-
-    # Desktop Environment
-    ./desktop/waybar.nix
-    ./desktop/noctalia.nix
-    ./desktop/tuicommander.nix
   ];
 
   options = {
     base.enable = lib.mkEnableOption "enables fish, zellij, helix, and git configurations";
     games.enable = lib.mkEnableOption "enables games; minecraft";
-    desktop.enable = lib.mkEnableOption "enables custom desktop environment";
   };
 
   config = lib.mkMerge [
@@ -58,14 +49,16 @@
         # Enable home-manager itself
         home-manager.enable = true;
       };
+    }
 
-      # catppuccin/nix is splitting `enable` (global toggle) from `autoEnable`
-      # (auto-enroll all ports). We theme via stylix, so keep ports off.
+    # catppuccin/nix is splitting `enable` (global toggle) from `autoEnable`
+    # (auto-enroll all ports). We theme via stylix, so keep ports off.
+    (lib.optionalAttrs (options ? catppuccin) {
       catppuccin = {
         enable = true;
         autoEnable = false;
       };
-    }
+    })
 
     (lib.mkIf config.base.enable {
       # Utils
@@ -98,17 +91,10 @@
 
       # Visuals
       visuals.fonts.enable = lib.mkDefault true;
-      visuals.theme.enable = lib.mkDefault true;
     })
 
     (lib.mkIf config.games.enable {
       games.minecraft.enable = lib.mkDefault true;
-    })
-
-    (lib.mkIf config.desktop.enable {
-      # desktop.waybar.enable = lib.mkDefault true;
-      desktop.noctalia.enable = lib.mkDefault true;
-      # TODO: add niri module here
     })
   ];
 }

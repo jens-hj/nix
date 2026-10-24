@@ -12,13 +12,7 @@
   };
 
   config = lib.mkIf config.shell.fish.enable {
-    home.packages = with pkgs; [
-      grc
-      eza
-      tree
-      sqlite
-      pre-commit
-    ];
+    home.packages = with pkgs; [ grc eza tree sqlite pre-commit ];
 
     programs = {
       fish = {
@@ -136,6 +130,9 @@
         '';
         shellInit = ''
           set --universal git_fish_git_status_command gstatus
+
+          string match -q "$TERM_PROGRAM" "vscode"
+          and . (code --locate-shell-integration-path fish)
           set -gx NIXOS_FLAKE ~/repos/nix
 
           # Use gh's existing auth for GitHub API
@@ -159,7 +156,7 @@
                   else
                       echo "Error: Configuration name is required (no argument given and NIXOS_DEFAULT_CONFIG is not set)"
                       echo "Usage: nr|nrb <config-name> [extra-flags]"
-                      echo "Available configurations: desktop (d), gmk (g), rp4j (r), macbook (m), systematic (s)"
+                      echo "Available configurations: desktop (d), gmk (g), rp4j (r), macbook (m), systematic (s), wsl (w)"
                       return 1
                   end
               else
@@ -180,6 +177,8 @@
                       set config "macbook"
                   case s
                       set config "systematic"
+                  case w
+                      set config "wsl"
                   case '*'
                       set config $input
               end
@@ -313,7 +312,8 @@
             '';
           };
           super-tab = {
-            description = "Enhanced tab completion that opens repos when empty line";
+            description =
+              "Enhanced tab completion that opens repos when empty line";
             body = ''
               commandline --paging-mode && down-or-search && return
 
@@ -328,7 +328,8 @@
             '';
           };
           zellij-auto = {
-            description = "Smart Zellij session management with terminal-specific sessions";
+            description =
+              "Smart Zellij session management with terminal-specific sessions";
             body = ''
               # Skip if already in a Zellij session
               if set -q ZELLIJ
@@ -462,61 +463,23 @@
           # kpbaks
           {
             name = "autols";
-            src = pkgs.fetchFromGitHub {
-              owner = "kpbaks";
-              repo = "autols.fish";
-              rev = "fe2693e80558550e0d995856332b280eb86fde19";
-              sha256 = "sha256-EPgvY8gozMzai0qeDH2dvB4tVvzVqfEtPewgXH6SPGs=";
-            };
+            src = pkgs.fishPlugins.autols-fish.src;
           }
           {
             name = "ctrl-z";
-            src = pkgs.fetchFromGitHub {
-              owner = "kpbaks";
-              repo = "ctrl-z.fish";
-              rev = "689d60cb9706d2a19cb65286c2dea488b3293807";
-              sha256 = "sha256-OaCMGsIP6wsbzgCNqQR1FOERL+k1ShAjOOg3T9Wln3k=";
-            };
-          }
-          {
-            name = "typst";
-            src = pkgs.fetchFromGitHub {
-              owner = "kpbaks";
-              repo = "typst.fish";
-              rev = "2d83f6a668a2be4eb00bf45b453c6e360ab5cb86";
-              sha256 = "sha256-pYbDIM/+jUTQB8L6jRBSAflNz5l3NwhwRc7SZXr26r0=";
-            };
+            src = pkgs.fishPlugins.ctrl-z-fish.src;
           }
           {
             name = "git";
-            src = inputs.git-fish;
+            src = pkgs.fishPlugins.git-fish.src;
           }
-          # {
-          #   name = "rust";
-          #   src = pkgs.fetchFromGitHub {
-          #     owner = "kpbaks";
-          #     repo = "rust.fish";
-          #     rev = "16261ed8c2c987c32d6a7d2135554862f2279843";
-          #     sha256 = "sha256-0vOTfAc2uiPQwEwp4hsVhxETZn+wrEmtojzamuLoCX4=";
-          #   };
-          # }
           {
             name = "border";
-            src = pkgs.fetchFromGitHub {
-              owner = "kpbaks";
-              repo = "border.fish";
-              rev = "a16e8e611420b24a2c06d71ffe80c0f8f03514ef";
-              sha256 = "sha256-X4Viw9JcLDDTFepaTE2jq09hQCJlo0Nlqa5ga/ygwdA=";
-            };
+            src = pkgs.fishPlugins.border-fish.src;
           }
           {
             name = "what-changed";
-            src = pkgs.fetchFromGitHub {
-              owner = "kpbaks";
-              repo = "what-changed.fish";
-              rev = "5c61537d5718a4b7a4c9ef903f7f458205b6fe9c";
-              sha256 = "sha256-zriK/H/EymSp5dhcn4nX1sZ9qce+v1Q6e8O/B7n21CM=";
-            };
+            src = pkgs.fishPlugins.what-changed-fish.src;
           }
           {
             name = "peopletime";

@@ -42,6 +42,6 @@
 
     nixpkgs.config.allowUnfree = true;
 
-    srv.k3s.agent.enable = lib.mkDefault true;
+    srv.k3s.agent.enable = true;
   };
 }
