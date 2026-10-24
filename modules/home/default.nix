@@ -19,6 +19,7 @@
 
     # Editor
     ./editor/helix.nix
+    ./editor/vis.nix
     ./editor/zed.nix
     ./editor/vscode.nix
 
@@ -84,6 +85,7 @@
 
       # Editor
       editor.helix.enable = lib.mkDefault true;
+      editor.vis.enable = lib.mkDefault false;
       editor.zed.enable = lib.mkDefault false;
       editor.vscode.enable = lib.mkDefault false;
 
