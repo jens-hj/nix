@@ -98,7 +98,7 @@ in {
             margin_ends = 5;
             padding = 4;
             shadow = false;
-            start = ["clock" "cpu" "temp" "ram" "gpu" "gpu_temp" "active_window" "media"];
+            start = ["clock" "cpu" "temp" "ram" "disk" "gpu" "gpu_temp" "active_window" "media"];
             center = ["workspaces"];
             end = ["ai_usage" "tray" "battery" "volume" "brightness" "bluetooth" "control-center"];
           };
@@ -108,6 +108,11 @@ in {
           # GiB") — switch to ram_pct so the vertical bar shows a bare integer
           # (% is auto-stripped on vertical bars; see displaySysmonLabel).
           widget.ram.stat = "ram_pct";
+          widget.disk = {
+            type = "sysmon";
+            stat = "disk_used_pct";
+            path = "/";
+          };
           widget.gpu = {
             type = "sysmon";
             stat = "gpu_usage";
