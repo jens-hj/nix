@@ -327,6 +327,36 @@
               commandline -f repaint
             '';
           };
+          throttle-watch = {
+            description = "Live CPU temp/clock monitor, highlights thermal throttle events";
+            body = ''
+              set -l tt /sys/devices/system/cpu/cpu*/thermal_throttle
+              set -l pkg (path dirname /sys/class/hwmon/hwmon*/name 2>/dev/null | while read -l h
+                  test (cat $h/name) = coretemp; and echo $h
+              end)[1]
+              if test (count $tt) -eq 0; or test -z "$pkg"
+                  echo "throttle-watch: needs an Intel CPU (coretemp + thermal_throttle counters)" >&2
+                  return 1
+              end
+              set -l prev (math (string join + (cat $tt/core_throttle_count $tt/package_throttle_count)))
+              while true
+                  set -l now (math (string join + (cat $tt/core_throttle_count $tt/package_throttle_count)))
+                  set -l temp (math (cat $pkg/temp1_input) / 1000)
+                  set -l mhz (math -s0 "("(string join + (cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq))")" / (count /sys/devices/system/cpu/cpu*/cpufreq) / 1000)
+                  set -l line (printf "%s  pkg %3s°C  avg %4s MHz  throttle events %s" (date +%T) $temp $mhz $now)
+                  if test $now -gt $prev
+                      set_color --bold red; echo "$line  <-- THROTTLED (+"(math $now - $prev)")"; set_color normal
+                  else if test $temp -ge 75
+                      set_color yellow; echo $line; set_color normal
+                  else
+                      echo $line
+                  end
+                  set prev $now
+                  sleep 1
+              end
+            '';
+          };
+
           zellij-auto = {
             description =
               "Smart Zellij session management with terminal-specific sessions";
