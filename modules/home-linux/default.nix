@@ -8,6 +8,7 @@
     ./desktop/waybar.nix
     ./desktop/noctalia.nix
     ./desktop/tuicommander.nix
+    ./games/horizon.nix
 
     # Craft apps
     ./craft

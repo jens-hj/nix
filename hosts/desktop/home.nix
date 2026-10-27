@@ -94,6 +94,7 @@
   editor.vscode.enable = lib.mkForce true;
 
   games.enable = true;
+  games.horizon.enable = true;
   # games.minecraft.enable = lib.mkForce false;
 
   desktop.enable = true;
