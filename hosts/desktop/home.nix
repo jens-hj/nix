@@ -38,7 +38,8 @@
     onedriver
     code-cursor
     bubblewrap
-    # openscad
+    openscad
+    bambu-studio
     # appimage-run
     # inputs.awww.packages.${pkgs.system}.awww
     bluetuith
@@ -236,28 +237,31 @@
   # files lazily on first access (no full mirror). Auth token + content cache
   # live under ~/.cache/onedriver. First run needs an interactive login once:
   #   onedriver -a ~/OneDrive   (opens an OAuth window, stores the token)
-  # then `systemctl --user start onedriver` (autostarts on login thereafter).
-  systemd.user.services.onedriver = {
+  # then `systemctl --user start onedriver@home-j-OneDrive`.
+  # Use the launcher's instance name so its toggle controls the same service.
+  systemd.user.services."onedriver@home-j-OneDrive" = {
     Unit = {
       Description = "onedriver OneDrive lazy mount";
-      After = ["network-online.target"];
+      After = ["network-online.target" "graphical-session.target"];
       Wants = ["network-online.target"];
+      PartOf = ["graphical-session.target"];
       StartLimitIntervalSec = 60;
       StartLimitBurst = 3;
     };
     Service = {
       # This onedriver build has no sd_notify support, so Type=notify would hang
       # until the start-job timeout. It runs in the foreground, so Type=simple is
-      # correct. onedriver unmounts itself on SIGTERM; the ExecStopPost is just a
-      # best-effort backstop (leading "-" so a failed/no-op unmount is ignored).
+      # correct. Use NixOS's privileged FUSE wrapper for cleanup; the unwrapped
+      # store binary cannot unmount and leaves a disconnected mount on failure.
       Type = "simple";
       ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p %h/OneDrive";
       ExecStart = "${pkgs.onedriver}/bin/onedriver %h/OneDrive";
-      ExecStopPost = "-${pkgs.fuse3}/bin/fusermount3 -uz %h/OneDrive";
+      ExecStopPost = "-/run/wrappers/bin/fusermount3 -uz %h/OneDrive";
       Restart = "on-abnormal";
       RestartSec = 3;
     };
-    Install.WantedBy = ["default.target"];
+    # Wait for the desktop to import DISPLAY/WAYLAND_DISPLAY so reauth can open.
+    Install.WantedBy = ["graphical-session.target"];
   };
 
   services = {

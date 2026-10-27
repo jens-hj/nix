@@ -448,8 +448,24 @@
 
   # Vicinae
   nix.settings = {
+    # Keep local builds usable alongside desktop applications. These settings
+    # control separate derivations and compiler workers within each derivation.
+    max-jobs = 1;
+    cores = 4;
     extra-substituters = ["https://vicinae.cachix.org"];
     extra-trusted-public-keys = ["vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="];
+  };
+
+  # Builds run under the daemon, so changing only nr's process priority would
+  # not constrain compilers. Enforce a shared budget for the daemon and builds.
+  systemd.services.nix-daemon.serviceConfig = {
+    CPUQuota = "800%"; # At most half of this desktop's 16 logical CPUs.
+    CPUWeight = 20;
+    IOWeight = 20;
+    Nice = 10;
+    MemoryHigh = "16G";
+    MemoryMax = "20G";
+    MemorySwapMax = "2G";
   };
 
   system.stateVersion = "25.05";

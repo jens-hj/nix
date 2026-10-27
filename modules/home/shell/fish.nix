@@ -188,10 +188,11 @@
                       echo "Note: darwin-rebuild has no 'boot' action; falling back to 'switch'"
                   end
                   echo "Rebuilding Darwin configuration: $config"
-                  sudo darwin-rebuild switch --flake $NIXOS_FLAKE#$config $extra_flags
+                  # Limit both simultaneous derivations and workers per build.
+                  sudo darwin-rebuild switch --flake $NIXOS_FLAKE#$config --max-jobs 1 --cores 4 $extra_flags
               else
                   echo "Rebuilding NixOS configuration ($action): $config"
-                  sudo nixos-rebuild $action --flake $NIXOS_FLAKE#$config $extra_flags
+                  sudo nixos-rebuild $action --flake $NIXOS_FLAKE#$config --max-jobs 1 --cores 4 $extra_flags
               end
             '';
           };
